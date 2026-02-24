@@ -1,0 +1,61 @@
+# ── Environment & Secrets ─────────────────────────────────────────────────────
+.env
+*.env
+.env.local
+.env.production
+
+# ── Python Virtual Environment ────────────────────────────────────────────────
+venv/
+env/
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# ── Database (SQLite — local only, not for production) ────────────────────────
+data/*.db
+data/*.sqlite
+
+# ── Agent PID files (runtime only) ───────────────────────────────────────────
+.pids/*.pid
+
+# ── ML Model files (large binaries) ──────────────────────────────────────────
+models/*.pkl
+models/*.joblib
+models/*.json
+# Exception: keep the model training script
+!models/__init__.py
+
+# ── Jupyter ───────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── GCP credentials (never commit these) ─────────────────────────────────────
+*-credentials.json
+service-account*.json
+gcloud-credentials.json
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/

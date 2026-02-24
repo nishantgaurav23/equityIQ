@@ -1,0 +1,72 @@
+# EquityIQ — Multi-Agent Stock Intelligence System
+# Same core stack as the reference project + additions for enhancements
+
+# ── Google ADK & AI (core of everything) ──────────────────────────────────────
+google-adk[a2a]>=0.1.0          # Google Agent Development Kit with A2A protocol support
+google-generativeai>=0.8.0      # Gemini API client
+
+# ── Data Models & Validation ──────────────────────────────────────────────────
+pydantic>=2.0.0                 # Structured schemas for all agent outputs
+pydantic-settings>=2.0.0        # Load settings from .env file
+
+# ── A2A Server Components ─────────────────────────────────────────────────────
+fastapi>=0.109.0                # Web framework — each agent is a FastAPI server
+uvicorn>=0.27.0                 # ASGI server to run FastAPI apps
+starlette>=0.36.0               # FastAPI dependency
+
+# ── Async & HTTP ──────────────────────────────────────────────────────────────
+aiohttp>=3.9.0                  # Async HTTP — used in orchestrator for parallel calls
+httpx>=0.27.0                   # Modern HTTP client with async support
+requests>=2.31.0                # Sync HTTP — used in tool/data fetchers
+
+# ── Financial Data APIs ───────────────────────────────────────────────────────
+# Polygon.io: use requests directly (no dedicated package needed for our usage)
+# FRED API: use requests directly (same as reference project)
+yfinance>=0.2.40                # Yahoo Finance fallback (free, no API key needed)
+
+# ── Technical Analysis ────────────────────────────────────────────────────────
+# We compute RSI/MACD manually in tools/ (educational + no C dependency)
+# Uncomment below if you want the full TA-Lib library instead:
+# TA-Lib>=0.4.28                # Requires: brew install ta-lib (macOS)
+
+# ── Machine Learning (Signal Fusion) ─────────────────────────────────────────
+scikit-learn>=1.3.0             # Used for signal calibration + train/test split
+xgboost>=2.0.0                  # XGBoost for signal synthesis (replaces weighted avg)
+joblib>=1.3.0                   # Save/load trained XGBoost model
+
+# ── Data Processing ───────────────────────────────────────────────────────────
+pandas>=2.0.0                   # DataFrames for price series + signal history
+numpy>=1.24.0                   # Numerical computations (RSI, volatility, etc.)
+
+# ── Memory / Storage ──────────────────────────────────────────────────────────
+aiosqlite>=0.19.0               # Async SQLite — local persistent memory
+# Uncomment for GCP production:
+# google-cloud-firestore>=2.14.0
+
+# ── Caching ───────────────────────────────────────────────────────────────────
+cachetools>=5.3.0               # TTL cache for API calls (avoids rate limit errors)
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0            # Load .env file for local development
+colorlog>=6.8.0                 # Colored console logging (easier to read agent logs)
+python-dateutil>=2.8.0          # Flexible date parsing
+
+# ── Web Scraping (SEC + News fallback) ────────────────────────────────────────
+beautifulsoup4>=4.12.0          # HTML parsing for SEC Edgar
+lxml>=4.9.0                     # Fast XML/HTML parser (beautifulsoup backend)
+
+# ── GCP (uncomment when deploying) ───────────────────────────────────────────
+# google-cloud-secret-manager>=2.18.0
+# google-cloud-logging>=3.8.0
+
+# ── Development & Testing ─────────────────────────────────────────────────────
+pytest>=7.4.0                   # Test runner
+pytest-asyncio>=0.23.0          # Async test support (needed for async agent calls)
+black>=23.0.0                   # Code formatter
+flake8>=6.1.0                   # Linter
+
+# ── Jupyter (demo notebook) ───────────────────────────────────────────────────
+jupyter>=1.0.0
+ipykernel>=6.25.0
+matplotlib>=3.7.0
+seaborn>=0.13.0
