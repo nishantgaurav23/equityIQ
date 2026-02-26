@@ -1,0 +1,111 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "FastAPI — app.py (port 8000)",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app:app", "--reload", "--port", "8000"],
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    },
+    {
+      "name": "Agent — ValuationScout (port 8001)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/agents/valuation_scout.py",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    },
+    {
+      "name": "Agent — MomentumTracker (port 8002)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/agents/momentum_tracker.py",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    },
+    {
+      "name": "Agent — PulseMonitor (port 8003)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/agents/pulse_monitor.py",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    },
+    {
+      "name": "Agent — EconomyWatcher (port 8004)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/agents/economy_watcher.py",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    },
+    {
+      "name": "Agent — ComplianceChecker (port 8005)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/agents/compliance_checker.py",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    },
+    {
+      "name": "Agent — SignalSynthesizer (port 8006)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/agents/signal_synthesizer.py",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    },
+    {
+      "name": "Agent — RiskGuardian (port 8007)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/agents/risk_guardian.py",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    },
+    {
+      "name": "Debug — Single Tool File",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    },
+    {
+      "name": "Run Evaluation Suite",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["evaluation/", "-v"],
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": false
+    }
+  ],
+  "compounds": [
+    {
+      "name": "All 7 Agents",
+      "configurations": [
+        "Agent — ValuationScout (port 8001)",
+        "Agent — MomentumTracker (port 8002)",
+        "Agent — PulseMonitor (port 8003)",
+        "Agent — EconomyWatcher (port 8004)",
+        "Agent — ComplianceChecker (port 8005)",
+        "Agent — SignalSynthesizer (port 8006)",
+        "Agent — RiskGuardian (port 8007)"
+      ]
+    }
+  ]
+}
