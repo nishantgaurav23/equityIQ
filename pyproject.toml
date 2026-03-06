@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "equityiq"
+version = "0.1.0"
+description = "Multi-agent stock intelligence system"
+requires-python = ">=3.12"
+dependencies = [
+    "google-adk",
+    "google-generativeai",
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "pydantic-settings",
+    "httpx",
+    "aiohttp",
+    "cachetools",
+    "aiosqlite",
+    "xgboost",
+    "scikit-learn",
+    "pandas",
+    "numpy",
+    "python-dotenv",
+    "beautifulsoup4",
+    "lxml",
+    "colorlog",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "ruff",
+    "pytest-mock",
+    "httpx",
+]
+
+[tool.setuptools.packages.find]
+include = ["config*", "tools*", "models*", "memory*", "agents*", "evaluation*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

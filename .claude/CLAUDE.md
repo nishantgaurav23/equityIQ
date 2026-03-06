@@ -91,6 +91,7 @@ Full spec index is in `roadmap.md`.
 
 | Command | Invocation | Purpose |
 |---------|------------|---------|
+| **Start spec dev** | `/start-spec-dev S1.1 dependency-declaration` | Full lifecycle: create, check deps, implement, verify (auto or step-by-step) |
 | **Create spec** | `/create-spec S1.1 dependency-declaration` | Creates spec.md + checklist.md in spec folder from roadmap |
 | **Check deps** | `/check-spec-deps S4.1` | Verifies all prerequisite specs are implemented and tests pass |
 | **Implement spec** | `/implement-spec S1.1` | TDD implementation following spec + checklist |

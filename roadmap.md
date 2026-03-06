@@ -90,11 +90,11 @@ Output: `make local-dev` starts a healthy FastAPI server with `/health` endpoint
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
-| S1.1 | `specs/spec-S1.1-dependency-declaration/` | -- | `pyproject.toml`, `.env.example` | Dependency declaration | Runtime: google-adk, google-generativeai, fastapi, uvicorn, pydantic, pydantic-settings, httpx, aiohttp, cachetools, aiosqlite, xgboost, scikit-learn, pandas, numpy, python-dotenv, beautifulsoup4, lxml, colorlog. Dev: pytest, pytest-asyncio, ruff, pytest-mock, httpx | pending |
-| S1.2 | `specs/spec-S1.2-developer-commands/` | -- | `Makefile` | Developer commands | Targets: venv, install, install-dev, local-dev, local-test, local-lint, dev (Docker), test (Docker) | pending |
-| S1.3 | `specs/spec-S1.3-pydantic-settings/` | S1.1 | `config/settings.py` | Settings via pydantic-settings | Fields: GOOGLE_API_KEY, POLYGON_API_KEY, FRED_API_KEY, NEWS_API_KEY, ENVIRONMENT, SQLITE_DB_PATH, GCP_PROJECT_ID, GCP_REGION, LOG_LEVEL. All from .env | pending |
-| S1.4 | `specs/spec-S1.4-fastapi-skeleton/` | S1.3 | `app.py` | FastAPI app factory | Lifespan: connect DB on startup, disconnect on shutdown. GET /health returning `{"status": "ok", "agents": {...}}`. Include routers | pending |
-| S1.5 | `specs/spec-S1.5-logging-setup/` | S1.3 | `config/logging.py` | Structured logging | Colorlog for local, structured JSON for production. LOG_LEVEL from settings. request_id context for tracing | pending |
+| S1.1 | `specs/spec-S1.1-dependency-declaration/` | -- | `pyproject.toml`, `.env.example` | Dependency declaration | Runtime: google-adk, google-generativeai, fastapi, uvicorn, pydantic, pydantic-settings, httpx, aiohttp, cachetools, aiosqlite, xgboost, scikit-learn, pandas, numpy, python-dotenv, beautifulsoup4, lxml, colorlog. Dev: pytest, pytest-asyncio, ruff, pytest-mock, httpx | done |
+| S1.2 | `specs/spec-S1.2-developer-commands/` | -- | `Makefile` | Developer commands | Targets: venv, install, install-dev, local-dev, local-test, local-lint, dev (Docker), test (Docker) | done |
+| S1.3 | `specs/spec-S1.3-pydantic-settings/` | S1.1 | `config/settings.py` | Settings via pydantic-settings | Fields: GOOGLE_API_KEY, POLYGON_API_KEY, FRED_API_KEY, NEWS_API_KEY, ENVIRONMENT, SQLITE_DB_PATH, GCP_PROJECT_ID, GCP_REGION, LOG_LEVEL. All from .env | done |
+| S1.4 | `specs/spec-S1.4-fastapi-skeleton/` | S1.3 | `app.py` | FastAPI app factory | Lifespan: connect DB on startup, disconnect on shutdown. GET /health returning `{"status": "ok", "agents": {...}}`. Include routers | done |
+| S1.5 | `specs/spec-S1.5-logging-setup/` | S1.3 | `config/logging.py` | Structured logging | Colorlog for local, structured JSON for production. LOG_LEVEL from settings. request_id context for tracing | done |
 
 ---
 
@@ -270,11 +270,11 @@ Evaluation framework, backtesting, and end-to-end validation.
 
 | Spec | Phase | Location | Feature | Spec Location | Status |
 |------|-------|----------|---------|--------------|--------|
-| S1.1 | Project Foundation | `pyproject.toml`, `.env.example` | Dependency declaration | `specs/spec-S1.1-dependency-declaration/` | pending |
-| S1.2 | Project Foundation | `Makefile` | Developer commands | `specs/spec-S1.2-developer-commands/` | pending |
-| S1.3 | Project Foundation | `config/settings.py` | pydantic-settings config | `specs/spec-S1.3-pydantic-settings/` | pending |
-| S1.4 | Project Foundation | `app.py` | FastAPI app factory | `specs/spec-S1.4-fastapi-skeleton/` | pending |
-| S1.5 | Project Foundation | `config/logging.py` | Structured logging | `specs/spec-S1.5-logging-setup/` | pending |
+| S1.1 | Project Foundation | `pyproject.toml`, `.env.example` | Dependency declaration | `specs/spec-S1.1-dependency-declaration/` | done |
+| S1.2 | Project Foundation | `Makefile` | Developer commands | `specs/spec-S1.2-developer-commands/` | done |
+| S1.3 | Project Foundation | `config/settings.py` | pydantic-settings config | `specs/spec-S1.3-pydantic-settings/` | done |
+| S1.4 | Project Foundation | `app.py` | FastAPI app factory | `specs/spec-S1.4-fastapi-skeleton/` | done |
+| S1.5 | Project Foundation | `config/logging.py` | Structured logging | `specs/spec-S1.5-logging-setup/` | done |
 | S2.1 | Data Contracts | `config/data_contracts.py` | AnalystReport + 6 subclass schemas | `specs/spec-S2.1-analyst-report-schemas/` | done |
 | S2.2 | Data Contracts | `config/data_contracts.py` | FinalVerdict + PortfolioInsight | `specs/spec-S2.2-verdict-schemas/` | done |
 | S2.3 | Data Contracts | `config/analyst_personas.py` | Agent system prompts | `specs/spec-S2.3-agent-personas/` | done |
