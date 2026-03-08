@@ -112,7 +112,7 @@ All Pydantic schemas for agent I/O and system prompts for each agent's LLM perso
 
 ## Phase 3 -- Data Connectors
 
-Async API wrappers for all external data sources. TTL caching on every call. Already implemented -- bring under spec governance.
+Async API wrappers for all external data sources. TTL caching on every call. Prior implementations were removed in clean-slate commit -- must be rebuilt under spec governance with TDD.
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
@@ -130,9 +130,9 @@ XGBoost signal fusion model and portfolio risk mathematics.
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
-| S4.1 | `specs/spec-S4.1-signal-fusion/` | S2.1, S2.2 | `models/signal_fusion.py` | XGBoost signal synthesis | SignalFusionModel class: fit(), predict(), extract_features(). Features from 5 AnalystReports. Returns FinalVerdict. Fallback to weighted-average if model not trained. Compliance hard override applied post-prediction | pending |
-| S4.2 | `specs/spec-S4.2-risk-calculator/` | S2.1 | `models/risk_calculator.py` | Portfolio risk math | calc_beta(), calc_sharpe(), calc_var_95(), calc_max_drawdown(), calc_position_size(). Pure math using numpy/pandas. Position size capped at 0.10 | pending |
-| S4.3 | `specs/spec-S4.3-model-persistence/` | S4.1 | `models/model_store.py` | Save/load XGBoost model | save_model(), load_model() using joblib. Model stored in data/models/. Version tracking with timestamp | pending |
+| S4.1 | `specs/spec-S4.1-signal-fusion/` | S2.1, S2.2 | `models/signal_fusion.py` | XGBoost signal synthesis | SignalFusionModel class: fit(), predict(), extract_features(). Features from 5 AnalystReports. Returns FinalVerdict. Fallback to weighted-average if model not trained. Compliance hard override applied post-prediction | done |
+| S4.2 | `specs/spec-S4.2-risk-calculator/` | S2.1 | `models/risk_calculator.py` | Portfolio risk math | calc_beta(), calc_sharpe(), calc_var_95(), calc_max_drawdown(), calc_position_size(). Pure math using numpy/pandas. Position size capped at 0.10 | done |
+| S4.3 | `specs/spec-S4.3-model-persistence/` | S4.1 | `models/model_store.py` | Save/load XGBoost model | save_model(), load_model() using joblib. Model stored in data/models/. Version tracking with timestamp | done |
 
 ---
 
@@ -142,9 +142,9 @@ Persistent storage for analysis sessions and historical verdicts.
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
-| S5.1 | `specs/spec-S5.1-insight-vault/` | S1.3, S2.2 | `memory/insight_vault.py` | SQLite session storage | InsightVault class: store_verdict(), get_verdict(), list_verdicts(). aiosqlite for async. Auto-create tables on init. Schema: session_id, ticker, verdict_json, created_at | pending |
-| S5.2 | `specs/spec-S5.2-history-retriever/` | S5.1 | `memory/history_retriever.py` | Query past analyses | get_ticker_history(), get_signal_trend(), get_recent_verdicts(). Returns structured data for API endpoints | pending |
-| S5.3 | `specs/spec-S5.3-firestore-backend/` | S5.1 | `memory/firestore_vault.py` | Firestore backend (prod) | Same interface as InsightVault but backed by Firestore. Selected via ENVIRONMENT env var. Optional -- only needed for GCP deployment | pending |
+| S5.1 | `specs/spec-S5.1-insight-vault/` | S1.3, S2.2 | `memory/insight_vault.py` | SQLite session storage | InsightVault class: store_verdict(), get_verdict(), list_verdicts(). aiosqlite for async. Auto-create tables on init. Schema: session_id, ticker, verdict_json, created_at | done |
+| S5.2 | `specs/spec-S5.2-history-retriever/` | S5.1 | `memory/history_retriever.py` | Query past analyses | get_ticker_history(), get_signal_trend(), get_recent_verdicts(). Returns structured data for API endpoints | done |
+| S5.3 | `specs/spec-S5.3-firestore-backend/` | S5.1 | `memory/firestore_vault.py` | Firestore backend (prod) | Same interface as InsightVault but backed by Firestore. Selected via ENVIRONMENT env var. Optional -- only needed for GCP deployment | done |
 
 ---
 
@@ -154,8 +154,8 @@ Base pattern for ADK agents and A2A server setup. This defines the template all 
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
-| S6.1 | `specs/spec-S6.1-agent-base/` | S1.3, S2.1, S2.3 | `agents/base_agent.py` | ADK agent base class | BaseAnalystAgent: init with persona, tools, output schema. Standard analyze() method. Gemini client setup. Error handling wrapper. Agent card generation for A2A discovery | pending |
-| S6.2 | `specs/spec-S6.2-a2a-server/` | S6.1, S1.4 | `agents/a2a_server.py` | A2A protocol server factory | create_agent_server(): FastAPI app with /.well-known/agent-card.json endpoint, JSONRPC handler, health check. Reusable for all agents | pending |
+| S6.1 | `specs/spec-S6.1-agent-base/` | S1.3, S2.1, S2.3 | `agents/base_agent.py` | ADK agent base class | BaseAnalystAgent: init with persona, tools, output schema. Standard analyze() method. Gemini client setup. Error handling wrapper. Agent card generation for A2A discovery | done |
+| S6.2 | `specs/spec-S6.2-a2a-server/` | S6.1, S1.4 | `agents/a2a_server.py` | A2A protocol server factory | create_agent_server(): FastAPI app with /.well-known/agent-card.json endpoint, JSONRPC handler, health check. Reusable for all agents | done |
 
 ---
 
@@ -165,12 +165,12 @@ Six domain-expert agents, each using the base pattern from Phase 6.
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
-| S7.1 | `specs/spec-S7.1-valuation-scout/` | S6.1, S3.1 | `agents/valuation_scout.py` | Fundamentals agent | Uses polygon_connector.get_fundamentals(). Returns ValuationReport. Calculates intrinsic_value_gap. Port 8001 | pending |
-| S7.2 | `specs/spec-S7.2-momentum-tracker/` | S6.1, S3.1, S3.5 | `agents/momentum_tracker.py` | Technical analysis agent | Uses polygon_connector + technical_engine. Returns MomentumReport. RSI, MACD, SMA crossovers. Port 8002 | pending |
-| S7.3 | `specs/spec-S7.3-pulse-monitor/` | S6.1, S3.3, S3.1 | `agents/pulse_monitor.py` | News sentiment agent | Uses news_connector + polygon news. Returns PulseReport. Caps confidence at 0.70 if <3 articles. Port 8003 | pending |
-| S7.4 | `specs/spec-S7.4-economy-watcher/` | S6.1, S3.2 | `agents/economy_watcher.py` | Macro indicators agent | Uses fred_connector. Returns EconomyReport. Classifies macro_regime. Port 8004 | pending |
-| S7.5 | `specs/spec-S7.5-compliance-checker/` | S6.1, S3.4 | `agents/compliance_checker.py` | Regulatory risk agent | Uses sec_connector. Returns ComplianceReport. going_concern/restatement flags. Port 8005 | pending |
-| S7.6 | `specs/spec-S7.6-risk-guardian/` | S6.1, S3.1, S4.2 | `agents/risk_guardian.py` | Portfolio risk agent | Uses polygon_connector + risk_calculator. Returns RiskGuardianReport. Position size capped at 0.10. Port 8007 | pending |
+| S7.1 | `specs/spec-S7.1-valuation-scout/` | S6.1, S3.1 | `agents/valuation_scout.py` | Fundamentals agent | Uses polygon_connector.get_fundamentals(). Returns ValuationReport. Calculates intrinsic_value_gap. Port 8001 | done |
+| S7.2 | `specs/spec-S7.2-momentum-tracker/` | S6.1, S3.1, S3.5 | `agents/momentum_tracker.py` | Technical analysis agent | Uses polygon_connector + technical_engine. Returns MomentumReport. RSI, MACD, SMA crossovers. Port 8002 | done |
+| S7.3 | `specs/spec-S7.3-pulse-monitor/` | S6.1, S3.3, S3.1 | `agents/pulse_monitor.py` | News sentiment agent | Uses news_connector + polygon news. Returns PulseReport. Caps confidence at 0.70 if <3 articles. Port 8003 | done |
+| S7.4 | `specs/spec-S7.4-economy-watcher/` | S6.1, S3.2 | `agents/economy_watcher.py` | Macro indicators agent | Uses fred_connector. Returns EconomyReport. Classifies macro_regime. Port 8004 | done |
+| S7.5 | `specs/spec-S7.5-compliance-checker/` | S6.1, S3.4 | `agents/compliance_checker.py` | Regulatory risk agent | Uses sec_connector. Returns ComplianceReport. going_concern/restatement flags. Port 8005 | done |
+| S7.6 | `specs/spec-S7.6-risk-guardian/` | S6.1, S3.1, S4.2 | `agents/risk_guardian.py` | Portfolio risk agent | Uses polygon_connector + risk_calculator. Returns RiskGuardianReport. Position size capped at 0.10. Port 8007 | done |
 
 ---
 
@@ -283,20 +283,20 @@ Evaluation framework, backtesting, and end-to-end validation.
 | S3.3 | Data Connectors | `tools/news_connector.py` | NewsAPI + sentiment | `specs/spec-S3.3-news-connector/` | done |
 | S3.4 | Data Connectors | `tools/sec_connector.py` | SEC Edgar + risk scoring | `specs/spec-S3.4-sec-connector/` | done |
 | S3.5 | Data Connectors | `tools/technical_engine.py` | Technical indicators | `specs/spec-S3.5-technical-engine/` | done |
-| S4.1 | ML Models | `models/signal_fusion.py` | XGBoost signal synthesis | `specs/spec-S4.1-signal-fusion/` | pending |
-| S4.2 | ML Models | `models/risk_calculator.py` | Portfolio risk math | `specs/spec-S4.2-risk-calculator/` | pending |
-| S4.3 | ML Models | `models/model_store.py` | Model persistence | `specs/spec-S4.3-model-persistence/` | pending |
-| S5.1 | Memory Layer | `memory/insight_vault.py` | SQLite session storage | `specs/spec-S5.1-insight-vault/` | pending |
-| S5.2 | Memory Layer | `memory/history_retriever.py` | Query past analyses | `specs/spec-S5.2-history-retriever/` | pending |
-| S5.3 | Memory Layer | `memory/firestore_vault.py` | Firestore backend (prod) | `specs/spec-S5.3-firestore-backend/` | pending |
-| S6.1 | Agent Framework | `agents/base_agent.py` | ADK agent base class | `specs/spec-S6.1-agent-base/` | pending |
-| S6.2 | Agent Framework | `agents/a2a_server.py` | A2A protocol server factory | `specs/spec-S6.2-a2a-server/` | pending |
-| S7.1 | Specialist Agents | `agents/valuation_scout.py` | Fundamentals agent | `specs/spec-S7.1-valuation-scout/` | pending |
-| S7.2 | Specialist Agents | `agents/momentum_tracker.py` | Technical analysis agent | `specs/spec-S7.2-momentum-tracker/` | pending |
-| S7.3 | Specialist Agents | `agents/pulse_monitor.py` | News sentiment agent | `specs/spec-S7.3-pulse-monitor/` | pending |
-| S7.4 | Specialist Agents | `agents/economy_watcher.py` | Macro indicators agent | `specs/spec-S7.4-economy-watcher/` | pending |
-| S7.5 | Specialist Agents | `agents/compliance_checker.py` | Regulatory risk agent | `specs/spec-S7.5-compliance-checker/` | pending |
-| S7.6 | Specialist Agents | `agents/risk_guardian.py` | Portfolio risk agent | `specs/spec-S7.6-risk-guardian/` | pending |
+| S4.1 | ML Models | `models/signal_fusion.py` | XGBoost signal synthesis | `specs/spec-S4.1-signal-fusion/` | done |
+| S4.2 | ML Models | `models/risk_calculator.py` | Portfolio risk math | `specs/spec-S4.2-risk-calculator/` | done |
+| S4.3 | ML Models | `models/model_store.py` | Model persistence | `specs/spec-S4.3-model-persistence/` | done |
+| S5.1 | Memory Layer | `memory/insight_vault.py` | SQLite session storage | `specs/spec-S5.1-insight-vault/` | done |
+| S5.2 | Memory Layer | `memory/history_retriever.py` | Query past analyses | `specs/spec-S5.2-history-retriever/` | done |
+| S5.3 | Memory Layer | `memory/firestore_vault.py` | Firestore backend (prod) | `specs/spec-S5.3-firestore-backend/` | done |
+| S6.1 | Agent Framework | `agents/base_agent.py` | ADK agent base class | `specs/spec-S6.1-agent-base/` | done |
+| S6.2 | Agent Framework | `agents/a2a_server.py` | A2A protocol server factory | `specs/spec-S6.2-a2a-server/` | done |
+| S7.1 | Specialist Agents | `agents/valuation_scout.py` | Fundamentals agent | `specs/spec-S7.1-valuation-scout/` | done |
+| S7.2 | Specialist Agents | `agents/momentum_tracker.py` | Technical analysis agent | `specs/spec-S7.2-momentum-tracker/` | done |
+| S7.3 | Specialist Agents | `agents/pulse_monitor.py` | News sentiment agent | `specs/spec-S7.3-pulse-monitor/` | done |
+| S7.4 | Specialist Agents | `agents/economy_watcher.py` | Macro indicators agent | `specs/spec-S7.4-economy-watcher/` | done |
+| S7.5 | Specialist Agents | `agents/compliance_checker.py` | Regulatory risk agent | `specs/spec-S7.5-compliance-checker/` | done |
+| S7.6 | Specialist Agents | `agents/risk_guardian.py` | Portfolio risk agent | `specs/spec-S7.6-risk-guardian/` | done |
 | S8.1 | Orchestration | `agents/signal_synthesizer.py` | Signal fusion agent | `specs/spec-S8.1-signal-synthesizer/` | pending |
 | S8.2 | Orchestration | `agents/market_conductor.py` | Orchestrator agent | `specs/spec-S8.2-market-conductor/` | pending |
 | S8.3 | Orchestration | `agents/market_conductor.py` | Portfolio analysis | `specs/spec-S8.3-portfolio-analyzer/` | pending |

@@ -22,10 +22,12 @@ dependencies = [
     "scikit-learn",
     "pandas",
     "numpy",
+    "joblib",
     "python-dotenv",
     "beautifulsoup4",
     "lxml",
     "colorlog",
+    "google-cloud-firestore",
 ]
 
 [project.optional-dependencies]
