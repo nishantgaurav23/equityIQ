@@ -38,7 +38,7 @@ class TestCloudRunYamlValid:
 
     def test_service_name(self):
         config = _load_config()
-        assert config["metadata"]["name"] == "equityiq"
+        assert config["metadata"]["name"] == "equityiq-api"
 
 
 class TestResourceLimits:
