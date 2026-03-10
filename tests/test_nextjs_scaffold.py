@@ -261,7 +261,7 @@ class TestTypescriptCompilation:
     """Verify TypeScript compiles without errors."""
 
     @pytest.mark.skipif(
-        not (FRONTEND_DIR / "node_modules").exists(),
+        not os.path.exists(os.path.join(FRONTEND_DIR, "node_modules")),
         reason="node_modules not installed (run npm install in frontend/)",
     )
     def test_typescript_compiles(self):

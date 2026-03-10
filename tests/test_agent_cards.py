@@ -7,6 +7,8 @@ exist with correct content, types, and integration.
 import os
 import subprocess
 
+import pytest
+
 FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
 
 
@@ -228,7 +230,7 @@ class TestTypeScriptCompilation:
     """Verify TypeScript compiles without errors."""
 
     @pytest.mark.skipif(
-        not (FRONTEND_DIR / "node_modules").exists(),
+        not os.path.exists(os.path.join(FRONTEND_DIR, "node_modules")),
         reason="node_modules not installed (run npm install in frontend/)",
     )
     def test_typescript_compiles(self):
