@@ -260,6 +260,10 @@ class TestNextConfig:
 class TestTypescriptCompilation:
     """Verify TypeScript compiles without errors."""
 
+    @pytest.mark.skipif(
+        not (FRONTEND_DIR / "node_modules").exists(),
+        reason="node_modules not installed (run npm install in frontend/)",
+    )
     def test_typescript_compiles(self):
         result = subprocess.run(
             ["npx", "tsc", "--noEmit"],
