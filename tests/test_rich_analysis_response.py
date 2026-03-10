@@ -22,6 +22,7 @@ from config.data_contracts import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _report(cls, agent_name, signal="BUY", confidence=0.7, **kwargs):
     return cls(
         ticker="AAPL",
@@ -36,6 +37,7 @@ def _report(cls, agent_name, signal="BUY", confidence=0.7, **kwargs):
 # ---------------------------------------------------------------------------
 # AgentDetail model
 # ---------------------------------------------------------------------------
+
 
 class TestAgentDetailModel:
     def test_agent_detail_has_all_fields(self):
@@ -73,6 +75,7 @@ class TestAgentDetailModel:
 # ---------------------------------------------------------------------------
 # FinalVerdict new fields
 # ---------------------------------------------------------------------------
+
 
 class TestFinalVerdictRichFields:
     def test_verdict_has_analyst_details_dict(self):
@@ -120,6 +123,7 @@ class TestFinalVerdictRichFields:
 # ---------------------------------------------------------------------------
 # Risk level calculation
 # ---------------------------------------------------------------------------
+
 
 class TestRiskLevelCalculation:
     def test_high_risk_signal_disagreement(self):
@@ -180,11 +184,10 @@ class TestRiskLevelCalculation:
 # _build_agent_detail
 # ---------------------------------------------------------------------------
 
+
 class TestBuildAgentDetail:
     def test_valuation_detail_has_metrics(self):
-        r = _report(
-            ValuationReport, "valuation_scout", pe_ratio=15.0, pb_ratio=2.5
-        )
+        r = _report(ValuationReport, "valuation_scout", pe_ratio=15.0, pb_ratio=2.5)
         d = _build_agent_detail(r, execution_time_ms=500)
         assert d.data_source == "Polygon.io"
         assert d.key_metrics["pe_ratio"] == 15.0
@@ -227,6 +230,7 @@ class TestBuildAgentDetail:
 # ---------------------------------------------------------------------------
 # Integration: execution_time_ms populated
 # ---------------------------------------------------------------------------
+
 
 class TestExecutionTimePopulated:
     def test_verdict_execution_time_positive(self):

@@ -57,9 +57,7 @@ class PolygonConnector:
                 prev_income = prev_financials.get("income_statement", {})
                 prev_revenue = prev_income.get("revenues", {}).get("value")
                 if prev_revenue and prev_revenue != 0:
-                    revenue_growth = round(
-                        (current_revenue - prev_revenue) / abs(prev_revenue), 4
-                    )
+                    revenue_growth = round((current_revenue - prev_revenue) / abs(prev_revenue), 4)
 
             # Compute PE ratio: need EPS from income statement
             pe_ratio = None
@@ -73,9 +71,7 @@ class PolygonConnector:
             # Compute PB ratio: price / book value per share
             pb_ratio = None
             equity = balance.get("equity", {}).get("value")
-            shares = income.get(
-                "basic_average_shares", {}
-            ).get("value") or balance.get(
+            shares = income.get("basic_average_shares", {}).get("value") or balance.get(
                 "common_stock_shares_outstanding", {}
             ).get("value")
             if equity and shares and shares != 0:
@@ -96,9 +92,9 @@ class PolygonConnector:
             # FCF yield: free cash flow / market cap as decimal fraction (0.05 = 5%)
             fcf_yield = None
             fcf = cash_flow.get("net_cash_flow_from_operating_activities", {}).get("value")
-            capex = cash_flow.get(
-                "net_cash_flow_from_investing_activities_continuing", {}
-            ).get("value")
+            capex = cash_flow.get("net_cash_flow_from_investing_activities_continuing", {}).get(
+                "value"
+            )
             if fcf is None:
                 fcf = cash_flow.get("free_cash_flow", {}).get("value")
             elif capex is not None:

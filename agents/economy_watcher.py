@@ -53,6 +53,7 @@ async def get_macro_web_outlook_tool() -> dict:
     """
     try:
         from tools.web_search import search_macro_intelligence
+
         market = "INDIA" if is_indian_ticker(_current_ticker) else "US"
         return await search_macro_intelligence(market)
     except Exception:

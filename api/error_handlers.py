@@ -59,6 +59,4 @@ def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def handle_unhandled_error(request: Request, exc: Exception):
         logger.error("Unhandled exception: %s", exc, exc_info=True)
-        return _error_response(
-            500, "INTERNAL_ERROR", "An unexpected error occurred"
-        )
+        return _error_response(500, "INTERNAL_ERROR", "An unexpected error occurred")

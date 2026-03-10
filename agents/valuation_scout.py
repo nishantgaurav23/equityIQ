@@ -59,6 +59,7 @@ async def get_analyst_web_reports_tool(ticker: str) -> dict:
     """
     try:
         from tools.serper_connector import serper
+
         if serper.available:
             return await serper.search_analyst_reports(ticker)
         return {}

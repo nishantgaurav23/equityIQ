@@ -40,7 +40,7 @@ PERSONAS: dict[str, str] = {
         "OUTPUT FORMAT:\n"
         "Return a ValuationReport as JSON with these fields:\n"
         "- ticker: stock symbol\n"
-        "- agent_name: \"valuation_scout\"\n"
+        '- agent_name: "valuation_scout"\n'
         "- signal: BUY / HOLD / SELL\n"
         "- confidence: float 0.0-1.0\n"
         "- reasoning: 2-3 sentences citing specific metrics and their values\n"
@@ -90,10 +90,10 @@ PERSONAS: dict[str, str] = {
         "Never estimate indicator values without data.\n\n"
         "OUTPUT FORMAT:\n"
         "Return a MomentumReport as JSON with these fields:\n"
-        "- ticker, agent_name (\"momentum_tracker\"), signal, confidence, reasoning\n"
+        '- ticker, agent_name ("momentum_tracker"), signal, confidence, reasoning\n'
         "- rsi_14: float (0-100), macd_signal: float (the numeric MACD signal line value)\n"
         "- above_sma_50: bool, above_sma_200: bool\n"
-        "- volume_trend: string (\"increasing\"/\"decreasing\"/\"stable\")\n"
+        '- volume_trend: string ("increasing"/"decreasing"/"stable")\n'
         "- price_momentum_score: float from -1.0 (extreme bearish) to 1.0 "
         "(extreme bullish)\n"
         "Do NOT include a timestamp field."
@@ -145,12 +145,12 @@ PERSONAS: dict[str, str] = {
         "Do not invent headlines or fabricate sentiment scores.\n\n"
         "OUTPUT FORMAT:\n"
         "Return a PulseReport as JSON with these fields:\n"
-        "- ticker, agent_name (\"pulse_monitor\"), signal, confidence, reasoning\n"
+        '- ticker, agent_name ("pulse_monitor"), signal, confidence, reasoning\n'
         "- sentiment_score: float from -1.0 to 1.0\n"
         "- article_count: integer count of articles analyzed\n"
         "- top_headlines: list of up to 5 headline strings\n"
-        "- event_flags: list of detected event types (e.g., [\"earnings_beat\", "
-        "\"analyst_upgrade\"])\n"
+        '- event_flags: list of detected event types (e.g., ["earnings_beat", '
+        '"analyst_upgrade"])\n'
         "Do NOT include a timestamp field."
     ),
     "economy_watcher": (
@@ -211,14 +211,14 @@ PERSONAS: dict[str, str] = {
         "Never fabricate economic statistics.\n\n"
         "OUTPUT FORMAT:\n"
         "Return an EconomyReport as JSON with these fields:\n"
-        "- ticker, agent_name (\"economy_watcher\"), signal, confidence, reasoning\n"
+        '- ticker, agent_name ("economy_watcher"), signal, confidence, reasoning\n'
         "- gdp_growth: float (annualized percentage)\n"
         "- inflation_rate: float (YoY percentage)\n"
         "- fed_funds_rate: float (central bank rate -- Fed rate for US, RBI repo "
         "rate for India)\n"
         "- unemployment_rate: float (percentage)\n"
-        "- macro_regime: one of \"expansion\", \"contraction\", \"stagflation\", "
-        "\"recovery\"\n"
+        '- macro_regime: one of "expansion", "contraction", "stagflation", '
+        '"recovery"\n'
         "Do NOT include a timestamp field."
     ),
     "compliance_checker": (
@@ -281,11 +281,11 @@ PERSONAS: dict[str, str] = {
         "Never assume filing status without verification.\n\n"
         "OUTPUT FORMAT:\n"
         "Return a ComplianceReport as JSON with these fields:\n"
-        "- ticker, agent_name (\"compliance_checker\"), signal, confidence, reasoning\n"
-        "- latest_filing_type: string (e.g., \"10-K\", \"10-Q\", \"8-K\")\n"
+        '- ticker, agent_name ("compliance_checker"), signal, confidence, reasoning\n'
+        '- latest_filing_type: string (e.g., "10-K", "10-Q", "8-K")\n'
         "- days_since_filing: integer\n"
-        "- risk_flags: list of detected flags (e.g., [\"going_concern\", "
-        "\"late_filing\"])\n"
+        '- risk_flags: list of detected flags (e.g., ["going_concern", '
+        '"late_filing"])\n'
         "- risk_score: float from 0.0 (minimal risk) to 1.0 (extreme risk)\n"
         "Do NOT include a timestamp field."
     ),
@@ -416,14 +416,14 @@ PERSONAS: dict[str, str] = {
         "Never estimate risk metrics without sufficient data.\n\n"
         "OUTPUT FORMAT:\n"
         "Return a RiskGuardianReport as JSON with these fields:\n"
-        "- ticker, agent_name (\"risk_guardian\"), signal, confidence, reasoning\n"
+        '- ticker, agent_name ("risk_guardian"), signal, confidence, reasoning\n'
         "- beta: float\n"
         "- annualized_volatility: float (non-negative)\n"
         "- sharpe_ratio: float\n"
         "- max_drawdown: float (non-positive, e.g., -0.25 for 25% drawdown)\n"
         "- suggested_position_size: float 0.0-0.10 (NEVER exceeds 0.10)\n"
         "- var_95: float (Value at Risk at 95% confidence)\n"
-        "- benchmark_used: string (\"SPY\" for US, \"^NSEI\" for India)\n"
+        '- benchmark_used: string ("SPY" for US, "^NSEI" for India)\n'
         "- risk_free_rate_used: float (0.05 for US, ~0.065 for India)\n"
         "- india_vix: float or null (only for Indian tickers)\n"
         "- circuit_breaker_band: string or null (only for Indian tickers)\n"

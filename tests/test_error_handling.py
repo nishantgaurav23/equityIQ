@@ -108,9 +108,7 @@ class TestStructuredErrorResponse:
 
     def test_ticker_not_found_returns_404(self, client, app):
         """TickerNotFoundError raised by conductor -> 404."""
-        app.state.conductor.analyze = AsyncMock(
-            side_effect=TickerNotFoundError("FAKECO")
-        )
+        app.state.conductor.analyze = AsyncMock(side_effect=TickerNotFoundError("FAKECO"))
         resp = client.post("/api/v1/analyze/FAKECO")
         assert resp.status_code == 404
         data = resp.json()
@@ -118,9 +116,7 @@ class TestStructuredErrorResponse:
 
     def test_analysis_timeout_returns_504(self, client, app):
         """asyncio.TimeoutError from conductor -> 504."""
-        app.state.conductor.analyze = AsyncMock(
-            side_effect=asyncio.TimeoutError()
-        )
+        app.state.conductor.analyze = AsyncMock(side_effect=asyncio.TimeoutError())
         resp = client.post("/api/v1/analyze/AAPL")
         assert resp.status_code == 504
         data = resp.json()
@@ -128,9 +124,7 @@ class TestStructuredErrorResponse:
 
     def test_analysis_timeout_domain_error_returns_504(self, client, app):
         """AnalysisTimeoutError raised explicitly -> 504."""
-        app.state.conductor.analyze = AsyncMock(
-            side_effect=AnalysisTimeoutError("AAPL")
-        )
+        app.state.conductor.analyze = AsyncMock(side_effect=AnalysisTimeoutError("AAPL"))
         resp = client.post("/api/v1/analyze/AAPL")
         assert resp.status_code == 504
         data = resp.json()
@@ -138,9 +132,7 @@ class TestStructuredErrorResponse:
 
     def test_insufficient_data_returns_422(self, client, app):
         """InsufficientDataError -> 422."""
-        app.state.conductor.analyze = AsyncMock(
-            side_effect=InsufficientDataError("AAPL")
-        )
+        app.state.conductor.analyze = AsyncMock(side_effect=InsufficientDataError("AAPL"))
         resp = client.post("/api/v1/analyze/AAPL")
         assert resp.status_code == 422
         data = resp.json()
@@ -156,9 +148,7 @@ class TestStructuredErrorResponse:
 
     def test_unhandled_exception_returns_500(self, client, app):
         """Random exception -> 500 with INTERNAL_ERROR."""
-        app.state.conductor.analyze = AsyncMock(
-            side_effect=RuntimeError("unexpected crash")
-        )
+        app.state.conductor.analyze = AsyncMock(side_effect=RuntimeError("unexpected crash"))
         resp = client.post("/api/v1/analyze/AAPL")
         assert resp.status_code == 500
         data = resp.json()
@@ -176,7 +166,6 @@ class TestStructuredErrorResponse:
         assert "/some/file.py" not in body
         assert data_has_no_traceback(resp.json())
 
-
     def test_portfolio_invalid_ticker_structured_error(self, client, app):
         """Portfolio endpoint with bad ticker returns structured error."""
         resp = client.post("/api/v1/portfolio", json={"tickers": ["VERYLONGTICKERSYMBOLNAME"]})
@@ -187,9 +176,7 @@ class TestStructuredErrorResponse:
 
     def test_portfolio_timeout_structured_error(self, client, app):
         """Portfolio endpoint timeout returns structured error."""
-        app.state.conductor.analyze_portfolio = AsyncMock(
-            side_effect=asyncio.TimeoutError()
-        )
+        app.state.conductor.analyze_portfolio = AsyncMock(side_effect=asyncio.TimeoutError())
         resp = client.post("/api/v1/portfolio", json={"tickers": ["AAPL"]})
         assert resp.status_code == 504
         data = resp.json()

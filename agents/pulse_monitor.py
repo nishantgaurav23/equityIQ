@@ -37,6 +37,7 @@ async def get_news_sentiment_tool(ticker: str) -> dict:
             # Also try to get the full company name via yfinance
             try:
                 import yfinance as yf
+
                 info = yf.Ticker(ticker).info or {}
                 short_name = info.get("shortName", "")
                 if short_name:
@@ -74,6 +75,7 @@ async def get_web_news_tool(ticker: str) -> dict:
     """
     try:
         from tools.web_search import search_stock_intelligence
+
         company_name = ""
         if is_indian_ticker(ticker):
             company_name = get_company_name_for_search(ticker)

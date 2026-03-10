@@ -23,6 +23,7 @@ from models.signal_fusion import SignalFusionModel
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_valuation(ticker: str = "AAPL") -> ValuationReport:
     return ValuationReport(
         ticker=ticker,

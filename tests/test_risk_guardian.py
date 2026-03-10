@@ -313,7 +313,6 @@ class TestBenchmarkFallback:
         from agents.risk_guardian import calc_risk_metrics_tool
 
         # Make SPY return empty data
-        original_side_effect = mock_polygon.get_price_history.side_effect
 
         def _spy_fails(ticker, days=365):
             if ticker == "SPY":

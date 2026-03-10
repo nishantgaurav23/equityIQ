@@ -30,7 +30,8 @@ def _make_verdict(
         ticker=ticker,
         final_signal=signal,
         overall_confidence=confidence,
-        analyst_signals=analyst_signals or {
+        analyst_signals=analyst_signals
+        or {
             "ValuationScout": "BUY",
             "MomentumTracker": "BUY",
             "PulseMonitor": "HOLD",

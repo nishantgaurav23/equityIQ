@@ -37,96 +37,606 @@ _TICKER_PATTERN = re.compile(r"\b([A-Z]{1,12}(?:\.(?:NS|BO|L))?)\b")
 
 # Common English words that look like tickers but aren't
 _TICKER_STOPWORDS = {
-    "A", "I", "AM", "AN", "AS", "AT", "BE", "BY", "DO", "GO", "HE", "IF", "IN",
-    "IS", "IT", "ME", "MY", "NO", "OF", "OK", "ON", "OR", "SO", "TO", "UP", "US",
-    "WE", "ALL", "AND", "ARE", "BUT", "CAN", "DID", "FOR", "GET", "GOT", "HAS",
-    "HAD", "HER", "HIM", "HIS", "HOW", "ITS", "LET", "MAY", "NEW", "NOT", "NOW",
-    "OLD", "OUR", "OUT", "OWN", "SAY", "SHE", "THE", "TOO", "TRY", "USE", "WAY",
-    "WHO", "WHY", "YOU", "YES", "YET", "ANY", "BIG", "DAY", "END", "FAR", "FEW",
-    "RUN", "SET", "PUT", "SEE", "WHAT", "WHEN", "WILL", "WITH", "HAVE", "THIS",
-    "THAT", "FROM", "THEY", "BEEN", "THAN", "THEM", "THEN", "SOME", "WERE", "MUCH",
-    "ALSO", "BOTH", "EACH", "JUST", "LIKE", "LONG", "MAKE", "MANY", "MORE", "MOST",
-    "ONLY", "OVER", "SUCH", "TAKE", "VERY", "YOUR", "SELL", "HOLD", "HIGH", "RISK",
-    "LAST", "GOOD", "WELL", "HELP", "TELL", "BUY", "PE", "EPS", "GDP", "IPO", "ETF",
-    "RSI", "SMA", "ATH", "FED", "SEC", "CEO", "CFO", "CTO", "ROI", "ROE", "YOY",
-    "QOQ", "MOM", "DAD", "NET", "TOP", "LOW", "MAX", "MIN", "AVG", "SUM", "ADD",
-    "ABOUT", "AFTER", "AGAIN", "BELOW", "COULD", "EVERY", "FIRST", "FOUND",
-    "GREAT", "NEVER", "OTHER", "PRICE", "RIGHT", "SHALL", "SHOW", "SINCE",
-    "STILL", "THEIR", "THERE", "THESE", "THINK", "THREE", "TODAY", "UNDER",
-    "UNTIL", "WHERE", "WHILE", "WOULD", "ABOVE", "BEING", "GOING", "GIVES",
-    "KEEPS", "KNOWN", "LARGE", "LATER", "LOOKS", "MIGHT", "NEEDS", "OFTEN",
-    "POINT", "QUITE", "SMALL", "START", "STOCK", "TRADE", "USING", "VALUE",
-    "WORLD", "WORSE", "WORST", "YEARS", "MARKET", "SIGNAL", "STRONG",
-    "GROWTH", "BETTER", "PLEASE", "REALLY", "SHOULD", "THANKS", "VERSUS",
-    "ALWAYS", "BEFORE", "BUYING", "DURING", "HIGHER", "INVEST", "LOSSES",
-    "MOVING", "OPTION", "PROFIT", "RETURN", "SECTOR", "VOLUME", "WEEKLY",
-    "ANNUAL", "ASSETS", "CHANGE", "EQUITY", "MARGIN", "YIELDS", "SHARES",
-    "REPORT", "RATING", "TARGET", "INCOME", "CHARTS", "TRENDS", "GLOBAL",
-    "COMPARE", "ANALYZE", "ANALYSE", "PREDICT", "BETWEEN", "AGAINST",
-    "BECAUSE", "OVERALL", "ANOTHER", "ALREADY", "THROUGH", "WITHOUT",
-    "HOWEVER", "WHETHER", "NOTHING", "LOOKING", "FURTHER", "CURRENT",
-    "QUARTER", "MONTHLY", "TRADING", "AVERAGE", "HISTORY", "DISPLAY",
-    "SUGGEST", "OPINION", "BELIEVE", "PERFORM", "GENERAL", "FINANCE",
-    "EARNING", "CAPITAL", "BILLION", "MILLION", "PERCENT", "DIVIDEND",
-    "FORECAST", "ANALYSIS", "MOMENTUM", "EARNINGS", "ESTIMATE", "STRATEGY",
-    "ECONOMIC", "INFLATION", "INTEREST", "PORTFOLIO", "POSITION",
-    "TECHNICAL", "FINANCIAL", "SENTIMENT", "VALUATION", "INDICATOR",
-    "RECOMMEND", "BENCHMARK", "VOLATILITY", "COMPLIANCE", "RECESSION",
-    "QUARTERLY", "VISUALIZE", "VISUALISE",
+    "A",
+    "I",
+    "AM",
+    "AN",
+    "AS",
+    "AT",
+    "BE",
+    "BY",
+    "DO",
+    "GO",
+    "HE",
+    "IF",
+    "IN",
+    "IS",
+    "IT",
+    "ME",
+    "MY",
+    "NO",
+    "OF",
+    "OK",
+    "ON",
+    "OR",
+    "SO",
+    "TO",
+    "UP",
+    "US",
+    "WE",
+    "ALL",
+    "AND",
+    "ARE",
+    "BUT",
+    "CAN",
+    "DID",
+    "FOR",
+    "GET",
+    "GOT",
+    "HAS",
+    "HAD",
+    "HER",
+    "HIM",
+    "HIS",
+    "HOW",
+    "ITS",
+    "LET",
+    "MAY",
+    "NEW",
+    "NOT",
+    "NOW",
+    "OLD",
+    "OUR",
+    "OUT",
+    "OWN",
+    "SAY",
+    "SHE",
+    "THE",
+    "TOO",
+    "TRY",
+    "USE",
+    "WAY",
+    "WHO",
+    "WHY",
+    "YOU",
+    "YES",
+    "YET",
+    "ANY",
+    "BIG",
+    "DAY",
+    "END",
+    "FAR",
+    "FEW",
+    "RUN",
+    "SET",
+    "PUT",
+    "SEE",
+    "WHAT",
+    "WHEN",
+    "WILL",
+    "WITH",
+    "HAVE",
+    "THIS",
+    "THAT",
+    "FROM",
+    "THEY",
+    "BEEN",
+    "THAN",
+    "THEM",
+    "THEN",
+    "SOME",
+    "WERE",
+    "MUCH",
+    "ALSO",
+    "BOTH",
+    "EACH",
+    "JUST",
+    "LIKE",
+    "LONG",
+    "MAKE",
+    "MANY",
+    "MORE",
+    "MOST",
+    "ONLY",
+    "OVER",
+    "SUCH",
+    "TAKE",
+    "VERY",
+    "YOUR",
+    "SELL",
+    "HOLD",
+    "HIGH",
+    "RISK",
+    "LAST",
+    "GOOD",
+    "WELL",
+    "HELP",
+    "TELL",
+    "BUY",
+    "PE",
+    "EPS",
+    "GDP",
+    "IPO",
+    "ETF",
+    "RSI",
+    "SMA",
+    "ATH",
+    "FED",
+    "SEC",
+    "CEO",
+    "CFO",
+    "CTO",
+    "ROI",
+    "ROE",
+    "YOY",
+    "QOQ",
+    "MOM",
+    "DAD",
+    "NET",
+    "TOP",
+    "LOW",
+    "MAX",
+    "MIN",
+    "AVG",
+    "SUM",
+    "ADD",
+    "ABOUT",
+    "AFTER",
+    "AGAIN",
+    "BELOW",
+    "COULD",
+    "EVERY",
+    "FIRST",
+    "FOUND",
+    "GREAT",
+    "NEVER",
+    "OTHER",
+    "PRICE",
+    "RIGHT",
+    "SHALL",
+    "SHOW",
+    "SINCE",
+    "STILL",
+    "THEIR",
+    "THERE",
+    "THESE",
+    "THINK",
+    "THREE",
+    "TODAY",
+    "UNDER",
+    "UNTIL",
+    "WHERE",
+    "WHILE",
+    "WOULD",
+    "ABOVE",
+    "BEING",
+    "GOING",
+    "GIVES",
+    "KEEPS",
+    "KNOWN",
+    "LARGE",
+    "LATER",
+    "LOOKS",
+    "MIGHT",
+    "NEEDS",
+    "OFTEN",
+    "POINT",
+    "QUITE",
+    "SMALL",
+    "START",
+    "STOCK",
+    "TRADE",
+    "USING",
+    "VALUE",
+    "WORLD",
+    "WORSE",
+    "WORST",
+    "YEARS",
+    "MARKET",
+    "SIGNAL",
+    "STRONG",
+    "GROWTH",
+    "BETTER",
+    "PLEASE",
+    "REALLY",
+    "SHOULD",
+    "THANKS",
+    "VERSUS",
+    "ALWAYS",
+    "BEFORE",
+    "BUYING",
+    "DURING",
+    "HIGHER",
+    "INVEST",
+    "LOSSES",
+    "MOVING",
+    "OPTION",
+    "PROFIT",
+    "RETURN",
+    "SECTOR",
+    "VOLUME",
+    "WEEKLY",
+    "ANNUAL",
+    "ASSETS",
+    "CHANGE",
+    "EQUITY",
+    "MARGIN",
+    "YIELDS",
+    "SHARES",
+    "REPORT",
+    "RATING",
+    "TARGET",
+    "INCOME",
+    "CHARTS",
+    "TRENDS",
+    "GLOBAL",
+    "COMPARE",
+    "ANALYZE",
+    "ANALYSE",
+    "PREDICT",
+    "BETWEEN",
+    "AGAINST",
+    "BECAUSE",
+    "OVERALL",
+    "ANOTHER",
+    "ALREADY",
+    "THROUGH",
+    "WITHOUT",
+    "HOWEVER",
+    "WHETHER",
+    "NOTHING",
+    "LOOKING",
+    "FURTHER",
+    "CURRENT",
+    "QUARTER",
+    "MONTHLY",
+    "TRADING",
+    "AVERAGE",
+    "HISTORY",
+    "DISPLAY",
+    "SUGGEST",
+    "OPINION",
+    "BELIEVE",
+    "PERFORM",
+    "GENERAL",
+    "FINANCE",
+    "EARNING",
+    "CAPITAL",
+    "BILLION",
+    "MILLION",
+    "PERCENT",
+    "DIVIDEND",
+    "FORECAST",
+    "ANALYSIS",
+    "MOMENTUM",
+    "EARNINGS",
+    "ESTIMATE",
+    "STRATEGY",
+    "ECONOMIC",
+    "INFLATION",
+    "INTEREST",
+    "PORTFOLIO",
+    "POSITION",
+    "TECHNICAL",
+    "FINANCIAL",
+    "SENTIMENT",
+    "VALUATION",
+    "INDICATOR",
+    "RECOMMEND",
+    "BENCHMARK",
+    "VOLATILITY",
+    "COMPLIANCE",
+    "RECESSION",
+    "QUARTERLY",
+    "VISUALIZE",
+    "VISUALISE",
     # Stock exchange names — NOT tickers
-    "NSE", "BSE", "NYSE", "NASDAQ", "NIFTY", "SENSEX", "FTSE", "DJIA",
-    "LSE", "SGX", "ASX", "TSX", "HKEX", "SSE", "SZSE", "KRX", "KOSPI",
-    "EXCHANGE", "BOMBAY", "NATIONAL",
+    "NSE",
+    "BSE",
+    "NYSE",
+    "NASDAQ",
+    "NIFTY",
+    "SENSEX",
+    "FTSE",
+    "DJIA",
+    "LSE",
+    "SGX",
+    "ASX",
+    "TSX",
+    "HKEX",
+    "SSE",
+    "SZSE",
+    "KRX",
+    "KOSPI",
+    "EXCHANGE",
+    "BOMBAY",
+    "NATIONAL",
 }
 
 # Words that look like company names but aren't (avoid searching for these)
 _NAME_STOPWORDS = {
-    "the", "and", "for", "are", "but", "not", "you", "all", "can", "had",
-    "her", "was", "one", "our", "out", "has", "how", "its", "may", "new",
-    "now", "say", "she", "too", "use", "way", "who", "why", "yet", "any",
-    "big", "day", "end", "far", "few", "run", "set", "put", "see", "did",
-    "get", "let", "old", "own", "try", "also", "both", "each", "just",
-    "like", "long", "make", "many", "more", "most", "only", "over", "such",
-    "take", "very", "your", "tell", "show", "help", "good", "well", "last",
-    "some", "what", "when", "will", "with", "have", "this", "that", "from",
-    "they", "been", "than", "them", "then", "were", "much", "compare",
-    "analyze", "analyse", "visualize", "visualise", "chart", "graph",
-    "plot", "draw", "display", "trend", "stock", "stocks", "price",
-    "market", "markets", "signal", "signals", "risk", "high", "low",
-    "medium", "hold", "sell", "buy", "strong", "about", "think",
-    "ratio", "growth", "rate", "value", "yield", "debt", "earnings",
-    "revenue", "profit", "loss", "income", "margin", "return", "beta",
-    "target", "level", "score", "data", "index", "fund", "bond",
-    "call", "option", "future", "share", "shares", "sector", "cap",
-    "volume", "average", "momentum", "sentiment", "economy", "macro",
-    "inflation", "interest", "dividend", "valuation", "fundamental",
-    "technical", "compliance", "filing", "report", "quarter", "annual",
-    "forecast", "prediction", "portfolio", "position", "size", "weight",
-    "better", "worse", "best", "worst", "should", "could", "would",
-    "which", "between", "versus", "against", "than", "going",
-    "doing", "current", "recent", "today", "india", "indian",
-    "affect", "affects", "difference", "explain", "stocks",
-    "capitalization", "understand", "meaning", "means", "work",
-    "works", "example", "examples", "type", "types", "kind", "kinds",
-    "invest", "investing", "investor", "investors", "money",
-    "concept", "concepts", "define", "definition", "definitions",
-    "hello", "hey", "hi", "thanks", "thank", "please", "sorry",
-    "does", "reasoning", "reason", "reasons", "because", "since",
-    "would", "could", "should", "impact", "impacts", "impacting",
-    "whether", "however", "although", "though", "still", "also",
-    "give", "gives", "gave", "given", "much", "really",
-    "different", "same", "similar", "important", "generally",
-    "there", "here", "where", "federal", "reserve", "rates",
-    "between", "during", "after", "before", "above", "below",
-    "these", "those", "other", "another", "every", "first",
-    "second", "third", "next", "last", "right", "wrong",
-    "what", "when", "where", "which", "how", "why", "who",
+    "the",
+    "and",
+    "for",
+    "are",
+    "but",
+    "not",
+    "you",
+    "all",
+    "can",
+    "had",
+    "her",
+    "was",
+    "one",
+    "our",
+    "out",
+    "has",
+    "how",
+    "its",
+    "may",
+    "new",
+    "now",
+    "say",
+    "she",
+    "too",
+    "use",
+    "way",
+    "who",
+    "why",
+    "yet",
+    "any",
+    "big",
+    "day",
+    "end",
+    "far",
+    "few",
+    "run",
+    "set",
+    "put",
+    "see",
+    "did",
+    "get",
+    "let",
+    "old",
+    "own",
+    "try",
+    "also",
+    "both",
+    "each",
+    "just",
+    "like",
+    "long",
+    "make",
+    "many",
+    "more",
+    "most",
+    "only",
+    "over",
+    "such",
+    "take",
+    "very",
+    "your",
+    "tell",
+    "show",
+    "help",
+    "good",
+    "well",
+    "last",
+    "some",
+    "what",
+    "when",
+    "will",
+    "with",
+    "have",
+    "this",
+    "that",
+    "from",
+    "they",
+    "been",
+    "than",
+    "them",
+    "then",
+    "were",
+    "much",
+    "compare",
+    "analyze",
+    "analyse",
+    "visualize",
+    "visualise",
+    "chart",
+    "graph",
+    "plot",
+    "draw",
+    "display",
+    "trend",
+    "stock",
+    "stocks",
+    "price",
+    "market",
+    "markets",
+    "signal",
+    "signals",
+    "risk",
+    "high",
+    "low",
+    "medium",
+    "hold",
+    "sell",
+    "buy",
+    "strong",
+    "about",
+    "think",
+    "ratio",
+    "growth",
+    "rate",
+    "value",
+    "yield",
+    "debt",
+    "earnings",
+    "revenue",
+    "profit",
+    "loss",
+    "income",
+    "margin",
+    "return",
+    "beta",
+    "target",
+    "level",
+    "score",
+    "data",
+    "index",
+    "fund",
+    "bond",
+    "call",
+    "option",
+    "future",
+    "share",
+    "shares",
+    "sector",
+    "cap",
+    "volume",
+    "average",
+    "momentum",
+    "sentiment",
+    "economy",
+    "macro",
+    "inflation",
+    "interest",
+    "dividend",
+    "valuation",
+    "fundamental",
+    "technical",
+    "compliance",
+    "filing",
+    "report",
+    "quarter",
+    "annual",
+    "forecast",
+    "prediction",
+    "portfolio",
+    "position",
+    "size",
+    "weight",
+    "better",
+    "worse",
+    "best",
+    "worst",
+    "should",
+    "could",
+    "would",
+    "which",
+    "between",
+    "versus",
+    "against",
+    "than",
+    "going",
+    "doing",
+    "current",
+    "recent",
+    "today",
+    "india",
+    "indian",
+    "affect",
+    "affects",
+    "difference",
+    "explain",
+    "stocks",
+    "capitalization",
+    "understand",
+    "meaning",
+    "means",
+    "work",
+    "works",
+    "example",
+    "examples",
+    "type",
+    "types",
+    "kind",
+    "kinds",
+    "invest",
+    "investing",
+    "investor",
+    "investors",
+    "money",
+    "concept",
+    "concepts",
+    "define",
+    "definition",
+    "definitions",
+    "hello",
+    "hey",
+    "hi",
+    "thanks",
+    "thank",
+    "please",
+    "sorry",
+    "does",
+    "reasoning",
+    "reason",
+    "reasons",
+    "because",
+    "since",
+    "would",
+    "could",
+    "should",
+    "impact",
+    "impacts",
+    "impacting",
+    "whether",
+    "however",
+    "although",
+    "though",
+    "still",
+    "also",
+    "give",
+    "gives",
+    "gave",
+    "given",
+    "much",
+    "really",
+    "different",
+    "same",
+    "similar",
+    "important",
+    "generally",
+    "there",
+    "here",
+    "where",
+    "federal",
+    "reserve",
+    "rates",
+    "between",
+    "during",
+    "after",
+    "before",
+    "above",
+    "below",
+    "these",
+    "those",
+    "other",
+    "another",
+    "every",
+    "first",
+    "second",
+    "third",
+    "next",
+    "last",
+    "right",
+    "wrong",
+    "what",
+    "when",
+    "where",
+    "which",
+    "how",
+    "why",
+    "who",
 }
 
 
 # ---------------------------------------------------------------------------
 # Ticker / company name helpers
 # ---------------------------------------------------------------------------
+
 
 async def resolve_company_names(message: str, known_tickers: list[str]) -> list[str]:
     """Resolve company names to ticker symbols using Yahoo Finance + Polygon search."""
@@ -166,10 +676,12 @@ async def resolve_company_names(message: str, known_tickers: list[str]) -> list[
 
         try:
             from tools.yahoo_connector import yahoo
+
             results = await yahoo.search_tickers(candidate, limit=3)
 
             if not results:
                 from tools.ticker_search import search_tickers
+
                 results = await search_tickers(candidate, limit=3)
 
             if results:
@@ -219,14 +731,27 @@ def _has_potential_company_names(message: str) -> bool:
 # Market context helpers
 # ---------------------------------------------------------------------------
 
+
 def _mentions_indian_market(message_lower: str) -> bool:
     """Check if the message references Indian stock exchanges or markets."""
     indian_keywords = [
-        "nse", "bse", "bombay", "national stock exchange",
-        "bombay stock exchange", "indian market", "indian exchange",
-        "india market", "india exchange", "indian stock",
-        "in india", "in rupees", "in inr", "inr price",
-        "nifty", "sensex", "rupee",
+        "nse",
+        "bse",
+        "bombay",
+        "national stock exchange",
+        "bombay stock exchange",
+        "indian market",
+        "indian exchange",
+        "india market",
+        "india exchange",
+        "indian stock",
+        "in india",
+        "in rupees",
+        "in inr",
+        "inr price",
+        "nifty",
+        "sensex",
+        "rupee",
     ]
     return any(kw in message_lower for kw in indian_keywords)
 
@@ -235,17 +760,29 @@ def _mentions_indian_market(message_lower: str) -> bool:
 # Intent detection — now distinguishes "full analysis" from "quick question"
 # ---------------------------------------------------------------------------
 
+
 def _wants_visual(message: str) -> bool:
     """Check if the user wants a visual/chart/graph output."""
     lower = message.lower()
     return any(
         kw in lower
         for kw in [
-            "visuali", "graph", "chart", "plot",
-            "price history", "price chart", "draw", "display",
-            "show me the chart", "show me the graph", "show chart",
-            "show the trend", "show trend", "price trend",
-            "show me the trend", "show price",
+            "visuali",
+            "graph",
+            "chart",
+            "plot",
+            "price history",
+            "price chart",
+            "draw",
+            "display",
+            "show me the chart",
+            "show me the graph",
+            "show chart",
+            "show the trend",
+            "show trend",
+            "price trend",
+            "show me the trend",
+            "show price",
         ]
     )
 
@@ -267,16 +804,24 @@ def detect_intent(message: str) -> str:
 
     # Greeting — short casual messages
     greeting_words = {
-        "hi", "hello", "hey", "howdy", "hola", "yo", "sup",
-        "good morning", "good evening", "good afternoon",
-        "what's up", "whats up", "wassup",
+        "hi",
+        "hello",
+        "hey",
+        "howdy",
+        "hola",
+        "yo",
+        "sup",
+        "good morning",
+        "good evening",
+        "good afternoon",
+        "what's up",
+        "whats up",
+        "wassup",
     }
     # Exact match or very short greeting-like message
     stripped = lower.rstrip("!?.,:; ")
     if stripped in greeting_words or (
-        len(lower.split()) <= 3 and any(
-            lower.startswith(g) for g in greeting_words
-        )
+        len(lower.split()) <= 3 and any(lower.startswith(g) for g in greeting_words)
     ):
         return "greeting"
 
@@ -304,19 +849,34 @@ def detect_intent(message: str) -> str:
 
     # Full analysis: user explicitly asks for deep/comprehensive analysis
     full_analysis_keywords = [
-        "analyze", "analysis", "analyse", "full analysis",
-        "deep dive", "evaluate", "run analysis",
-        "detailed analysis", "comprehensive",
+        "analyze",
+        "analysis",
+        "analyse",
+        "full analysis",
+        "deep dive",
+        "evaluate",
+        "run analysis",
+        "detailed analysis",
+        "comprehensive",
     ]
     if any(kw in lower for kw in full_analysis_keywords) and has_subjects:
         return "full_analysis"
 
     # Follow-up intent — requires referencing prior context specifically
     follow_up_keywords = [
-        "why did you", "why is it", "what made you",
-        "tell me more", "elaborate", "go deeper", "can you clarify",
-        "what does that mean", "why sell", "why buy", "why hold",
-        "reason for", "reasoning behind",
+        "why did you",
+        "why is it",
+        "what made you",
+        "tell me more",
+        "elaborate",
+        "go deeper",
+        "can you clarify",
+        "what does that mean",
+        "why sell",
+        "why buy",
+        "why hold",
+        "reason for",
+        "reasoning behind",
     ]
     if any(kw in lower for kw in follow_up_keywords):
         return "follow_up"
@@ -325,10 +885,18 @@ def detect_intent(message: str) -> str:
     # "Explain the PE ratio" -> general, "Explain why you said sell" -> follow_up
     if "explain" in lower and not has_subjects:
         # Check if it references prior analysis context
-        if any(kw in lower for kw in [
-            "your", "you said", "that", "the reasoning", "the signal",
-            "the verdict", "the analysis",
-        ]):
+        if any(
+            kw in lower
+            for kw in [
+                "your",
+                "you said",
+                "that",
+                "the reasoning",
+                "the signal",
+                "the verdict",
+                "the analysis",
+            ]
+        ):
             return "follow_up"
         # Otherwise it's a general knowledge question
         return "general"
@@ -344,6 +912,7 @@ def detect_intent(message: str) -> str:
 # ---------------------------------------------------------------------------
 # Data fetching helpers — lightweight, no full pipeline
 # ---------------------------------------------------------------------------
+
 
 async def _fetch_quick_data(ticker: str) -> str:
     """Fetch lightweight data for a ticker: company info, price, fundamentals.
@@ -361,7 +930,10 @@ async def _fetch_quick_data(ticker: str) -> str:
         price_task = yahoo.get_price_history(ticker, days=30)
 
         info, fund, price_data = await asyncio.gather(
-            info_task, fund_task, price_task, return_exceptions=True,
+            info_task,
+            fund_task,
+            price_task,
+            return_exceptions=True,
         )
 
         # Company info
@@ -376,17 +948,11 @@ async def _fetch_quick_data(ticker: str) -> str:
             if info.get("market_cap"):
                 mc = info["market_cap"]
                 if mc >= 1e12:
-                    parts.append(
-                        f"Market Cap: {currency} {mc / 1e12:.2f} Trillion"
-                    )
+                    parts.append(f"Market Cap: {currency} {mc / 1e12:.2f} Trillion")
                 elif mc >= 1e9:
-                    parts.append(
-                        f"Market Cap: {currency} {mc / 1e9:.2f} Billion"
-                    )
+                    parts.append(f"Market Cap: {currency} {mc / 1e9:.2f} Billion")
                 elif mc >= 1e6:
-                    parts.append(
-                        f"Market Cap: {currency} {mc / 1e6:.2f} Million"
-                    )
+                    parts.append(f"Market Cap: {currency} {mc / 1e6:.2f} Million")
                 else:
                     parts.append(f"Market Cap: {currency} {mc:,.0f}")
             if info.get("employees"):
@@ -404,9 +970,7 @@ async def _fetch_quick_data(ticker: str) -> str:
                 day_change = current - prev
                 day_pct = (day_change / prev) * 100 if prev else 0
                 sign = "+" if day_change >= 0 else ""
-                parts.append(
-                    f"Day Change: {sign}{day_change:,.2f} ({sign}{day_pct:.2f}%)"
-                )
+                parts.append(f"Day Change: {sign}{day_change:,.2f} ({sign}{day_pct:.2f}%)")
 
             if len(prices) >= 5:
                 week_ago = prices[-5] if len(prices) >= 5 else prices[0]
@@ -441,9 +1005,7 @@ async def _fetch_quick_data(ticker: str) -> str:
             if fund.get("fcf_yield") is not None:
                 parts.append(f"  FCF Yield: {fund['fcf_yield'] * 100:.2f}%")
             if fund.get("dividend_yield") is not None:
-                parts.append(
-                    f"  Dividend Yield: {fund['dividend_yield'] * 100:.2f}%"
-                )
+                parts.append(f"  Dividend Yield: {fund['dividend_yield'] * 100:.2f}%")
             if fund.get("market_cap") and not any("Market Cap" in p for p in parts):
                 mc = fund["market_cap"]
                 curr = fund.get("currency", "USD")
@@ -460,7 +1022,8 @@ async def _fetch_quick_data(ticker: str) -> str:
 
     # Enrich with web search intelligence (Serper + Tavily)
     try:
-        from tools.web_search import search_stock_intelligence, format_web_context
+        from tools.web_search import format_web_context, search_stock_intelligence
+
         web_data = await search_stock_intelligence(ticker)
         web_context = format_web_context(web_data, "Latest Web Intelligence")
         if web_context:
@@ -475,12 +1038,12 @@ async def _fetch_quick_data(ticker: str) -> str:
 # Format full analysis context (richer than before — includes key_metrics)
 # ---------------------------------------------------------------------------
 
+
 def _format_verdict_context(verdict: FinalVerdict) -> str:
     """Format a FinalVerdict into detailed context for the LLM prompt."""
     lines = [
         f"## Full Multi-Agent Analysis for {verdict.ticker}",
-        f"Signal: {verdict.final_signal} "
-        f"(confidence: {verdict.overall_confidence:.0%})",
+        f"Signal: {verdict.final_signal} (confidence: {verdict.overall_confidence:.0%})",
         f"Risk Level: {verdict.risk_level}",
     ]
 
@@ -515,8 +1078,7 @@ def _format_verdict_context(verdict: FinalVerdict) -> str:
         lines.append("\nAgent Reports:")
         for name, detail in verdict.analyst_details.items():
             lines.append(
-                f"\n  {name}: {detail.signal} "
-                f"({detail.confidence:.0%}) -- {detail.reasoning}"
+                f"\n  {name}: {detail.signal} ({detail.confidence:.0%}) -- {detail.reasoning}"
             )
             # Include key_metrics so the model has actual numbers
             if detail.key_metrics:
@@ -609,6 +1171,7 @@ analysis, don't give it again. Answer the new specific question.
 # Chat Engine
 # ---------------------------------------------------------------------------
 
+
 class ChatEngine:
     """Orchestrates chat: context retrieval, LLM generation, storage."""
 
@@ -617,9 +1180,7 @@ class ChatEngine:
         self._memory = memory
         self._vault = vault
 
-    async def process_message(
-        self, request: ChatRequest
-    ) -> AsyncGenerator[dict, None]:
+    async def process_message(self, request: ChatRequest) -> AsyncGenerator[dict, None]:
         """Process a chat message and yield SSE events."""
         session_id = request.session_id or str(uuid.uuid4())
         yield {"type": "session", "session_id": session_id}
@@ -635,13 +1196,12 @@ class ChatEngine:
         # "apple" -> AAPL, "tata motors" -> TATAMOTORS.NS)
         if intent != "greeting" and _has_potential_company_names(request.message):
             try:
-                resolved = await resolve_company_names(
-                    request.message, tickers
-                )
+                resolved = await resolve_company_names(request.message, tickers)
                 tickers.extend(resolved)
                 logger.info(
                     "Resolved company names: %s -> %s",
-                    request.message, resolved,
+                    request.message,
+                    resolved,
                 )
             except Exception:
                 logger.warning(
@@ -660,9 +1220,7 @@ class ChatEngine:
         # Retrieve conversation history
         if self._memory:
             try:
-                history_entries = await self._memory.get_conversation(
-                    session_id, limit=20
-                )
+                history_entries = await self._memory.get_conversation(session_id, limit=20)
             except Exception:
                 logger.exception("Failed to retrieve conversation history")
 
@@ -681,9 +1239,7 @@ class ChatEngine:
             # Full multi-agent analysis — only when explicitly requested
             if len(tickers) <= 1:
                 try:
-                    verdict = await asyncio.wait_for(
-                        self._conductor.analyze(ticker), timeout=60
-                    )
+                    verdict = await asyncio.wait_for(self._conductor.analyze(ticker), timeout=60)
                     context_parts.append(_format_verdict_context(verdict))
                     verdict_session_id = verdict.session_id
                     analyzed_tickers.append(ticker)
@@ -697,9 +1253,7 @@ class ChatEngine:
                 # Multiple tickers for full analysis
                 for t in tickers[:3]:
                     try:
-                        v = await asyncio.wait_for(
-                            self._conductor.analyze(t), timeout=60
-                        )
+                        v = await asyncio.wait_for(self._conductor.analyze(t), timeout=60)
                         context_parts.append(_format_verdict_context(v))
                         if not verdict_session_id:
                             verdict_session_id = v.session_id
@@ -711,9 +1265,7 @@ class ChatEngine:
             # Compare — needs full analysis for each
             for t in tickers[:3]:
                 try:
-                    v = await asyncio.wait_for(
-                        self._conductor.analyze(t), timeout=60
-                    )
+                    v = await asyncio.wait_for(self._conductor.analyze(t), timeout=60)
                     context_parts.append(_format_verdict_context(v))
                     if not verdict_session_id:
                         verdict_session_id = v.session_id
@@ -727,9 +1279,7 @@ class ChatEngine:
             if self._conductor:
                 for t in tickers[:3]:
                     try:
-                        v = await asyncio.wait_for(
-                            self._conductor.analyze(t), timeout=60
-                        )
+                        v = await asyncio.wait_for(self._conductor.analyze(t), timeout=60)
                         context_parts.append(_format_verdict_context(v))
                         if not verdict_session_id:
                             verdict_session_id = v.session_id
@@ -745,15 +1295,12 @@ class ChatEngine:
                 analyzed_tickers.append(ticker)
                 # Fetch lightweight data for brief commentary
                 quick_data = await _fetch_quick_data(ticker)
-                context_parts.append(
-                    f"--- Live Data for {ticker} ---\n{quick_data}"
-                )
+                context_parts.append(f"--- Live Data for {ticker} ---\n{quick_data}")
                 # Also check for prior analysis in conversation
                 prior = self._find_prior_analysis(history_entries, ticker)
                 if prior:
                     context_parts.append(
-                        f"[Prior analysis for {ticker} — use for "
-                        f"brief commentary]\n{prior[:300]}"
+                        f"[Prior analysis for {ticker} — use for brief commentary]\n{prior[:300]}"
                     )
             else:
                 # No ticker found — LLM should ask which stock to visualize
@@ -780,9 +1327,7 @@ class ChatEngine:
 
             # Always fetch fresh lightweight data (price, fundamentals, info)
             quick_data = await _fetch_quick_data(ticker)
-            context_parts.append(
-                f"--- Live Data for {ticker} ---\n{quick_data}"
-            )
+            context_parts.append(f"--- Live Data for {ticker} ---\n{quick_data}")
 
             # If user wants Indian market data and ticker has no exchange suffix,
             # also fetch .NS and .BO variants
@@ -793,8 +1338,7 @@ class ChatEngine:
                     if "No data available" not in indian_data:
                         exchange = "NSE" if suffix == ".NS" else "BSE"
                         context_parts.append(
-                            f"--- {exchange} Data for {indian_ticker} ---\n"
-                            f"{indian_data}"
+                            f"--- {exchange} Data for {indian_ticker} ---\n{indian_data}"
                         )
 
             # Also fetch for additional tickers if mentioned
@@ -814,66 +1358,51 @@ class ChatEngine:
                 elif self._vault:
                     try:
                         from memory.history_retriever import HistoryRetriever
+
                         retriever = HistoryRetriever(self._vault)
-                        verdicts = await retriever.get_ticker_history(
-                            ticker, limit=1
-                        )
+                        verdicts = await retriever.get_ticker_history(ticker, limit=1)
                         if verdicts:
-                            context_parts.append(
-                                _format_verdict_context(verdicts[0])
-                            )
+                            context_parts.append(_format_verdict_context(verdicts[0]))
                             verdict_session_id = verdicts[0].session_id
                     except Exception:
                         logger.exception("Failed to retrieve follow-up data")
             elif history_entries:
-                last_with_ticker = next(
-                    (e for e in reversed(history_entries) if e.ticker), None
-                )
+                last_with_ticker = next((e for e in reversed(history_entries) if e.ticker), None)
                 if last_with_ticker and last_with_ticker.verdict_session_id:
                     try:
-                        v = await self._vault.get_verdict(
-                            last_with_ticker.verdict_session_id
-                        )
+                        v = await self._vault.get_verdict(last_with_ticker.verdict_session_id)
                         if v:
                             context_parts.append(_format_verdict_context(v))
                             ticker = last_with_ticker.ticker
-                            verdict_session_id = (
-                                last_with_ticker.verdict_session_id
-                            )
+                            verdict_session_id = last_with_ticker.verdict_session_id
                     except Exception:
                         pass
 
         # For "general" intent — enrich with web search if available
         if intent == "general" and not context_parts:
             try:
-                from tools.web_search import search_general, format_web_context
+                from tools.web_search import format_web_context, search_general
+
                 web_data = await search_general(request.message)
-                web_ctx = format_web_context(
-                    web_data, "Web Research"
-                )
+                web_ctx = format_web_context(web_data, "Web Research")
                 if web_ctx:
                     context_parts.append(web_ctx)
             except Exception:
                 logger.debug("Web search failed for general question")
 
         # Build LLM prompt
-        prompt = self._build_prompt(
-            request.message, context_parts, history_entries, intent
-        )
+        prompt = self._build_prompt(request.message, context_parts, history_entries, intent)
 
         # Generate response via Gemini
         full_response = ""
         try:
-            async for token in self._generate_streaming(
-                prompt, history_entries
-            ):
+            async for token in self._generate_streaming(prompt, history_entries):
                 full_response += token
                 yield {"type": "token", "content": token}
         except Exception:
             logger.exception("Gemini generation failed")
             full_response = (
-                "I'm sorry, I encountered an error generating a response. "
-                "Please try again."
+                "I'm sorry, I encountered an error generating a response. Please try again."
             )
             yield {"type": "token", "content": full_response}
 
@@ -922,9 +1451,7 @@ class ChatEngine:
             "session_id": session_id,
         }
 
-    def _find_prior_analysis(
-        self, history: list[ConversationEntry], ticker: str
-    ) -> str | None:
+    def _find_prior_analysis(self, history: list[ConversationEntry], ticker: str) -> str | None:
         """Search conversation history for prior analysis of a ticker."""
         ticker_upper = ticker.upper()
         for entry in reversed(history):
@@ -979,12 +1506,9 @@ class ChatEngine:
                 "and friendly — 2-3 sentences max."
             ),
             "full_analysis": (
-                "The user wants a comprehensive multi-agent analysis. "
-                "Give a thorough breakdown."
+                "The user wants a comprehensive multi-agent analysis. Give a thorough breakdown."
             ),
-            "compare": (
-                "The user wants a comparison. Include a comparison table."
-            ),
+            "compare": ("The user wants a comparison. Include a comparison table."),
             "visualize": (
                 "The user wants analysis with visualization. "
                 "A price chart will be shown separately by the UI."
@@ -1052,9 +1576,7 @@ class ChatEngine:
                 content = entry.content
                 if len(content) > 500 and entry.role == "assistant":
                     content = content[:500] + "... [truncated]"
-                contents.append(
-                    {"role": role, "parts": [{"text": content}]}
-                )
+                contents.append({"role": role, "parts": [{"text": content}]})
 
             # Add current prompt (includes system prompt + context)
             contents.append({"role": "user", "parts": [{"text": prompt}]})
@@ -1067,9 +1589,7 @@ class ChatEngine:
                 if chunk.text:
                     yield chunk.text
         except ImportError:
-            logger.warning(
-                "google-genai not available, using fallback response"
-            )
+            logger.warning("google-genai not available, using fallback response")
             yield "I can help you understand stock analysis. "
             yield "However, the AI generation service is currently unavailable."
             yield " Please try again later."
@@ -1081,6 +1601,7 @@ class ChatEngine:
 # ---------------------------------------------------------------------------
 # API routes (unchanged — no impact on landing, compare, history pages)
 # ---------------------------------------------------------------------------
+
 
 def _sse_format(data: dict) -> str:
     """Format a dict as an SSE data line."""
@@ -1140,7 +1661,5 @@ async def delete_chat_history(session_id: str, request: Request) -> dict:
             )
             await conn.commit()
         except Exception:
-            logger.exception(
-                "Failed to delete chat history for %s", session_id
-            )
+            logger.exception("Failed to delete chat history for %s", session_id)
     return {"deleted": True, "session_id": session_id}

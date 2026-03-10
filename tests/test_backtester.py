@@ -18,6 +18,7 @@ from evaluation.backtester import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_verdict(
     ticker: str = "AAPL",
     signal: str = "BUY",
@@ -41,16 +42,19 @@ def _make_price_lookup(prices: dict[str, dict[str, float | None]]):
 
     prices: {ticker: {iso_date_str: price}} -- date keys are matched by date only.
     """
+
     async def lookup(ticker: str, date: datetime) -> float | None:
         ticker_prices = prices.get(ticker, {})
         date_str = date.strftime("%Y-%m-%d")
         return ticker_prices.get(date_str)
+
     return lookup
 
 
 # ---------------------------------------------------------------------------
 # FR-1: BacktestConfig
 # ---------------------------------------------------------------------------
+
 
 class TestBacktestConfig:
     def test_defaults(self):
@@ -77,6 +81,7 @@ class TestBacktestConfig:
 # ---------------------------------------------------------------------------
 # FR-2: BacktestResult
 # ---------------------------------------------------------------------------
+
 
 class TestBacktestResult:
     def test_valid(self):
@@ -113,6 +118,7 @@ class TestBacktestResult:
 # FR-3: BacktestSummary
 # ---------------------------------------------------------------------------
 
+
 class TestBacktestSummary:
     def test_valid(self):
         summary = BacktestSummary(
@@ -143,6 +149,7 @@ class TestBacktestSummary:
 # ---------------------------------------------------------------------------
 # FR-7: is_signal_correct
 # ---------------------------------------------------------------------------
+
 
 class TestIsSignalCorrect:
     def test_buy_up(self):
@@ -195,6 +202,7 @@ class TestIsSignalCorrect:
 # FR-4: evaluate_verdict
 # ---------------------------------------------------------------------------
 
+
 class TestEvaluateVerdict:
     @pytest.mark.asyncio
     async def test_all_windows(self):
@@ -213,8 +221,8 @@ class TestEvaluateVerdict:
         result = await bt.evaluate_verdict(verdict, lookup, windows=[30, 60, 90])
 
         assert result.ticker == "AAPL"
-        assert result.outcomes[30] == "correct"   # BUY + up
-        assert result.outcomes[60] == "correct"   # BUY + up
+        assert result.outcomes[30] == "correct"  # BUY + up
+        assert result.outcomes[60] == "correct"  # BUY + up
         assert result.outcomes[90] == "incorrect"  # BUY + down
         assert result.price_at_prediction == 100.0
         assert abs(result.actual_returns[30] - 0.10) < 0.001
@@ -248,6 +256,7 @@ class TestEvaluateVerdict:
 # ---------------------------------------------------------------------------
 # FR-5: run_backtest
 # ---------------------------------------------------------------------------
+
 
 class TestRunBacktest:
     @pytest.mark.asyncio
@@ -367,6 +376,7 @@ class TestRunBacktest:
 # FR-6: run_multi_ticker
 # ---------------------------------------------------------------------------
 
+
 class TestRunMultiTicker:
     @pytest.mark.asyncio
     async def test_multi_ticker(self):
@@ -398,9 +408,7 @@ class TestRunMultiTicker:
         lookup = _make_price_lookup(prices)
 
         bt = Backtester()
-        results = await bt.run_multi_ticker(
-            ["AAPL", "TSLA"], mock_retriever, lookup, windows=[30]
-        )
+        results = await bt.run_multi_ticker(["AAPL", "TSLA"], mock_retriever, lookup, windows=[30])
 
         assert "AAPL" in results
         assert "TSLA" in results
@@ -441,9 +449,7 @@ class TestRunMultiTicker:
         lookup = _make_price_lookup(prices)
 
         bt = Backtester()
-        results = await bt.run_multi_ticker(
-            ["AAPL", "FAIL"], mock_retriever, lookup, windows=[30]
-        )
+        results = await bt.run_multi_ticker(["AAPL", "FAIL"], mock_retriever, lookup, windows=[30])
 
         # AAPL succeeds, FAIL is skipped (not in results or has empty summary)
         assert "AAPL" in results

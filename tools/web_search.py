@@ -26,9 +26,7 @@ def _truncate(text: str, max_len: int = 300) -> str:
     return text[:max_len].rsplit(" ", 1)[0] + "..."
 
 
-async def search_stock_intelligence(
-    ticker: str, company_name: str = ""
-) -> dict:
+async def search_stock_intelligence(ticker: str, company_name: str = "") -> dict:
     """Get comprehensive web intelligence for a stock.
 
     Combines Serper (Google News) + Tavily (deep research) for:
@@ -74,9 +72,7 @@ async def search_stock_intelligence(
                     result["web_headlines"].append(headline)
                     snippet = item.get("snippet", "").strip()
                     if snippet:
-                        result["web_snippets"].append(
-                            _truncate(snippet)
-                        )
+                        result["web_snippets"].append(_truncate(snippet))
                     link = item.get("link", "")
                     if link:
                         result["sources"].append(link)
@@ -100,9 +96,7 @@ async def search_stock_intelligence(
                 snippet = item.get("snippet", "").strip()
                 if snippet and title not in seen_titles:
                     seen_titles.add(title)
-                    result["analyst_info"].append(
-                        _truncate(f"{title}: {snippet}")
-                    )
+                    result["analyst_info"].append(_truncate(f"{title}: {snippet}"))
         except Exception:
             logger.debug("Serper analyst search failed for %s", ticker)
 
@@ -118,9 +112,7 @@ async def search_stock_intelligence(
                 content = item.get("content", "").strip()
                 if content and title not in seen_titles:
                     seen_titles.add(title)
-                    result["web_snippets"].append(
-                        _truncate(content)
-                    )
+                    result["web_snippets"].append(_truncate(content))
                 url = item.get("url", "")
                 if url:
                     result["sources"].append(url)
@@ -133,9 +125,7 @@ async def search_stock_intelligence(
     return result
 
 
-async def search_regulatory_intelligence(
-    ticker: str, company_name: str = ""
-) -> dict:
+async def search_regulatory_intelligence(ticker: str, company_name: str = "") -> dict:
     """Search for regulatory news, investigations, and compliance issues.
 
     Returns:
@@ -153,18 +143,14 @@ async def search_regulatory_intelligence(
 
     if serper.available:
         try:
-            data = await serper.search_regulatory_news(
-                ticker, company_name
-            )
+            data = await serper.search_regulatory_news(ticker, company_name)
             for item in data.get("results", [])[:8]:
                 title = item.get("title", "").strip()
                 if title:
                     result["regulatory_headlines"].append(title)
                 snippet = item.get("snippet", "").strip()
                 if snippet:
-                    result["regulatory_details"].append(
-                        _truncate(snippet)
-                    )
+                    result["regulatory_details"].append(_truncate(snippet))
         except Exception:
             logger.debug("Serper regulatory search failed for %s", ticker)
 
@@ -172,8 +158,7 @@ async def search_regulatory_intelligence(
         try:
             name = company_name or ticker
             data = await tavily.search(
-                f"{name} ({ticker}) regulatory investigation "
-                f"compliance SEBI SEC lawsuit",
+                f"{name} ({ticker}) regulatory investigation compliance SEBI SEC lawsuit",
                 search_depth="advanced",
                 max_results=5,
                 topic="news",
@@ -183,9 +168,7 @@ async def search_regulatory_intelligence(
             for item in data.get("results", [])[:5]:
                 content = item.get("content", "").strip()
                 if content:
-                    result["regulatory_details"].append(
-                        _truncate(content)
-                    )
+                    result["regulatory_details"].append(_truncate(content))
         except Exception:
             logger.debug("Tavily regulatory search failed for %s", ticker)
 
@@ -261,10 +244,12 @@ async def search_general(query: str) -> dict:
             if data.get("answer"):
                 result["answer"] = data["answer"]
             for item in data.get("results", [])[:5]:
-                result["results"].append({
-                    "title": item.get("title", ""),
-                    "snippet": _truncate(item.get("content", "")),
-                })
+                result["results"].append(
+                    {
+                        "title": item.get("title", ""),
+                        "snippet": _truncate(item.get("content", "")),
+                    }
+                )
                 url = item.get("url", "")
                 if url:
                     result["sources"].append(url)
@@ -278,13 +263,13 @@ async def search_general(query: str) -> dict:
             for item in data.get("results", [])[:5]:
                 title = item.get("title", "")
                 snippet = item.get("snippet", "")
-                if title and not any(
-                    r["title"] == title for r in result["results"]
-                ):
-                    result["results"].append({
-                        "title": title,
-                        "snippet": _truncate(snippet),
-                    })
+                if title and not any(r["title"] == title for r in result["results"]):
+                    result["results"].append(
+                        {
+                            "title": title,
+                            "snippet": _truncate(snippet),
+                        }
+                    )
                 link = item.get("link", "")
                 if link:
                     result["sources"].append(link)

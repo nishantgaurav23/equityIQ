@@ -133,9 +133,7 @@ class TestToolFunctions:
         from agents.valuation_scout import get_fundamentals_tool
 
         mock_yahoo = AsyncMock()
-        mock_yahoo.get_fundamentals = AsyncMock(
-            return_value={"pe_ratio": 30.0, "pb_ratio": 5.0}
-        )
+        mock_yahoo.get_fundamentals = AsyncMock(return_value={"pe_ratio": 30.0, "pb_ratio": 5.0})
         with patch("agents.valuation_scout._yahoo", mock_yahoo):
             result = await get_fundamentals_tool("TCS.NS")
         mock_yahoo.get_fundamentals.assert_awaited_once_with("TCS.NS")

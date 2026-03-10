@@ -86,10 +86,8 @@ class TestSetupSecretsIdempotentCheck:
 class TestSetupSecretsProjectIdRequired:
     def test_project_id_validation(self, script_content):
         # Script must validate GCP_PROJECT_ID is set
-        assert "GCP_PROJECT_ID" in script_content, (
-            "Script must reference GCP_PROJECT_ID"
-        )
-        assert re.search(r'(if.*GCP_PROJECT_ID|-z.*GCP_PROJECT_ID|PROJECT_ID)', script_content), (
+        assert "GCP_PROJECT_ID" in script_content, "Script must reference GCP_PROJECT_ID"
+        assert re.search(r"(if.*GCP_PROJECT_ID|-z.*GCP_PROJECT_ID|PROJECT_ID)", script_content), (
             "Script must validate GCP_PROJECT_ID is set"
         )
 

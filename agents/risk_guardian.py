@@ -184,15 +184,10 @@ async def get_india_market_risk_tool(ticker: str) -> dict:
             ) as client:
                 # NSE requires session cookie -- hit main page first
                 await client.get("https://www.nseindia.com", timeout=5.0)
-                resp = await client.get(
-                    "https://www.nseindia.com/api/live-analysis-ban"
-                )
+                resp = await client.get("https://www.nseindia.com/api/live-analysis-ban")
                 if resp.status_code == 200:
                     ban_data = resp.json()
-                    banned_symbols = [
-                        item.get("symbol", "")
-                        for item in ban_data.get("data", [])
-                    ]
+                    banned_symbols = [item.get("symbol", "") for item in ban_data.get("data", [])]
                     result["fno_ban"] = symbol in banned_symbols
         except Exception:
             result["fno_ban"] = None

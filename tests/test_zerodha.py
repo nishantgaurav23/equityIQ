@@ -546,9 +546,7 @@ class TestRoutes:
             new_callable=AsyncMock,
             return_value={"access_token": "abc123", "user_id": "ZR1234"},
         ):
-            resp = test_app.get(
-                "/api/v1/zerodha/callback?request_token=test_req_token"
-            )
+            resp = test_app.get("/api/v1/zerodha/callback?request_token=test_req_token")
             assert resp.status_code == 200
             data = resp.json()
             assert data["access_token"] == "abc123"
@@ -560,7 +558,5 @@ class TestRoutes:
             new_callable=AsyncMock,
             side_effect=ValueError("Invalid or expired request token"),
         ):
-            resp = test_app.get(
-                "/api/v1/zerodha/callback?request_token=bad_token"
-            )
+            resp = test_app.get("/api/v1/zerodha/callback?request_token=bad_token")
             assert resp.status_code == 401

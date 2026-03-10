@@ -65,13 +65,13 @@ class SerperConnector:
             }
             payload = {"q": query, "num": num_results}
 
-            response = await self.client.post(
-                url, json=payload, headers=headers
-            )
+            response = await self.client.post(url, json=payload, headers=headers)
             if response.status_code != 200:
                 logger.warning(
                     "Serper %s returned %d for query: %s",
-                    search_type, response.status_code, query,
+                    search_type,
+                    response.status_code,
+                    query,
                 )
                 return {}
 
@@ -82,22 +82,26 @@ class SerperConnector:
 
             # Web search results
             for item in data.get("organic", []):
-                results.append({
-                    "title": item.get("title", ""),
-                    "snippet": item.get("snippet", ""),
-                    "link": item.get("link", ""),
-                    "date": item.get("date", ""),
-                })
+                results.append(
+                    {
+                        "title": item.get("title", ""),
+                        "snippet": item.get("snippet", ""),
+                        "link": item.get("link", ""),
+                        "date": item.get("date", ""),
+                    }
+                )
 
             # News search results
             for item in data.get("news", []):
-                results.append({
-                    "title": item.get("title", ""),
-                    "snippet": item.get("snippet", ""),
-                    "link": item.get("link", ""),
-                    "date": item.get("date", ""),
-                    "source": item.get("source", ""),
-                })
+                results.append(
+                    {
+                        "title": item.get("title", ""),
+                        "snippet": item.get("snippet", ""),
+                        "link": item.get("link", ""),
+                        "date": item.get("date", ""),
+                        "source": item.get("source", ""),
+                    }
+                )
 
             output = {"results": results}
 
@@ -148,9 +152,7 @@ class SerperConnector:
         query = f"{sector} sector outlook trends 2026"
         return await self.search(query, num_results=8)
 
-    async def search_regulatory_news(
-        self, ticker: str, company_name: str = ""
-    ) -> dict:
+    async def search_regulatory_news(self, ticker: str, company_name: str = "") -> dict:
         """Search for regulatory news, investigations, compliance issues."""
         name = company_name or ticker
         query = f"{name} regulatory investigation compliance SEC SEBI 2026"

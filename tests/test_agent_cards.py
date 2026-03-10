@@ -113,9 +113,7 @@ class TestAgentDetailType:
         with open(filepath) as f:
             content = f.read()
         verdict_section = content.split("interface FinalVerdict")[1].split("}")[0]
-        assert "analyst_details" in verdict_section, (
-            "FinalVerdict missing analyst_details field"
-        )
+        assert "analyst_details" in verdict_section, "FinalVerdict missing analyst_details field"
 
 
 class TestAgentCardComponent:
@@ -174,9 +172,7 @@ class TestAgentCardGridComponent:
         with open(filepath) as f:
             content = f.read()
         assert "grid" in content, "AgentCardGrid missing grid layout"
-        assert "md:" in content or "lg:" in content, (
-            "AgentCardGrid missing responsive breakpoints"
-        )
+        assert "md:" in content or "lg:" in content, "AgentCardGrid missing responsive breakpoints"
 
     def test_agent_card_grid_empty_state(self):
         filepath = os.path.join(FRONTEND_DIR, "app", "components", "AgentCardGrid.tsx")
@@ -221,9 +217,7 @@ class TestPageIntegration:
         filepath = os.path.join(FRONTEND_DIR, "app", "page.tsx")
         with open(filepath) as f:
             content = f.read()
-        assert "analyst_signals" in content, (
-            "page.tsx should pass analyst_signals to AgentCardGrid"
-        )
+        assert "analyst_signals" in content, "page.tsx should pass analyst_signals to AgentCardGrid"
 
 
 class TestTypeScriptCompilation:

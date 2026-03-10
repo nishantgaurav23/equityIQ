@@ -64,22 +64,22 @@ class IndiaComplianceConnector:
             await self.client.get("https://www.nseindia.com", timeout=5.0)
 
             params = {"index": "equities", "symbol": symbol}
-            response = await self.client.get(
-                self.NSE_ANNOUNCEMENTS_URL, params=params
-            )
+            response = await self.client.get(self.NSE_ANNOUNCEMENTS_URL, params=params)
             if response.status_code != 200:
                 return []
 
             data = response.json()
             announcements = []
             for item in data[:20]:  # Last 20 announcements
-                announcements.append({
-                    "filing_type": item.get("desc", "Corporate Announcement"),
-                    "filed_date": item.get("an_dt", ""),
-                    "description": item.get("attchmntText", item.get("desc", "")),
-                    "url": item.get("attchmntFile", ""),
-                    "subject": item.get("smIndustry", ""),
-                })
+                announcements.append(
+                    {
+                        "filing_type": item.get("desc", "Corporate Announcement"),
+                        "filed_date": item.get("an_dt", ""),
+                        "description": item.get("attchmntText", item.get("desc", "")),
+                        "url": item.get("attchmntFile", ""),
+                        "subject": item.get("smIndustry", ""),
+                    }
+                )
 
             self.cache[cache_key] = announcements
             return announcements
@@ -105,13 +105,17 @@ class IndiaComplianceConnector:
             actions = stock.actions
             if actions is not None and not actions.empty:
                 for date_idx in actions.index[-5:]:
-                    filings.append({
-                        "filing_type": "Corporate Action",
-                        "filed_date": date_idx.strftime("%Y-%m-%d"),
-                        "description": f"Dividends: {actions.loc[date_idx].get('Dividends', 0)}, "
-                                       f"Stock Splits: {actions.loc[date_idx].get('Stock Splits', 0)}",
-                        "url": "",
-                    })
+                    filings.append(
+                        {
+                            "filing_type": "Corporate Action",
+                            "filed_date": date_idx.strftime("%Y-%m-%d"),
+                            "description": (
+                                f"Dividends: {actions.loc[date_idx].get('Dividends', 0)}, "
+                                f"Stock Splits: {actions.loc[date_idx].get('Stock Splits', 0)}"
+                            ),
+                            "url": "",
+                        }
+                    )
 
             # Use basic info as a filing proxy
             audit_risk = info.get("auditRisk")
@@ -119,17 +123,20 @@ class IndiaComplianceConnector:
             overall_risk = info.get("overallRisk")
 
             if audit_risk is not None or board_risk is not None:
-                filings.insert(0, {
-                    "filing_type": "Governance Report",
-                    "filed_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-                    "description": (
-                        f"Audit risk: {audit_risk}, Board risk: {board_risk}, "
-                        f"Overall risk: {overall_risk}. "
-                        f"Sector: {info.get('sector', 'N/A')}. "
-                        f"Market cap: {info.get('marketCap', 'N/A')}."
-                    ),
-                    "url": "",
-                })
+                filings.insert(
+                    0,
+                    {
+                        "filing_type": "Governance Report",
+                        "filed_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                        "description": (
+                            f"Audit risk: {audit_risk}, Board risk: {board_risk}, "
+                            f"Overall risk: {overall_risk}. "
+                            f"Sector: {info.get('sector', 'N/A')}. "
+                            f"Market cap: {info.get('marketCap', 'N/A')}."
+                        ),
+                        "url": "",
+                    },
+                )
 
             self.cache[cache_key] = filings
             return filings
@@ -179,9 +186,7 @@ class IndiaComplianceConnector:
                     # Handle multiple date formats
                     for fmt in ("%Y-%m-%d", "%d-%b-%Y", "%d/%m/%Y", "%d-%m-%Y"):
                         try:
-                            filed_dt = datetime.strptime(date_str, fmt).replace(
-                                tzinfo=timezone.utc
-                            )
+                            filed_dt = datetime.strptime(date_str, fmt).replace(tzinfo=timezone.utc)
                             days_since = (datetime.now(timezone.utc) - filed_dt).days
                             break
                         except ValueError:
@@ -191,9 +196,7 @@ class IndiaComplianceConnector:
 
             # Detect risk flags
             risk_flags: list[str] = []
-            all_text = " ".join(
-                f.get("description", "").lower() for f in filings
-            )
+            all_text = " ".join(f.get("description", "").lower() for f in filings)
 
             for flag, keywords in RISK_KEYWORDS_IN.items():
                 if any(kw in all_text for kw in keywords):

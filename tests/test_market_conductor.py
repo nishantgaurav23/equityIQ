@@ -46,9 +46,7 @@ def _make_mock_agents(include_risk=True):
     for agent_name, report_cls in agent_specs:
         agent = MagicMock()
         agent.name = agent_name
-        agent.analyze = AsyncMock(
-            return_value=_make_report(report_cls, agent_name=agent_name)
-        )
+        agent.analyze = AsyncMock(return_value=_make_report(report_cls, agent_name=agent_name))
         agents.append(agent)
 
     if include_risk:

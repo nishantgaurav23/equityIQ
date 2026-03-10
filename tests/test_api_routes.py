@@ -122,12 +122,8 @@ class TestHistoryEndpointsS93:
     def test_trend_endpoint_success(self, client, app):
         """GET /api/v1/history/AAPL/trend returns list of SignalSnapshot."""
         snapshots = [
-            _sample_snapshot(
-                created_at="2026-03-01T10:00:00Z", signal="HOLD", confidence=0.65
-            ),
-            _sample_snapshot(
-                created_at="2026-03-05T10:00:00Z", signal="BUY", confidence=0.72
-            ),
+            _sample_snapshot(created_at="2026-03-01T10:00:00Z", signal="HOLD", confidence=0.65),
+            _sample_snapshot(created_at="2026-03-05T10:00:00Z", signal="BUY", confidence=0.72),
         ]
         app.state.history_retriever.get_signal_trend = AsyncMock(return_value=snapshots)
 
@@ -159,18 +155,14 @@ class TestHistoryEndpointsS93:
         app.state.history_retriever.get_signal_trend = AsyncMock(return_value=[])
 
         client.get("/api/v1/history/AAPL/trend?limit=50")
-        app.state.history_retriever.get_signal_trend.assert_awaited_once_with(
-            "AAPL", limit=50
-        )
+        app.state.history_retriever.get_signal_trend.assert_awaited_once_with("AAPL", limit=50)
 
     def test_trend_endpoint_default_limit(self, client, app):
         """Default limit=20 when not specified."""
         app.state.history_retriever.get_signal_trend = AsyncMock(return_value=[])
 
         client.get("/api/v1/history/AAPL/trend")
-        app.state.history_retriever.get_signal_trend.assert_awaited_once_with(
-            "AAPL", limit=20
-        )
+        app.state.history_retriever.get_signal_trend.assert_awaited_once_with("AAPL", limit=20)
 
     def test_trend_endpoint_empty_result(self, client, app):
         """Unknown ticker returns 200 with empty list."""
@@ -191,9 +183,7 @@ class TestHistoryEndpointsS93:
 
         resp = client.get("/api/v1/history")
         assert resp.status_code == 200
-        app.state.history_retriever.get_recent_verdicts.assert_awaited_once_with(
-            limit=20, offset=0
-        )
+        app.state.history_retriever.get_recent_verdicts.assert_awaited_once_with(limit=20, offset=0)
 
 
 class TestVerdictEndpoint:

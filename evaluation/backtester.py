@@ -132,9 +132,7 @@ class Backtester:
             try:
                 future_price = await price_lookup(verdict.ticker, future_date)
             except Exception:
-                logger.warning(
-                    "Price lookup failed for %s at +%d days", verdict.ticker, w
-                )
+                logger.warning("Price lookup failed for %s at +%d days", verdict.ticker, w)
                 future_price = None
 
             if future_price is None:
@@ -168,9 +166,7 @@ class Backtester:
     ) -> BacktestSummary:
         """Run a full backtest for a ticker (FR-5)."""
         try:
-            verdicts = await history_retriever.get_ticker_history(
-                config.ticker, limit=200
-            )
+            verdicts = await history_retriever.get_ticker_history(config.ticker, limit=200)
         except Exception:
             logger.exception("Failed to fetch history for %s", config.ticker)
             verdicts = []

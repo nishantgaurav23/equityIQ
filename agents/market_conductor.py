@@ -70,9 +70,7 @@ def _compute_portfolio_signal(verdicts: list[FinalVerdict]) -> str:
     if total_weight == 0:
         return "HOLD"
 
-    weighted_sum = sum(
-        _SIGNAL_SCORE[v.final_signal] * v.overall_confidence for v in verdicts
-    )
+    weighted_sum = sum(_SIGNAL_SCORE[v.final_signal] * v.overall_confidence for v in verdicts)
     avg_score = weighted_sum / total_weight
     max_confidence = max(v.overall_confidence for v in verdicts)
 
@@ -110,6 +108,7 @@ def _select_top_pick(verdicts: list[FinalVerdict]) -> str | None:
         return None
     return max(buy_verdicts, key=lambda v: v.overall_confidence).ticker
 
+
 # Maps agent_name (from BaseAnalystAgent) -> report class & display name
 _AGENT_NAME_MAP: dict[str, tuple[type[AnalystReport], str]] = {
     "valuation_scout": (ValuationReport, "ValuationScout"),
@@ -140,9 +139,7 @@ def _calculate_risk_level(reports: list[AnalystReport]) -> str:
     return "LOW"
 
 
-def _build_agent_detail(
-    report: AnalystReport, execution_time_ms: int = 0
-) -> AgentDetail:
+def _build_agent_detail(report: AnalystReport, execution_time_ms: int = 0) -> AgentDetail:
     """Convert an AnalystReport to AgentDetail for API response."""
     key_metrics: dict = {}
     data_source = ""
@@ -181,9 +178,7 @@ def _build_agent_detail(
             for k, v in {
                 "sentiment_score": report.sentiment_score,
                 "article_count": report.article_count,
-                "top_headlines": (
-                    report.top_headlines[:3] if report.top_headlines else []
-                ),
+                "top_headlines": (report.top_headlines[:3] if report.top_headlines else []),
                 "event_flags": report.event_flags,
             }.items()
             if v is not None
@@ -350,9 +345,7 @@ class MarketConductor:
 
         return self._agents
 
-    async def _run_agent_with_timeout(
-        self, agent, ticker: str
-    ) -> tuple[AnalystReport, int]:
+    async def _run_agent_with_timeout(self, agent, ticker: str) -> tuple[AnalystReport, int]:
         """Run a single agent with timeout. Returns (report, execution_time_ms).
 
         Raises asyncio.TimeoutError on timeout.
@@ -398,6 +391,7 @@ class MarketConductor:
         async def _fetch_company_info() -> CompanyInfo | None:
             try:
                 from tools.yahoo_connector import yahoo
+
                 raw = await yahoo.get_company_info(ticker)
                 if raw:
                     return CompanyInfo(**{k: v for k, v in raw.items() if v is not None})
@@ -443,9 +437,7 @@ class MarketConductor:
 
             if isinstance(report, AnalystReport):
                 # Remap agent_name to display name for fusion model compatibility
-                display_name = _AGENT_NAME_MAP.get(
-                    report.agent_name, (None, report.agent_name)
-                )[1]
+                display_name = _AGENT_NAME_MAP.get(report.agent_name, (None, report.agent_name))[1]
                 report.agent_name = display_name
                 agent_timings[display_name] = exec_time
                 all_reports.append(report)
@@ -486,17 +478,13 @@ class MarketConductor:
         )
 
         # Set total execution time
-        verdict.execution_time_ms = int(
-            (time.perf_counter() - overall_start) * 1000
-        )
+        verdict.execution_time_ms = int((time.perf_counter() - overall_start) * 1000)
 
         # --- Graceful degradation (S10.2) ---
         # Reduce confidence by MISSING_AGENT_PENALTY per missing directional agent.
         if missing_directional > 0:
             penalty = missing_directional * MISSING_AGENT_PENALTY
-            verdict.overall_confidence = max(
-                0.0, min(1.0, verdict.overall_confidence - penalty)
-            )
+            verdict.overall_confidence = max(0.0, min(1.0, verdict.overall_confidence - penalty))
 
         # Downgrade STRONG signals when confidence drops below 0.75.
         if verdict.overall_confidence < 0.75:
@@ -551,7 +539,9 @@ class MarketConductor:
 
         logger.info(
             "Starting portfolio analysis for %d tickers: %s (session=%s)",
-            len(clean_tickers), clean_tickers, session_id,
+            len(clean_tickers),
+            clean_tickers,
+            session_id,
         )
 
         # Run all ticker analyses concurrently
@@ -562,9 +552,7 @@ class MarketConductor:
         verdicts: list[FinalVerdict] = []
         for i, result in enumerate(results):
             if isinstance(result, Exception):
-                logger.warning(
-                    "Portfolio analysis failed for %s: %s", clean_tickers[i], result
-                )
+                logger.warning("Portfolio analysis failed for %s: %s", clean_tickers[i], result)
                 continue
             if isinstance(result, FinalVerdict):
                 verdicts.append(result)

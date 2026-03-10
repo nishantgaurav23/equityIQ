@@ -29,15 +29,15 @@ class TestReadmeExists:
 
     def test_readme_has_testing_section(self):
         content = (ROOT / "README.md").read_text()
-        assert re.search(
-            r"##\s*(Test|Running Tests|Development)", content
-        ), "README must have a testing section"
+        assert re.search(r"##\s*(Test|Running Tests|Development)", content), (
+            "README must have a testing section"
+        )
 
     def test_readme_has_architecture_section(self):
         content = (ROOT / "README.md").read_text()
-        assert re.search(
-            r"##\s*Architecture", content
-        ), "README must have an architecture section or link"
+        assert re.search(r"##\s*Architecture", content), (
+            "README must have an architecture section or link"
+        )
 
     def test_readme_mentions_env_setup(self):
         content = (ROOT / "README.md").read_text()
@@ -82,9 +82,9 @@ class TestApiReference:
     def test_api_reference_has_response_examples(self):
         content = (ROOT / "docs" / "api-reference.md").read_text()
         # Check for JSON response examples
-        assert re.search(
-            r'"(ticker|status|final_signal)"', content
-        ), "API docs must include response examples"
+        assert re.search(r'"(ticker|status|final_signal)"', content), (
+            "API docs must include response examples"
+        )
 
 
 class TestArchitectureDoc:
@@ -110,15 +110,15 @@ class TestArchitectureDoc:
 
     def test_architecture_has_data_flow(self):
         content = (ROOT / "docs" / "architecture.md").read_text()
-        assert re.search(
-            r"(data flow|signal flow|pipeline|orchestrat)", content, re.IGNORECASE
-        ), "Architecture doc must describe the data/signal flow"
+        assert re.search(r"(data flow|signal flow|pipeline|orchestrat)", content, re.IGNORECASE), (
+            "Architecture doc must describe the data/signal flow"
+        )
 
     def test_architecture_has_signal_weighting(self):
         content = (ROOT / "docs" / "architecture.md").read_text()
-        assert re.search(
-            r"(weight|0\.25|0\.20|0\.15)", content
-        ), "Architecture doc must describe signal weighting"
+        assert re.search(r"(weight|0\.25|0\.20|0\.15)", content), (
+            "Architecture doc must describe signal weighting"
+        )
 
     def test_architecture_has_design_decisions(self):
         content = (ROOT / "docs" / "architecture.md").read_text()
@@ -138,21 +138,19 @@ class TestDeploymentDoc:
 
     def test_deployment_has_docker_section(self):
         content = (ROOT / "docs" / "deployment.md").read_text()
-        assert re.search(
-            r"(docker|Docker|container)", content
-        ), "Deployment doc must cover Docker"
+        assert re.search(r"(docker|Docker|container)", content), "Deployment doc must cover Docker"
 
     def test_deployment_has_gcp_section(self):
         content = (ROOT / "docs" / "deployment.md").read_text()
-        assert re.search(
-            r"(Cloud Run|GCP|Google Cloud)", content
-        ), "Deployment doc must cover GCP Cloud Run"
+        assert re.search(r"(Cloud Run|GCP|Google Cloud)", content), (
+            "Deployment doc must cover GCP Cloud Run"
+        )
 
     def test_deployment_has_env_vars(self):
         content = (ROOT / "docs" / "deployment.md").read_text()
-        assert re.search(
-            r"(environment variable|\.env|ENVIRONMENT)", content
-        ), "Deployment doc must cover environment variables"
+        assert re.search(r"(environment variable|\.env|ENVIRONMENT)", content), (
+            "Deployment doc must cover environment variables"
+        )
 
     def test_deployment_has_health_check(self):
         content = (ROOT / "docs" / "deployment.md").read_text()

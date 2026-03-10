@@ -63,6 +63,7 @@ async def get_regulatory_web_news_tool(ticker: str) -> dict:
     """
     try:
         from tools.web_search import search_regulatory_intelligence
+
         company_name = ""
         if is_indian_ticker(ticker):
             company_name = get_company_name_for_search(ticker)

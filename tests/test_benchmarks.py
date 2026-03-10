@@ -30,28 +30,47 @@ class TestBenchmarkCaseModel:
 
         reports = [
             ValuationReport(
-                ticker="AAPL", agent_name="ValuationScout",
-                signal="BUY", confidence=0.7, reasoning="test",
+                ticker="AAPL",
+                agent_name="ValuationScout",
+                signal="BUY",
+                confidence=0.7,
+                reasoning="test",
             ),
             MomentumReport(
-                ticker="AAPL", agent_name="MomentumTracker",
-                signal="BUY", confidence=0.7, reasoning="test",
+                ticker="AAPL",
+                agent_name="MomentumTracker",
+                signal="BUY",
+                confidence=0.7,
+                reasoning="test",
             ),
             PulseReport(
-                ticker="AAPL", agent_name="PulseMonitor",
-                signal="BUY", confidence=0.7, reasoning="test", article_count=5,
+                ticker="AAPL",
+                agent_name="PulseMonitor",
+                signal="BUY",
+                confidence=0.7,
+                reasoning="test",
+                article_count=5,
             ),
             EconomyReport(
-                ticker="AAPL", agent_name="EconomyWatcher",
-                signal="HOLD", confidence=0.6, reasoning="test",
+                ticker="AAPL",
+                agent_name="EconomyWatcher",
+                signal="HOLD",
+                confidence=0.6,
+                reasoning="test",
             ),
             ComplianceReport(
-                ticker="AAPL", agent_name="ComplianceChecker",
-                signal="HOLD", confidence=0.7, reasoning="test",
+                ticker="AAPL",
+                agent_name="ComplianceChecker",
+                signal="HOLD",
+                confidence=0.7,
+                reasoning="test",
             ),
             RiskGuardianReport(
-                ticker="AAPL", agent_name="RiskGuardian",
-                signal="HOLD", confidence=0.6, reasoning="test",
+                ticker="AAPL",
+                agent_name="RiskGuardian",
+                signal="HOLD",
+                confidence=0.6,
+                reasoning="test",
             ),
         ]
 
@@ -74,8 +93,11 @@ class TestBenchmarkCaseModel:
 
         reports = [
             ValuationReport(
-                ticker="TEST", agent_name="ValuationScout",
-                signal="BUY", confidence=0.7, reasoning="test",
+                ticker="TEST",
+                agent_name="ValuationScout",
+                signal="BUY",
+                confidence=0.7,
+                reasoning="test",
             ),
         ]
         with pytest.raises(ValueError, match="at least one expected signal"):
@@ -95,8 +117,11 @@ class TestBenchmarkCaseModel:
 
         reports = [
             ValuationReport(
-                ticker="TEST", agent_name="ValuationScout",
-                signal="BUY", confidence=0.7, reasoning="test",
+                ticker="TEST",
+                agent_name="ValuationScout",
+                signal="BUY",
+                confidence=0.7,
+                reasoning="test",
             ),
         ]
         case = BenchmarkCase(

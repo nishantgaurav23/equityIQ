@@ -24,6 +24,7 @@ KITE_LOGIN_URL = "https://kite.zerodha.com/connect/login"
 # Data Models
 # ---------------------------------------------------------------------------
 
+
 class ZerodhaHolding(BaseModel):
     """A single delivery holding from Zerodha."""
 
@@ -73,6 +74,7 @@ class ZerodhaPortfolio(BaseModel):
 # Symbol Mapping
 # ---------------------------------------------------------------------------
 
+
 def map_zerodha_to_equityiq(tradingsymbol: str, exchange: str) -> str:
     """Map Zerodha symbol + exchange to EquityIQ ticker.
 
@@ -115,6 +117,7 @@ def map_equityiq_to_zerodha(ticker: str) -> tuple[str, str]:
 # ---------------------------------------------------------------------------
 # Zerodha Client
 # ---------------------------------------------------------------------------
+
 
 class ZerodhaClient:
     """Async client for Kite Connect API."""
@@ -164,9 +167,7 @@ class ZerodhaClient:
         try:
             async with self._semaphore:
                 client = await self._get_client()
-                resp = await client.post(
-                    f"{KITE_API_BASE}/session/token", data=payload
-                )
+                resp = await client.post(f"{KITE_API_BASE}/session/token", data=payload)
 
             if resp.status_code == 403:
                 raise ValueError("Invalid or expired request token")
@@ -211,9 +212,7 @@ class ZerodhaClient:
             raw_holdings = resp.json().get("data", [])
             holdings = []
             for h in raw_holdings:
-                ticker = map_zerodha_to_equityiq(
-                    h.get("tradingsymbol", ""), h.get("exchange", "")
-                )
+                ticker = map_zerodha_to_equityiq(h.get("tradingsymbol", ""), h.get("exchange", ""))
                 holdings.append(
                     ZerodhaHolding(
                         tradingsymbol=h.get("tradingsymbol", ""),
@@ -297,10 +296,7 @@ class ZerodhaClient:
         current_value = sum(h.last_price * h.quantity for h in holdings)
         total_pnl = sum(h.pnl for h in holdings)
         total_pnl_pct = (total_pnl / total_invested * 100) if total_invested > 0 else 0.0
-        day_pnl = sum(
-            h.last_price * h.quantity * h.day_change_percentage / 100
-            for h in holdings
-        )
+        day_pnl = sum(h.last_price * h.quantity * h.day_change_percentage / 100 for h in holdings)
 
         # Collect unique EquityIQ tickers (non-empty only)
         tickers = sorted(

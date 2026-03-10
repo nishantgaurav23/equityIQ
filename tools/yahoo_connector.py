@@ -121,9 +121,7 @@ class YahooConnector:
             # Revenue growth as decimal fraction (0.05 = 5%). yfinance already
             # returns a decimal fraction, so no multiplication needed.
             raw_rev_growth = info.get("revenueGrowth")
-            revenue_growth = (
-                round(raw_rev_growth, 4) if raw_rev_growth is not None else None
-            )
+            revenue_growth = round(raw_rev_growth, 4) if raw_rev_growth is not None else None
 
             # FCF yield as decimal fraction (0.05 = 5%)
             raw_fcf = info.get("freeCashflow")
@@ -217,12 +215,15 @@ class YahooConnector:
 
             for quote in getattr(search, "quotes", [])[:limit]:
                 exchange = quote.get("exchange", "")
-                locale = "in" if exchange in (
-                    "NSI", "BOM", "NSE", "BSE", "NMS"
-                ) and (
-                    quote.get("symbol", "").endswith(".NS")
-                    or quote.get("symbol", "").endswith(".BO")
-                ) else "us"
+                locale = (
+                    "in"
+                    if exchange in ("NSI", "BOM", "NSE", "BSE", "NMS")
+                    and (
+                        quote.get("symbol", "").endswith(".NS")
+                        or quote.get("symbol", "").endswith(".BO")
+                    )
+                    else "us"
+                )
                 # Better locale detection
                 symbol = quote.get("symbol", "")
                 if symbol.endswith(".NS") or symbol.endswith(".BO"):
@@ -302,9 +303,7 @@ class YahooConnector:
 
         return 1.0
 
-    async def get_multi_price_history(
-        self, tickers: list[str], days: int = 90
-    ) -> dict[str, dict]:
+    async def get_multi_price_history(self, tickers: list[str], days: int = 90) -> dict[str, dict]:
         """Fetch price history for multiple tickers.
 
         Returns {ticker: {prices, volumes, dates, currency}} for each.

@@ -288,6 +288,7 @@ class TestPortfolioAnalysis:
     @pytest.fixture
     def portfolio_client(self):
         """Client with agents that handle multiple tickers."""
+
         def _make_agents_for_any_ticker(self_ref=None):
             """Return agents whose analyze() builds reports from the given ticker."""
             agent_configs = [

@@ -157,11 +157,17 @@ class TestDeployDockerBuildPush:
         steps = self._get_steps()
         # Check for docker/build-push-action or a run step with docker build/push
         build_steps = [
-            s for s in steps
+            s
+            for s in steps
             if "docker/build-push-action" in s.get("uses", "")
-            or ("run" in s and "docker" in str(s.get("run", "")).lower()
-                and ("build" in str(s.get("run", "")).lower()
-                     or "push" in str(s.get("run", "")).lower()))
+            or (
+                "run" in s
+                and "docker" in str(s.get("run", "")).lower()
+                and (
+                    "build" in str(s.get("run", "")).lower()
+                    or "push" in str(s.get("run", "")).lower()
+                )
+            )
         ]
         assert len(build_steps) >= 1, "Must have a Docker build/push step"
 
@@ -202,8 +208,7 @@ class TestDeployCloudRun:
         """Must use google-github-actions/deploy-cloudrun."""
         steps = self._get_steps()
         cr_steps = [
-            s for s in steps
-            if "google-github-actions/deploy-cloudrun" in s.get("uses", "")
+            s for s in steps if "google-github-actions/deploy-cloudrun" in s.get("uses", "")
         ]
         assert len(cr_steps) >= 1, "Must have deploy-cloudrun step"
 
@@ -211,8 +216,7 @@ class TestDeployCloudRun:
         """Cloud Run service and region must reference secrets."""
         steps = self._get_steps()
         cr_steps = [
-            s for s in steps
-            if "google-github-actions/deploy-cloudrun" in s.get("uses", "")
+            s for s in steps if "google-github-actions/deploy-cloudrun" in s.get("uses", "")
         ]
         cr_step = cr_steps[0]
         with_block = cr_step.get("with", {})
@@ -235,9 +239,7 @@ class TestDeployNoHardcodedSecrets:
         # Project IDs: typically lowercase-with-dashes
         # Service account emails: something@something.iam.gserviceaccount.com
         sa_pattern = re.compile(r"[a-z0-9-]+@[a-z0-9-]+\.iam\.gserviceaccount\.com")
-        assert not sa_pattern.search(content), (
-            "Found hardcoded service account email in workflow"
-        )
+        assert not sa_pattern.search(content), "Found hardcoded service account email in workflow"
 
         # Should not have hardcoded Artifact Registry paths (without ${{ }})
         # Lines with docker.pkg.dev should contain ${{ references
@@ -246,6 +248,4 @@ class TestDeployNoHardcodedSecrets:
                 # Allow comment lines
                 stripped = line.strip()
                 if not stripped.startswith("#"):
-                    assert False, (
-                        f"Found hardcoded Artifact Registry path: {line.strip()}"
-                    )
+                    assert False, f"Found hardcoded Artifact Registry path: {line.strip()}"

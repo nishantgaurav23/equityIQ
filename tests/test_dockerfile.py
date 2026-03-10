@@ -38,14 +38,14 @@ class TestStages:
         ), "Must have base stage FROM python:3.12-slim AS base"
 
     def test_has_dev_stage(self, dockerfile_content):
-        assert re.search(
-            r"FROM\s+base\s+AS\s+dev", dockerfile_content, re.IGNORECASE
-        ), "Must have dev stage FROM base AS dev"
+        assert re.search(r"FROM\s+base\s+AS\s+dev", dockerfile_content, re.IGNORECASE), (
+            "Must have dev stage FROM base AS dev"
+        )
 
     def test_has_prod_stage(self, dockerfile_content):
-        assert re.search(
-            r"FROM\s+base\s+AS\s+prod", dockerfile_content, re.IGNORECASE
-        ), "Must have prod stage FROM base AS prod"
+        assert re.search(r"FROM\s+base\s+AS\s+prod", dockerfile_content, re.IGNORECASE), (
+            "Must have prod stage FROM base AS prod"
+        )
 
     def test_exactly_three_from_instructions(self, dockerfile_content):
         froms = re.findall(r"^FROM\s+", dockerfile_content, re.MULTILINE)
@@ -68,19 +68,17 @@ class TestBaseStage:
         assert "PYTHONUNBUFFERED=1" in dockerfile_content
 
     def test_workdir_app(self, dockerfile_content):
-        assert re.search(
-            r"WORKDIR\s+/app", dockerfile_content
-        ), "Must set WORKDIR /app"
+        assert re.search(r"WORKDIR\s+/app", dockerfile_content), "Must set WORKDIR /app"
 
     def test_copies_pyproject_toml(self, dockerfile_content):
-        assert re.search(
-            r"COPY\s+.*pyproject\.toml", dockerfile_content
-        ), "Must COPY pyproject.toml"
+        assert re.search(r"COPY\s+.*pyproject\.toml", dockerfile_content), (
+            "Must COPY pyproject.toml"
+        )
 
     def test_no_requirements_txt_copy(self, dockerfile_content):
-        assert not re.search(
-            r"COPY\s+.*requirements\.txt", dockerfile_content
-        ), "Must NOT copy requirements.txt -- deps come from pyproject.toml"
+        assert not re.search(r"COPY\s+.*requirements\.txt", dockerfile_content), (
+            "Must NOT copy requirements.txt -- deps come from pyproject.toml"
+        )
 
     def test_pip_no_cache_dir(self, dockerfile_content):
         pip_installs = re.findall(r"pip install.*", dockerfile_content)
@@ -98,15 +96,13 @@ class TestDevStage:
     def test_dev_installs_dev_deps(self, dockerfile_content):
         # After the dev FROM, should install .[dev]
         dev_section = self._get_stage_content(dockerfile_content, "dev")
-        assert re.search(
-            r'pip install.*\.\[dev\]', dev_section
-        ), "Dev stage must install .[dev] dependencies"
+        assert re.search(r"pip install.*\.\[dev\]", dev_section), (
+            "Dev stage must install .[dev] dependencies"
+        )
 
     def test_dev_default_cmd_runs_pytest(self, dockerfile_content):
         dev_section = self._get_stage_content(dockerfile_content, "dev")
-        assert re.search(
-            r"CMD.*pytest", dev_section
-        ), "Dev stage CMD must run pytest"
+        assert re.search(r"CMD.*pytest", dev_section), "Dev stage CMD must run pytest"
 
     @staticmethod
     def _get_stage_content(content, stage_name):
@@ -124,21 +120,17 @@ class TestProdStage:
 
     def test_creates_nonroot_user(self, dockerfile_content):
         prod_section = self._get_stage_content(dockerfile_content, "prod")
-        assert re.search(
-            r"(useradd|adduser).*appuser", prod_section
-        ), "Prod stage must create appuser"
+        assert re.search(r"(useradd|adduser).*appuser", prod_section), (
+            "Prod stage must create appuser"
+        )
 
     def test_switches_to_nonroot_user(self, dockerfile_content):
         prod_section = self._get_stage_content(dockerfile_content, "prod")
-        assert re.search(
-            r"USER\s+appuser", prod_section
-        ), "Prod stage must switch to appuser"
+        assert re.search(r"USER\s+appuser", prod_section), "Prod stage must switch to appuser"
 
     def test_exposes_port_8080(self, dockerfile_content):
         prod_section = self._get_stage_content(dockerfile_content, "prod")
-        assert re.search(
-            r"EXPOSE\s+8080", prod_section
-        ), "Prod stage must EXPOSE 8080"
+        assert re.search(r"EXPOSE\s+8080", prod_section), "Prod stage must EXPOSE 8080"
 
     def test_healthcheck_exists(self, dockerfile_content):
         prod_section = self._get_stage_content(dockerfile_content, "prod")
@@ -146,27 +138,23 @@ class TestProdStage:
 
     def test_healthcheck_pings_health_endpoint(self, dockerfile_content):
         prod_section = self._get_stage_content(dockerfile_content, "prod")
-        assert re.search(
-            r"HEALTHCHECK.*(/health|localhost.*8080)", prod_section, re.DOTALL
-        ), "HEALTHCHECK must ping /health endpoint"
+        assert re.search(r"HEALTHCHECK.*(/health|localhost.*8080)", prod_section, re.DOTALL), (
+            "HEALTHCHECK must ping /health endpoint"
+        )
 
     def test_cmd_uses_uvicorn(self, dockerfile_content):
         prod_section = self._get_stage_content(dockerfile_content, "prod")
-        assert re.search(
-            r"CMD.*uvicorn.*app:app", prod_section
-        ), "Prod CMD must run uvicorn app:app"
+        assert re.search(r"CMD.*uvicorn.*app:app", prod_section), (
+            "Prod CMD must run uvicorn app:app"
+        )
 
     def test_cmd_binds_to_all_interfaces(self, dockerfile_content):
         prod_section = self._get_stage_content(dockerfile_content, "prod")
-        assert re.search(
-            r"CMD.*0\.0\.0\.0", prod_section
-        ), "Prod CMD must bind to 0.0.0.0"
+        assert re.search(r"CMD.*0\.0\.0\.0", prod_section), "Prod CMD must bind to 0.0.0.0"
 
     def test_cmd_uses_port_8080(self, dockerfile_content):
         prod_section = self._get_stage_content(dockerfile_content, "prod")
-        assert re.search(
-            r"CMD.*8080", prod_section
-        ), "Prod CMD must use port 8080"
+        assert re.search(r"CMD.*8080", prod_section), "Prod CMD must use port 8080"
 
     def test_user_directive_before_cmd(self, dockerfile_content):
         prod_section = self._get_stage_content(dockerfile_content, "prod")
@@ -190,8 +178,6 @@ class TestEnvironment:
     """Verify environment variable setup."""
 
     def test_port_env_var(self, dockerfile_content):
-        assert re.search(
-            r"ENV\s+PORT\s*=?\s*8080", dockerfile_content
-        ) or re.search(
+        assert re.search(r"ENV\s+PORT\s*=?\s*8080", dockerfile_content) or re.search(
             r"EXPOSE\s+8080", dockerfile_content
         ), "Must set PORT=8080 or EXPOSE 8080"

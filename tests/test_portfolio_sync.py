@@ -16,6 +16,7 @@ from integrations.zerodha import ZerodhaHolding, ZerodhaPortfolio
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 def _make_zerodha_portfolio(
     holdings: list[dict] | None = None,
 ) -> ZerodhaPortfolio:
@@ -143,6 +144,7 @@ def _make_portfolio_insight(tickers: list[str]) -> PortfolioInsight:
 # Model Tests
 # ---------------------------------------------------------------------------
 
+
 class TestUnifiedModels:
     """Test UnifiedHolding and related Pydantic models."""
 
@@ -209,6 +211,7 @@ class TestUnifiedModels:
 # Import Tests (FR-1)
 # ---------------------------------------------------------------------------
 
+
 class TestImportHoldings:
     """FR-1: Unified portfolio import from brokers."""
 
@@ -216,9 +219,7 @@ class TestImportHoldings:
         from integrations.portfolio_sync import PortfolioSyncer
 
         zerodha_client = AsyncMock()
-        zerodha_client.get_portfolio_summary = AsyncMock(
-            return_value=_make_zerodha_portfolio()
-        )
+        zerodha_client.get_portfolio_summary = AsyncMock(return_value=_make_zerodha_portfolio())
 
         syncer = PortfolioSyncer(
             zerodha_client=zerodha_client,
@@ -234,9 +235,7 @@ class TestImportHoldings:
         from integrations.portfolio_sync import PortfolioSyncer
 
         alpaca_client = AsyncMock()
-        alpaca_client.get_portfolio_summary = AsyncMock(
-            return_value=_make_alpaca_portfolio()
-        )
+        alpaca_client.get_portfolio_summary = AsyncMock(return_value=_make_alpaca_portfolio())
 
         syncer = PortfolioSyncer(
             zerodha_client=None,
@@ -252,13 +251,9 @@ class TestImportHoldings:
         from integrations.portfolio_sync import PortfolioSyncer
 
         zerodha_client = AsyncMock()
-        zerodha_client.get_portfolio_summary = AsyncMock(
-            return_value=_make_zerodha_portfolio()
-        )
+        zerodha_client.get_portfolio_summary = AsyncMock(return_value=_make_zerodha_portfolio())
         alpaca_client = AsyncMock()
-        alpaca_client.get_portfolio_summary = AsyncMock(
-            return_value=_make_alpaca_portfolio()
-        )
+        alpaca_client.get_portfolio_summary = AsyncMock(return_value=_make_alpaca_portfolio())
 
         syncer = PortfolioSyncer(
             zerodha_client=zerodha_client,
@@ -276,9 +271,7 @@ class TestImportHoldings:
         zerodha_client = AsyncMock()
         zerodha_client.get_portfolio_summary = AsyncMock(side_effect=Exception("Zerodha down"))
         alpaca_client = AsyncMock()
-        alpaca_client.get_portfolio_summary = AsyncMock(
-            return_value=_make_alpaca_portfolio()
-        )
+        alpaca_client.get_portfolio_summary = AsyncMock(return_value=_make_alpaca_portfolio())
 
         syncer = PortfolioSyncer(
             zerodha_client=zerodha_client,
@@ -323,6 +316,7 @@ class TestImportHoldings:
 # Analysis Tests (FR-2)
 # ---------------------------------------------------------------------------
 
+
 class TestRunAnalysis:
     """FR-2: Run analysis on imported tickers."""
 
@@ -333,18 +327,24 @@ class TestRunAnalysis:
         insight = _make_portfolio_insight(["AAPL", "GOOGL"])
         conductor.analyze_portfolio = AsyncMock(return_value=insight)
 
-        syncer = PortfolioSyncer(
-            zerodha_client=None, alpaca_client=None, conductor=conductor
-        )
+        syncer = PortfolioSyncer(zerodha_client=None, alpaca_client=None, conductor=conductor)
         portfolio = UnifiedPortfolio(
             holdings=[
                 UnifiedHolding(
-                    ticker="AAPL", quantity=10, avg_price=170.0,
-                    current_price=180.0, unrealized_pnl=100.0, broker_source="alpaca",
+                    ticker="AAPL",
+                    quantity=10,
+                    avg_price=170.0,
+                    current_price=180.0,
+                    unrealized_pnl=100.0,
+                    broker_source="alpaca",
                 ),
                 UnifiedHolding(
-                    ticker="GOOGL", quantity=5, avg_price=140.0,
-                    current_price=145.0, unrealized_pnl=25.0, broker_source="alpaca",
+                    ticker="GOOGL",
+                    quantity=5,
+                    avg_price=140.0,
+                    current_price=145.0,
+                    unrealized_pnl=25.0,
+                    broker_source="alpaca",
                 ),
             ]
         )
@@ -357,9 +357,7 @@ class TestRunAnalysis:
     async def test_run_analysis_empty_portfolio(self):
         from integrations.portfolio_sync import PortfolioSyncer, UnifiedPortfolio
 
-        syncer = PortfolioSyncer(
-            zerodha_client=None, alpaca_client=None, conductor=AsyncMock()
-        )
+        syncer = PortfolioSyncer(zerodha_client=None, alpaca_client=None, conductor=AsyncMock())
         portfolio = UnifiedPortfolio(holdings=[])
         result = await syncer.run_analysis(portfolio)
         assert result is None
@@ -373,8 +371,12 @@ class TestRunAnalysis:
             ticker = f"TICK{i}"
             holdings.append(
                 UnifiedHolding(
-                    ticker=ticker, quantity=1, avg_price=100.0,
-                    current_price=100.0, unrealized_pnl=0.0, broker_source="alpaca",
+                    ticker=ticker,
+                    quantity=1,
+                    avg_price=100.0,
+                    current_price=100.0,
+                    unrealized_pnl=0.0,
+                    broker_source="alpaca",
                 )
             )
         portfolio = UnifiedPortfolio(holdings=holdings)
@@ -387,9 +389,7 @@ class TestRunAnalysis:
 
         conductor.analyze_portfolio = AsyncMock(side_effect=mock_analyze)
 
-        syncer = PortfolioSyncer(
-            zerodha_client=None, alpaca_client=None, conductor=conductor
-        )
+        syncer = PortfolioSyncer(zerodha_client=None, alpaca_client=None, conductor=conductor)
         result = await syncer.run_analysis(portfolio)
         assert result is not None
         # Should have been called twice: batch of 10 + batch of 5
@@ -399,26 +399,30 @@ class TestRunAnalysis:
         from integrations.portfolio_sync import PortfolioSyncer, UnifiedHolding, UnifiedPortfolio
 
         conductor = AsyncMock()
-        conductor.analyze_portfolio = AsyncMock(
-            return_value=_make_portfolio_insight(["AAPL"])
-        )
+        conductor.analyze_portfolio = AsyncMock(return_value=_make_portfolio_insight(["AAPL"]))
 
         # Same ticker from two brokers
         holdings = [
             UnifiedHolding(
-                ticker="AAPL", quantity=10, avg_price=170.0,
-                current_price=180.0, unrealized_pnl=100.0, broker_source="alpaca",
+                ticker="AAPL",
+                quantity=10,
+                avg_price=170.0,
+                current_price=180.0,
+                unrealized_pnl=100.0,
+                broker_source="alpaca",
             ),
             UnifiedHolding(
-                ticker="AAPL", quantity=5, avg_price=175.0,
-                current_price=180.0, unrealized_pnl=25.0, broker_source="zerodha",
+                ticker="AAPL",
+                quantity=5,
+                avg_price=175.0,
+                current_price=180.0,
+                unrealized_pnl=25.0,
+                broker_source="zerodha",
             ),
         ]
         portfolio = UnifiedPortfolio(holdings=holdings)
 
-        syncer = PortfolioSyncer(
-            zerodha_client=None, alpaca_client=None, conductor=conductor
-        )
+        syncer = PortfolioSyncer(zerodha_client=None, alpaca_client=None, conductor=conductor)
         await syncer.run_analysis(portfolio)
         call_tickers = conductor.analyze_portfolio.call_args[0][0]
         assert call_tickers == ["AAPL"]  # Deduplicated
@@ -428,20 +432,23 @@ class TestRunAnalysis:
 # Comparison Tests (FR-3)
 # ---------------------------------------------------------------------------
 
+
 class TestComparison:
     """FR-3: Side-by-side comparison."""
 
     async def test_comparison_report(self):
         from integrations.portfolio_sync import PortfolioSyncer, UnifiedHolding, UnifiedPortfolio
 
-        syncer = PortfolioSyncer(
-            zerodha_client=None, alpaca_client=None, conductor=AsyncMock()
-        )
+        syncer = PortfolioSyncer(zerodha_client=None, alpaca_client=None, conductor=AsyncMock())
         portfolio = UnifiedPortfolio(
             holdings=[
                 UnifiedHolding(
-                    ticker="AAPL", quantity=10, avg_price=170.0,
-                    current_price=180.0, unrealized_pnl=100.0, broker_source="alpaca",
+                    ticker="AAPL",
+                    quantity=10,
+                    avg_price=170.0,
+                    current_price=180.0,
+                    unrealized_pnl=100.0,
+                    broker_source="alpaca",
                 ),
             ]
         )
@@ -456,14 +463,16 @@ class TestComparison:
     async def test_comparison_action_hints_buy_on_held(self):
         from integrations.portfolio_sync import PortfolioSyncer, UnifiedHolding, UnifiedPortfolio
 
-        syncer = PortfolioSyncer(
-            zerodha_client=None, alpaca_client=None, conductor=AsyncMock()
-        )
+        syncer = PortfolioSyncer(zerodha_client=None, alpaca_client=None, conductor=AsyncMock())
         portfolio = UnifiedPortfolio(
             holdings=[
                 UnifiedHolding(
-                    ticker="AAPL", quantity=10, avg_price=170.0,
-                    current_price=180.0, unrealized_pnl=100.0, broker_source="alpaca",
+                    ticker="AAPL",
+                    quantity=10,
+                    avg_price=170.0,
+                    current_price=180.0,
+                    unrealized_pnl=100.0,
+                    broker_source="alpaca",
                 ),
             ]
         )
@@ -476,14 +485,16 @@ class TestComparison:
     async def test_comparison_action_hints_sell(self):
         from integrations.portfolio_sync import PortfolioSyncer, UnifiedHolding, UnifiedPortfolio
 
-        syncer = PortfolioSyncer(
-            zerodha_client=None, alpaca_client=None, conductor=AsyncMock()
-        )
+        syncer = PortfolioSyncer(zerodha_client=None, alpaca_client=None, conductor=AsyncMock())
         portfolio = UnifiedPortfolio(
             holdings=[
                 UnifiedHolding(
-                    ticker="SELL_STOCK", quantity=10, avg_price=100.0,
-                    current_price=90.0, unrealized_pnl=-100.0, broker_source="alpaca",
+                    ticker="SELL_STOCK",
+                    quantity=10,
+                    avg_price=100.0,
+                    current_price=90.0,
+                    unrealized_pnl=-100.0,
+                    broker_source="alpaca",
                 ),
             ]
         )
@@ -511,14 +522,16 @@ class TestComparison:
     async def test_comparison_hold_signal(self):
         from integrations.portfolio_sync import PortfolioSyncer, UnifiedHolding, UnifiedPortfolio
 
-        syncer = PortfolioSyncer(
-            zerodha_client=None, alpaca_client=None, conductor=AsyncMock()
-        )
+        syncer = PortfolioSyncer(zerodha_client=None, alpaca_client=None, conductor=AsyncMock())
         portfolio = UnifiedPortfolio(
             holdings=[
                 UnifiedHolding(
-                    ticker="HOLD_STOCK", quantity=10, avg_price=100.0,
-                    current_price=100.0, unrealized_pnl=0.0, broker_source="alpaca",
+                    ticker="HOLD_STOCK",
+                    quantity=10,
+                    avg_price=100.0,
+                    current_price=100.0,
+                    unrealized_pnl=0.0,
+                    broker_source="alpaca",
                 ),
             ]
         )
@@ -545,14 +558,16 @@ class TestComparison:
     async def test_comparison_unmapped_ticker(self):
         from integrations.portfolio_sync import PortfolioSyncer, UnifiedHolding, UnifiedPortfolio
 
-        syncer = PortfolioSyncer(
-            zerodha_client=None, alpaca_client=None, conductor=AsyncMock()
-        )
+        syncer = PortfolioSyncer(zerodha_client=None, alpaca_client=None, conductor=AsyncMock())
         portfolio = UnifiedPortfolio(
             holdings=[
                 UnifiedHolding(
-                    ticker="", quantity=10, avg_price=100.0,
-                    current_price=100.0, unrealized_pnl=0.0, broker_source="zerodha",
+                    ticker="",
+                    quantity=10,
+                    avg_price=100.0,
+                    current_price=100.0,
+                    unrealized_pnl=0.0,
+                    broker_source="zerodha",
                 ),
             ]
         )
@@ -565,14 +580,16 @@ class TestComparison:
     async def test_comparison_analysis_unavailable(self):
         from integrations.portfolio_sync import PortfolioSyncer, UnifiedHolding, UnifiedPortfolio
 
-        syncer = PortfolioSyncer(
-            zerodha_client=None, alpaca_client=None, conductor=AsyncMock()
-        )
+        syncer = PortfolioSyncer(zerodha_client=None, alpaca_client=None, conductor=AsyncMock())
         portfolio = UnifiedPortfolio(
             holdings=[
                 UnifiedHolding(
-                    ticker="MISSING", quantity=10, avg_price=100.0,
-                    current_price=100.0, unrealized_pnl=0.0, broker_source="alpaca",
+                    ticker="MISSING",
+                    quantity=10,
+                    avg_price=100.0,
+                    current_price=100.0,
+                    unrealized_pnl=0.0,
+                    broker_source="alpaca",
                 ),
             ]
         )
@@ -586,15 +603,14 @@ class TestComparison:
 # Scheduler Tests (FR-4)
 # ---------------------------------------------------------------------------
 
+
 class TestScheduler:
     """FR-4: Periodic refresh scheduler."""
 
     async def test_scheduler_start_stop(self):
         from integrations.portfolio_sync import PortfolioSyncer
 
-        syncer = PortfolioSyncer(
-            zerodha_client=None, alpaca_client=None, conductor=AsyncMock()
-        )
+        syncer = PortfolioSyncer(zerodha_client=None, alpaca_client=None, conductor=AsyncMock())
         assert not syncer.scheduler_running
         syncer.start_scheduler(interval_minutes=10)
         assert syncer.scheduler_running
@@ -604,9 +620,7 @@ class TestScheduler:
     async def test_scheduler_clamp_interval(self):
         from integrations.portfolio_sync import PortfolioSyncer
 
-        syncer = PortfolioSyncer(
-            zerodha_client=None, alpaca_client=None, conductor=AsyncMock()
-        )
+        syncer = PortfolioSyncer(zerodha_client=None, alpaca_client=None, conductor=AsyncMock())
         syncer.start_scheduler(interval_minutes=2)  # Below minimum of 5
         assert syncer._refresh_interval_minutes >= 5
         await syncer.stop_scheduler()
@@ -614,9 +628,7 @@ class TestScheduler:
     async def test_scheduler_no_duplicate(self):
         from integrations.portfolio_sync import PortfolioSyncer
 
-        syncer = PortfolioSyncer(
-            zerodha_client=None, alpaca_client=None, conductor=AsyncMock()
-        )
+        syncer = PortfolioSyncer(zerodha_client=None, alpaca_client=None, conductor=AsyncMock())
         syncer.start_scheduler(interval_minutes=10)
         task1 = syncer._scheduler_task
         syncer.start_scheduler(interval_minutes=10)  # Duplicate -- should not replace
@@ -628,6 +640,7 @@ class TestScheduler:
 # Full Sync Flow (FR-5)
 # ---------------------------------------------------------------------------
 
+
 class TestFullSync:
     """End-to-end sync flow."""
 
@@ -635,13 +648,9 @@ class TestFullSync:
         from integrations.portfolio_sync import PortfolioSyncer
 
         zerodha_client = AsyncMock()
-        zerodha_client.get_portfolio_summary = AsyncMock(
-            return_value=_make_zerodha_portfolio()
-        )
+        zerodha_client.get_portfolio_summary = AsyncMock(return_value=_make_zerodha_portfolio())
         alpaca_client = AsyncMock()
-        alpaca_client.get_portfolio_summary = AsyncMock(
-            return_value=_make_alpaca_portfolio()
-        )
+        alpaca_client.get_portfolio_summary = AsyncMock(return_value=_make_alpaca_portfolio())
 
         conductor = AsyncMock()
 
@@ -665,9 +674,7 @@ class TestFullSync:
         from integrations.portfolio_sync import PortfolioSyncer
 
         zerodha_client = AsyncMock()
-        zerodha_client.get_portfolio_summary = AsyncMock(
-            return_value=_make_zerodha_portfolio()
-        )
+        zerodha_client.get_portfolio_summary = AsyncMock(return_value=_make_zerodha_portfolio())
         conductor = AsyncMock()
         conductor.analyze_portfolio = AsyncMock(
             return_value=_make_portfolio_insight(["RELIANCE.NS", "TCS.NS"])
@@ -688,9 +695,7 @@ class TestFullSync:
         from integrations.portfolio_sync import PortfolioSyncer
 
         alpaca_client = AsyncMock()
-        alpaca_client.get_portfolio_summary = AsyncMock(
-            return_value=_make_alpaca_portfolio()
-        )
+        alpaca_client.get_portfolio_summary = AsyncMock(return_value=_make_alpaca_portfolio())
         conductor = AsyncMock()
         conductor.analyze_portfolio = AsyncMock(side_effect=Exception("Analysis failed"))
 

@@ -216,9 +216,7 @@ class PredictionTracker:
                 continue  # Can't resolve yet
 
             actual_return = (price_now - price_pred) / price_pred
-            outcome_str = (
-                "correct" if is_signal_correct(signal, actual_return) else "incorrect"
-            )
+            outcome_str = "correct" if is_signal_correct(signal, actual_return) else "incorrect"
 
             await conn.execute(
                 """UPDATE prediction_outcomes
@@ -253,9 +251,7 @@ class PredictionTracker:
     # FR-4: Accuracy scorecard
     # -------------------------------------------------------------------
 
-    async def get_accuracy_scorecard(
-        self, ticker: str | None = None
-    ) -> AccuracyScorecard:
+    async def get_accuracy_scorecard(self, ticker: str | None = None) -> AccuracyScorecard:
         """Compute accuracy scorecard, optionally filtered by ticker."""
         conn = await self._ensure_conn()
 
@@ -377,9 +373,7 @@ class PredictionTracker:
                 # Agent is correct if it agreed with verdict AND verdict was correct,
                 # OR it disagreed with verdict AND verdict was incorrect
                 agent_agreed = agent_signal == verdict_signal
-                if (agent_agreed and verdict_correct) or (
-                    not agent_agreed and not verdict_correct
-                ):
+                if (agent_agreed and verdict_correct) or (not agent_agreed and not verdict_correct):
                     agent_stats[agent_name]["correct"] += 1
 
         result: dict[str, AgentAccuracy] = {}

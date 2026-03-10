@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 # World Bank indicator codes
 _WB_INDICATORS: dict[str, str] = {
-    "gdp_growth": "NY.GDP.MKTP.KD.ZG",       # GDP growth (annual %)
-    "inflation_rate": "FP.CPI.TOTL.ZG",       # CPI inflation (annual %)
-    "unemployment_rate": "SL.UEM.TOTL.ZS",    # Unemployment (% of labor force)
+    "gdp_growth": "NY.GDP.MKTP.KD.ZG",  # GDP growth (annual %)
+    "inflation_rate": "FP.CPI.TOTL.ZG",  # CPI inflation (annual %)
+    "unemployment_rate": "SL.UEM.TOTL.ZS",  # Unemployment (% of labor force)
 }
 
 # RBI repo rate is not directly in World Bank; we use a known recent value

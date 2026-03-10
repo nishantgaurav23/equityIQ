@@ -179,9 +179,7 @@ class VertexMemoryBank:
             logger.exception("Failed to store conversation entry %s", entry.entry_id)
             raise
 
-    async def get_conversation(
-        self, session_id: str, limit: int = 50
-    ) -> list[ConversationEntry]:
+    async def get_conversation(self, session_id: str, limit: int = 50) -> list[ConversationEntry]:
         """Retrieve conversation entries for a session, ordered by created_at ASC."""
         limit = max(1, min(limit, 200))
         try:
@@ -276,9 +274,7 @@ class VertexMemoryBank:
             logger.exception("Failed to store prediction %s", prediction.outcome_id)
             raise
 
-    async def get_pending_predictions(
-        self, check_window_days: int = 30
-    ) -> list[PredictionOutcome]:
+    async def get_pending_predictions(self, check_window_days: int = 30) -> list[PredictionOutcome]:
         """Get predictions that are still pending resolution."""
         try:
             conn = await self._get_connection()
@@ -333,9 +329,7 @@ class VertexMemoryBank:
             logger.exception("Failed to update prediction %s", outcome_id)
             return False
 
-    async def get_prediction_accuracy(
-        self, ticker: str | None = None
-    ) -> dict:
+    async def get_prediction_accuracy(self, ticker: str | None = None) -> dict:
         """Calculate prediction accuracy metrics.
 
         Returns: {"total": int, "correct": int, "accuracy": float, "by_signal": {...}}
@@ -404,9 +398,7 @@ class VertexMemoryBank:
         """Retrieve learned agent weights. Returns None if not set or on error."""
         try:
             conn = await self._get_connection()
-            cursor = await conn.execute(
-                "SELECT weights_json FROM learned_weights WHERE id = 1"
-            )
+            cursor = await conn.execute("SELECT weights_json FROM learned_weights WHERE id = 1")
             row = await cursor.fetchone()
             if row is None:
                 return None

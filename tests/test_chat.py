@@ -22,6 +22,7 @@ from config.data_contracts import (
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 def _make_verdict(ticker="AAPL", signal="BUY", confidence=0.82) -> FinalVerdict:
     return FinalVerdict(
         ticker=ticker,
@@ -87,6 +88,7 @@ def engine_no_gemini():
 # ---------------------------------------------------------------------------
 # Data contract tests
 # ---------------------------------------------------------------------------
+
 
 class TestChatRequestValidation:
     def test_valid_request(self):
@@ -156,6 +158,7 @@ class TestChatHistoryResponse:
 # Intent detection tests
 # ---------------------------------------------------------------------------
 
+
 class TestIntentDetection:
     def test_analyze_explicit(self):
         assert detect_intent("Analyze AAPL") == "full_analysis"
@@ -209,6 +212,7 @@ class TestIntentDetection:
 # Ticker extraction tests
 # ---------------------------------------------------------------------------
 
+
 class TestTickerExtraction:
     def test_single_ticker(self):
         assert extract_tickers("Analyze AAPL") == ["AAPL"]
@@ -237,6 +241,7 @@ class TestTickerExtraction:
 # ---------------------------------------------------------------------------
 # Context building tests
 # ---------------------------------------------------------------------------
+
 
 class TestContextBuilding:
     def test_format_verdict_context(self):
@@ -268,12 +273,18 @@ class TestContextBuilding:
     def test_build_prompt_with_history(self, engine):
         history = [
             ConversationEntry(
-                entry_id="e1", user_id="default", session_id="s1",
-                role="user", content="What about AAPL?"
+                entry_id="e1",
+                user_id="default",
+                session_id="s1",
+                role="user",
+                content="What about AAPL?",
             ),
             ConversationEntry(
-                entry_id="e2", user_id="default", session_id="s1",
-                role="assistant", content="AAPL shows a BUY signal."
+                entry_id="e2",
+                user_id="default",
+                session_id="s1",
+                role="assistant",
+                content="AAPL shows a BUY signal.",
             ),
         ]
         prompt = engine._build_prompt("Tell me more", [], history, "follow_up")
@@ -290,6 +301,7 @@ class TestContextBuilding:
 # ---------------------------------------------------------------------------
 # ChatEngine streaming tests
 # ---------------------------------------------------------------------------
+
 
 class TestProcessMessageStreaming:
     @pytest.mark.asyncio
@@ -319,9 +331,7 @@ class TestProcessMessageStreaming:
     async def test_streaming_yields_done(self, engine):
         req = ChatRequest(message="Hello")
         events = []
-        with patch.object(
-            engine, "_generate_streaming", return_value=_async_iter(["response"])
-        ):
+        with patch.object(engine, "_generate_streaming", return_value=_async_iter(["response"])):
             async for event in engine.process_message(req):
                 events.append(event)
         done_events = [e for e in events if e["type"] == "done"]
@@ -332,9 +342,7 @@ class TestProcessMessageStreaming:
     async def test_analysis_trigger(self, engine):
         """'Analyze AAPL' should call conductor.analyze."""
         req = ChatRequest(message="Analyze AAPL")
-        with patch.object(
-            engine, "_generate_streaming", return_value=_async_iter(["ok"])
-        ):
+        with patch.object(engine, "_generate_streaming", return_value=_async_iter(["ok"])):
             async for _ in engine.process_message(req):
                 pass
         engine._conductor.analyze.assert_called_once()
@@ -344,9 +352,7 @@ class TestProcessMessageStreaming:
         sid = str(uuid.uuid4())
         req = ChatRequest(message="Hello", session_id=sid)
         events = []
-        with patch.object(
-            engine, "_generate_streaming", return_value=_async_iter(["hi"])
-        ):
+        with patch.object(engine, "_generate_streaming", return_value=_async_iter(["hi"])):
             async for event in engine.process_message(req):
                 events.append(event)
         assert events[0]["session_id"] == sid
@@ -355,9 +361,7 @@ class TestProcessMessageStreaming:
     async def test_context_event_with_ticker(self, engine):
         req = ChatRequest(message="Analyze AAPL")
         events = []
-        with patch.object(
-            engine, "_generate_streaming", return_value=_async_iter(["ok"])
-        ):
+        with patch.object(engine, "_generate_streaming", return_value=_async_iter(["ok"])):
             async for event in engine.process_message(req):
                 events.append(event)
         context_events = [e for e in events if e["type"] == "context"]
@@ -369,9 +373,7 @@ class TestProcessMessageSync:
     @pytest.mark.asyncio
     async def test_sync_returns_chat_response(self, engine):
         req = ChatRequest(message="Hello")
-        with patch.object(
-            engine, "_generate_streaming", return_value=_async_iter(["Hello there"])
-        ):
+        with patch.object(engine, "_generate_streaming", return_value=_async_iter(["Hello there"])):
             resp = await engine.process_message_sync(req)
         assert isinstance(resp, ChatResponse)
         assert resp.response == "Hello there"
@@ -382,13 +384,12 @@ class TestProcessMessageSync:
 # Conversation persistence tests
 # ---------------------------------------------------------------------------
 
+
 class TestConversationPersistence:
     @pytest.mark.asyncio
     async def test_stores_user_and_assistant(self, engine):
         req = ChatRequest(message="Hello")
-        with patch.object(
-            engine, "_generate_streaming", return_value=_async_iter(["Hi"])
-        ):
+        with patch.object(engine, "_generate_streaming", return_value=_async_iter(["Hi"])):
             async for _ in engine.process_message(req):
                 pass
         # Should store 2 entries: user + assistant
@@ -406,6 +407,7 @@ class TestConversationPersistence:
 # Context grounding tests
 # ---------------------------------------------------------------------------
 
+
 class TestContextGrounding:
     @pytest.mark.asyncio
     async def test_analyze_includes_verdict_context(self, engine):
@@ -418,9 +420,7 @@ class TestContextGrounding:
             return original_build(msg, ctx, hist, intent)
 
         engine._build_prompt = capture_prompt
-        with patch.object(
-            engine, "_generate_streaming", return_value=_async_iter(["ok"])
-        ):
+        with patch.object(engine, "_generate_streaming", return_value=_async_iter(["ok"])):
             async for _ in engine.process_message(req):
                 pass
         assert len(prompts_captured) == 1
@@ -432,6 +432,7 @@ class TestContextGrounding:
 # ---------------------------------------------------------------------------
 # Gemini failure fallback tests
 # ---------------------------------------------------------------------------
+
 
 class TestGeminiFailureFallback:
     @pytest.mark.asyncio
@@ -460,7 +461,8 @@ class TestGeminiFailureFallback:
         # Mock it to raise ImportError
         with patch.dict("sys.modules", {"google": None, "google.genai": None}):
             with patch.object(
-                engine, "_generate_streaming",
+                engine,
+                "_generate_streaming",
                 return_value=_async_iter(["Fallback response"]),
             ):
                 async for event in engine.process_message(req):
@@ -473,15 +475,14 @@ class TestGeminiFailureFallback:
 # API endpoint tests (using FastAPI TestClient)
 # ---------------------------------------------------------------------------
 
+
 class TestChatEndpointStreaming:
     @pytest.mark.asyncio
     async def test_post_chat_sse(self):
         from httpx import ASGITransport, AsyncClient
 
         app = _create_test_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             resp = await client.post(
                 "/api/v1/chat",
                 json={"message": "Hello"},
@@ -503,9 +504,7 @@ class TestChatEndpointJson:
         from httpx import ASGITransport, AsyncClient
 
         app = _create_test_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             resp = await client.post(
                 "/api/v1/chat",
                 json={"message": "Hello"},
@@ -523,9 +522,7 @@ class TestChatHistoryEndpoint:
         from httpx import ASGITransport, AsyncClient
 
         app = _create_test_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             resp = await client.get("/api/v1/chat/history/test-session")
         assert resp.status_code == 200
         body = resp.json()
@@ -539,9 +536,7 @@ class TestChatHistoryDelete:
         from httpx import ASGITransport, AsyncClient
 
         app = _create_test_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             resp = await client.delete("/api/v1/chat/history/test-session")
         assert resp.status_code == 200
         body = resp.json()
@@ -554,9 +549,7 @@ class TestEmptyMessageRejected:
         from httpx import ASGITransport, AsyncClient
 
         app = _create_test_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             resp = await client.post(
                 "/api/v1/chat",
                 json={"message": ""},
@@ -571,9 +564,7 @@ class TestMessageTooLong:
         from httpx import ASGITransport, AsyncClient
 
         app = _create_test_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             resp = await client.post(
                 "/api/v1/chat",
                 json={"message": "x" * 2001},
@@ -585,6 +576,7 @@ class TestMessageTooLong:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 async def _async_iter(items):
     """Create an async iterator from a list."""

@@ -21,15 +21,11 @@ class TestFileExistence:
         assert os.path.isfile(path), f"Missing: {path}"
 
     def test_signal_trend_chart_exists(self):
-        path = os.path.join(
-            FRONTEND_DIR, "app", "history", "components", "SignalTrendChart.tsx"
-        )
+        path = os.path.join(FRONTEND_DIR, "app", "history", "components", "SignalTrendChart.tsx")
         assert os.path.isfile(path), f"Missing: {path}"
 
     def test_date_range_filter_exists(self):
-        path = os.path.join(
-            FRONTEND_DIR, "app", "history", "components", "DateRangeFilter.tsx"
-        )
+        path = os.path.join(FRONTEND_DIR, "app", "history", "components", "DateRangeFilter.tsx")
         assert os.path.isfile(path), f"Missing: {path}"
 
 
@@ -161,9 +157,7 @@ class TestSignalTrendChart:
     """Verify SignalTrendChart component."""
 
     def test_trend_chart_maps_signals_to_numbers(self):
-        path = os.path.join(
-            FRONTEND_DIR, "app", "history", "components", "SignalTrendChart.tsx"
-        )
+        path = os.path.join(FRONTEND_DIR, "app", "history", "components", "SignalTrendChart.tsx")
         content = open(path).read()
         # Should map signals like STRONG_BUY=2, BUY=1, HOLD=0, SELL=-1, STRONG_SELL=-2
         assert re.search(r"STRONG_BUY|STRONG_SELL", content), (
@@ -171,16 +165,12 @@ class TestSignalTrendChart:
         )
 
     def test_trend_chart_accepts_snapshots_prop(self):
-        path = os.path.join(
-            FRONTEND_DIR, "app", "history", "components", "SignalTrendChart.tsx"
-        )
+        path = os.path.join(FRONTEND_DIR, "app", "history", "components", "SignalTrendChart.tsx")
         content = open(path).read()
         assert "SignalSnapshot" in content, "SignalTrendChart should use SignalSnapshot type"
 
     def test_trend_chart_handles_empty(self):
-        path = os.path.join(
-            FRONTEND_DIR, "app", "history", "components", "SignalTrendChart.tsx"
-        )
+        path = os.path.join(FRONTEND_DIR, "app", "history", "components", "SignalTrendChart.tsx")
         content = open(path).read()
         assert re.search(r"no.*data|empty|No.*trend|length.*0|\.length", content, re.IGNORECASE), (
             "SignalTrendChart should handle empty data"
@@ -191,18 +181,14 @@ class TestDateRangeFilter:
     """Verify DateRangeFilter component."""
 
     def test_date_filter_has_date_inputs(self):
-        path = os.path.join(
-            FRONTEND_DIR, "app", "history", "components", "DateRangeFilter.tsx"
-        )
+        path = os.path.join(FRONTEND_DIR, "app", "history", "components", "DateRangeFilter.tsx")
         content = open(path).read()
         assert re.search(r'type=["\']date["\']', content), (
             "DateRangeFilter should have date input fields"
         )
 
     def test_date_filter_has_clear_button(self):
-        path = os.path.join(
-            FRONTEND_DIR, "app", "history", "components", "DateRangeFilter.tsx"
-        )
+        path = os.path.join(FRONTEND_DIR, "app", "history", "components", "DateRangeFilter.tsx")
         content = open(path).read()
         assert re.search(r"[Cc]lear|[Rr]eset", content), (
             "DateRangeFilter should have a clear/reset button"

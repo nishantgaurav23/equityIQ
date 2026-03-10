@@ -119,7 +119,9 @@ class TestGetFundamentals:
         fund_resp = _mock_httpx_response(_fundamentals_response())
         price_resp = _mock_httpx_response(_prev_close_response())
         # First call: financials, subsequent calls: prev close for price
-        connector.client.get = AsyncMock(side_effect=[fund_resp, price_resp, price_resp, price_resp])
+        connector.client.get = AsyncMock(
+            side_effect=[fund_resp, price_resp, price_resp, price_resp]
+        )
 
         result = await connector.get_fundamentals("AAPL")
 
@@ -274,8 +276,14 @@ class TestCaching:
         # Each ticker call needs: 1 financials + up to 3 price lookups (with caching)
         connector.client.get = AsyncMock(
             side_effect=[
-                fund_resp, price_resp, price_resp, price_resp,
-                fund_resp, price_resp, price_resp, price_resp,
+                fund_resp,
+                price_resp,
+                price_resp,
+                price_resp,
+                fund_resp,
+                price_resp,
+                price_resp,
+                price_resp,
             ]
         )
 

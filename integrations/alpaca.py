@@ -264,9 +264,7 @@ class AlpacaClient:
         )
         day_pl = account.equity - account.last_equity
 
-        tickers = sorted(
-            {p.equityiq_ticker for p in positions if p.equityiq_ticker}
-        )
+        tickers = sorted({p.equityiq_ticker for p in positions if p.equityiq_ticker})
 
         return AlpacaPortfolio(
             positions=positions,

@@ -8,9 +8,7 @@ import subprocess
 import pytest
 
 SCRIPT_PATH = os.path.join(os.path.dirname(__file__), "..", "deploy", "setup-firestore.sh")
-FIRESTORE_VAULT_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "memory", "firestore_vault.py"
-)
+FIRESTORE_VAULT_PATH = os.path.join(os.path.dirname(__file__), "..", "memory", "firestore_vault.py")
 
 
 @pytest.fixture
@@ -59,16 +57,16 @@ class TestSetupFirestoreShellcheck:
 class TestSetupFirestoreProjectIdRequired:
     def test_project_id_validation(self, script_content):
         assert "GCP_PROJECT_ID" in script_content, "Script must reference GCP_PROJECT_ID"
-        assert re.search(
-            r'(if.*GCP_PROJECT_ID|-z.*GCP_PROJECT_ID|PROJECT_ID)', script_content
-        ), "Script must validate GCP_PROJECT_ID is set"
+        assert re.search(r"(if.*GCP_PROJECT_ID|-z.*GCP_PROJECT_ID|PROJECT_ID)", script_content), (
+            "Script must validate GCP_PROJECT_ID is set"
+        )
 
 
 class TestSetupFirestoreGcloudCheck:
     def test_checks_gcloud_availability(self, script_content):
-        assert re.search(
-            r"(command -v gcloud|which gcloud|gcloud version)", script_content
-        ), "Script must check gcloud CLI is available"
+        assert re.search(r"(command -v gcloud|which gcloud|gcloud version)", script_content), (
+            "Script must check gcloud CLI is available"
+        )
 
 
 class TestSetupFirestoreNativeMode:
@@ -78,16 +76,14 @@ class TestSetupFirestoreNativeMode:
         ), "Script must create Firestore database in Native mode"
 
     def test_firestore_database_create_command(self, script_content):
-        assert re.search(
-            r"firestore databases create", script_content
-        ), "Script must use 'firestore databases create' command"
+        assert re.search(r"firestore databases create", script_content), (
+            "Script must use 'firestore databases create' command"
+        )
 
 
 class TestSetupFirestoreCollectionName:
     def test_verdicts_collection_referenced(self, script_content):
-        assert "verdicts" in script_content, (
-            "Script must reference 'verdicts' collection"
-        )
+        assert "verdicts" in script_content, "Script must reference 'verdicts' collection"
 
     def test_collection_matches_firestore_vault(self, script_content, firestore_vault_content):
         # Extract collection name from firestore_vault.py
@@ -111,9 +107,9 @@ class TestSetupFirestoreCompositeIndex:
         )
 
     def test_index_creation_command(self, script_content):
-        assert re.search(
-            r"firestore indexes composite create|indexes.*create", script_content
-        ), "Script must create composite indexes"
+        assert re.search(r"firestore indexes composite create|indexes.*create", script_content), (
+            "Script must create composite indexes"
+        )
 
 
 class TestSetupFirestoreApiEnablement:
@@ -123,16 +119,14 @@ class TestSetupFirestoreApiEnablement:
         )
 
     def test_services_enable_command(self, script_content):
-        assert re.search(
-            r"gcloud services enable.*firestore", script_content
-        ), "Script must use 'gcloud services enable' for Firestore API"
+        assert re.search(r"gcloud services enable.*firestore", script_content), (
+            "Script must use 'gcloud services enable' for Firestore API"
+        )
 
 
 class TestSetupFirestoreIamBinding:
     def test_datastore_user_role(self, script_content):
-        assert "datastore.user" in script_content, (
-            "Script must grant roles/datastore.user role"
-        )
+        assert "datastore.user" in script_content, "Script must grant roles/datastore.user role"
 
     def test_service_account_reference(self, script_content):
         pattern = r"(service-account|compute@developer|iam\.gserviceaccount)"
@@ -148,9 +142,9 @@ class TestSetupFirestoreIdempotent:
         ), "Script must check for existing database before creating"
 
     def test_skip_existing_pattern(self, script_content):
-        assert re.search(
-            r"(already exists|skipping|exists|SKIP)", script_content, re.IGNORECASE
-        ), "Script must handle already-existing resources gracefully"
+        assert re.search(r"(already exists|skipping|exists|SKIP)", script_content, re.IGNORECASE), (
+            "Script must handle already-existing resources gracefully"
+        )
 
 
 class TestSetupFirestoreHelpFlag:
@@ -184,9 +178,7 @@ class TestSetupFirestoreHelpFlag:
 
 class TestSetupFirestoreRegionDefault:
     def test_default_region_us_central1(self, script_content):
-        assert "us-central1" in script_content, (
-            "Script must use us-central1 as default region"
-        )
+        assert "us-central1" in script_content, "Script must use us-central1 as default region"
 
     def test_region_flag_supported(self, script_content):
         assert "--region" in script_content, "Script must support --region flag"

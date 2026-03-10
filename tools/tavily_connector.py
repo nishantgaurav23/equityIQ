@@ -58,9 +58,7 @@ class TavilyConnector:
         if not self.api_key:
             return {}
 
-        cache_key = (
-            f"tavily_{query}_{search_depth}_{max_results}_{topic}"
-        )
+        cache_key = f"tavily_{query}_{search_depth}_{max_results}_{topic}"
         if cache_key in self.cache:
             return self.cache[cache_key]
 
@@ -79,7 +77,8 @@ class TavilyConnector:
             if response.status_code != 200:
                 logger.warning(
                     "Tavily returned %d for query: %s",
-                    response.status_code, query,
+                    response.status_code,
+                    query,
                 )
                 return {}
 
@@ -87,12 +86,14 @@ class TavilyConnector:
 
             results: list[dict] = []
             for item in data.get("results", []):
-                results.append({
-                    "title": item.get("title", ""),
-                    "content": item.get("content", ""),
-                    "url": item.get("url", ""),
-                    "score": item.get("score", 0),
-                })
+                results.append(
+                    {
+                        "title": item.get("title", ""),
+                        "content": item.get("content", ""),
+                        "url": item.get("url", ""),
+                        "score": item.get("score", 0),
+                    }
+                )
 
             output: dict = {"results": results}
 
@@ -108,58 +109,39 @@ class TavilyConnector:
             logger.warning("Tavily search failed for '%s': %s", query, exc)
             return {}
 
-    async def research_stock(
-        self, ticker: str, company_name: str = ""
-    ) -> dict:
+    async def research_stock(self, ticker: str, company_name: str = "") -> dict:
         """Deep research on a stock — analyst opinions, outlook, risks."""
         name = company_name or ticker
-        query = (
-            f"{name} ({ticker}) stock analysis outlook risks "
-            f"analyst opinion 2026"
-        )
-        return await self.search(
-            query, search_depth="advanced", max_results=8
-        )
+        query = f"{name} ({ticker}) stock analysis outlook risks analyst opinion 2026"
+        return await self.search(query, search_depth="advanced", max_results=8)
 
     async def research_sector(self, sector: str) -> dict:
         """Research sector/industry trends and outlook."""
         query = f"{sector} industry sector outlook trends analysis 2026"
-        return await self.search(
-            query, search_depth="advanced", max_results=6
-        )
+        return await self.search(query, search_depth="advanced", max_results=6)
 
     async def research_macro(self, market: str = "US") -> dict:
         """Research macroeconomic conditions and monetary policy."""
         if market.upper() == "INDIA":
-            query = (
-                "India economy 2026 RBI monetary policy GDP growth "
-                "inflation outlook"
-            )
+            query = "India economy 2026 RBI monetary policy GDP growth inflation outlook"
         else:
-            query = (
-                "US economy 2026 Federal Reserve monetary policy GDP "
-                "growth inflation outlook"
-            )
-        return await self.search(
-            query, search_depth="advanced", max_results=6, topic="news"
-        )
+            query = "US economy 2026 Federal Reserve monetary policy GDP growth inflation outlook"
+        return await self.search(query, search_depth="advanced", max_results=6, topic="news")
 
     async def research_topic(self, query: str) -> dict:
         """Research any financial/economic topic in depth."""
         return await self.search(
-            query, search_depth="advanced", max_results=8,
+            query,
+            search_depth="advanced",
+            max_results=8,
             include_answer=True,
         )
 
-    async def get_latest_news(
-        self, ticker: str, company_name: str = ""
-    ) -> dict:
+    async def get_latest_news(self, ticker: str, company_name: str = "") -> dict:
         """Get latest news for a stock (news-focused search)."""
         name = company_name or ticker
         query = f"{name} ({ticker}) latest news"
-        return await self.search(
-            query, max_results=10, topic="news"
-        )
+        return await self.search(query, max_results=10, topic="news")
 
     async def close(self) -> None:
         """Close the underlying httpx client."""
