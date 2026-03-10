@@ -28,6 +28,7 @@ dependencies = [
     "lxml",
     "colorlog",
     "google-cloud-firestore",
+    "alembic>=1.13.0",
 ]
 
 [project.optional-dependencies]
