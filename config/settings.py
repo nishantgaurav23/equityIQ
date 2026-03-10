@@ -19,6 +19,26 @@ class Settings(BaseSettings):
     POLYGON_API_KEY: str = ""
     FRED_API_KEY: str = ""
     NEWS_API_KEY: str = ""
+    SERPER_API_KEY: str = ""
+    TAVILY_API_KEY: str = ""
+
+    # Zerodha Kite Connect
+    ZERODHA_API_KEY: str = ""
+    ZERODHA_API_SECRET: str = ""
+    ZERODHA_REDIRECT_URL: str = "http://localhost:8000/api/v1/zerodha/callback"
+
+    # Alpaca Trading API
+    ALPACA_API_KEY: str = ""
+    ALPACA_API_SECRET: str = ""
+    ALPACA_BASE_URL: str = "https://paper-api.alpaca.markets"
+    ALPACA_DATA_URL: str = "https://data.alpaca.markets"
+    ALPACA_ALLOW_PAPER_TRADING: bool = False
+
+    # Alert system
+    ALERT_CHECK_INTERVAL_MINUTES: int = 60
+    ALERT_WEBHOOK_SECRET: str = ""
+    ALERT_MAX_WATCHLIST_SIZE: int = 50
+    ALERT_HISTORY_RETENTION_DAYS: int = 90
 
     # Environment and infrastructure
     ENVIRONMENT: str = "local"

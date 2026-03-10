@@ -158,25 +158,25 @@ class TestChatHistoryResponse:
 
 class TestIntentDetection:
     def test_analyze_explicit(self):
-        assert detect_intent("Analyze AAPL") == "analyze"
+        assert detect_intent("Analyze AAPL") == "full_analysis"
 
     def test_analyze_what_about(self):
-        assert detect_intent("What about TSLA?") == "analyze"
+        assert detect_intent("What about TSLA?") == "quick_question"
 
     def test_analyze_tell_me_about(self):
-        assert detect_intent("Tell me about MSFT") == "analyze"
+        assert detect_intent("Tell me about MSFT") == "quick_question"
 
     def test_analyze_bare_ticker(self):
-        assert detect_intent("AAPL") == "analyze"
+        assert detect_intent("AAPL") == "full_analysis"
 
     def test_analyze_evaluate(self):
-        assert detect_intent("Evaluate GOOG for me") == "analyze"
+        assert detect_intent("Evaluate GOOG for me") == "full_analysis"
 
     def test_follow_up_why(self):
         assert detect_intent("Why did you say SELL?") == "follow_up"
 
     def test_follow_up_explain(self):
-        assert detect_intent("Explain the risk assessment") == "follow_up"
+        assert detect_intent("Explain the reasoning") == "follow_up"
 
     def test_follow_up_elaborate(self):
         assert detect_intent("Can you elaborate on that?") == "follow_up"
@@ -193,8 +193,13 @@ class TestIntentDetection:
     def test_general(self):
         assert detect_intent("What is a PE ratio?") == "general"
 
-    def test_general_greeting(self):
-        assert detect_intent("Hello, how are you?") == "general"
+    def test_greeting(self):
+        # "Hello" is a greeting — warm conversational response
+        assert detect_intent("Hello") == "greeting"
+        assert detect_intent("Hi") == "greeting"
+        assert detect_intent("Hey!") == "greeting"
+        assert detect_intent("Good morning") == "greeting"
+        assert detect_intent("hello") == "greeting"
 
     def test_general_no_ticker(self):
         assert detect_intent("How does the stock market work?") == "general"
@@ -254,9 +259,10 @@ class TestContextBuilding:
             "Analyze AAPL",
             ["## Analysis for AAPL\nSignal: BUY"],
             [],
+            "full_analysis",
         )
         assert "EquityIQ" in prompt
-        assert "Analysis Context" in prompt
+        assert "Data Context" in prompt
         assert "Analyze AAPL" in prompt
 
     def test_build_prompt_with_history(self, engine):
@@ -270,14 +276,14 @@ class TestContextBuilding:
                 role="assistant", content="AAPL shows a BUY signal."
             ),
         ]
-        prompt = engine._build_prompt("Tell me more", [], history)
-        assert "Previous conversation" in prompt
+        prompt = engine._build_prompt("Tell me more", [], history, "follow_up")
+        assert "Conversation so far" in prompt
         assert "What about AAPL?" in prompt
         assert "AAPL shows a BUY signal." in prompt
 
     def test_build_prompt_no_context(self, engine):
-        prompt = engine._build_prompt("Hello", [], [])
-        assert "Analysis Context" not in prompt
+        prompt = engine._build_prompt("Hello", [], [], "general")
+        assert "Data Context" not in prompt
         assert "Hello" in prompt
 
 
@@ -407,9 +413,9 @@ class TestContextGrounding:
         prompts_captured = []
         original_build = engine._build_prompt
 
-        def capture_prompt(msg, ctx, hist):
+        def capture_prompt(msg, ctx, hist, intent):
             prompts_captured.append((msg, ctx, hist))
-            return original_build(msg, ctx, hist)
+            return original_build(msg, ctx, hist, intent)
 
         engine._build_prompt = capture_prompt
         with patch.object(

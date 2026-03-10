@@ -77,10 +77,25 @@ async def lifespan(app: FastAPI):
         vault=vault,
     )
 
+    # Initialize Alert Engine
+    from integrations.alerts import AlertEngine
+
+    alert_engine = AlertEngine()
+    try:
+        await alert_engine.initialize()
+        alert_engine.start_scheduler(app.state.conductor)
+    except Exception:
+        logger.warning("AlertEngine init failed; alerts will be unavailable")
+        alert_engine = None
+    app.state.alert_engine = alert_engine
+
     logger.info("EquityIQ starting up (env=%s)", settings.ENVIRONMENT)
     yield
 
     # Cleanup
+    if alert_engine:
+        await alert_engine.stop_scheduler()
+        await alert_engine.close()
     if vertex_memory:
         await vertex_memory.close()
     await vault.close()
@@ -122,6 +137,21 @@ def create_app() -> FastAPI:
     from api.chat import chat_router
 
     app.include_router(chat_router)
+
+    # Zerodha integration routes
+    from api.zerodha_routes import router as zerodha_router
+
+    app.include_router(zerodha_router)
+
+    # Alpaca integration routes
+    from api.alpaca_routes import router as alpaca_router
+
+    app.include_router(alpaca_router)
+
+    # Webhook alert routes
+    from api.webhooks import router as webhook_router
+
+    app.include_router(webhook_router)
 
     return app
 

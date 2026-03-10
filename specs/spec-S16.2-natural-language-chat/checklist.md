@@ -7,15 +7,19 @@
 
 ## ChatEngine (`api/chat.py`)
 - [x] Create `ChatEngine` class with constructor (conductor, memory, vault)
-- [x] Implement intent detection (analyze, follow_up, compare, general)
-- [x] Implement ticker extraction from natural language
+- [x] Implement intent detection (greeting, full_analysis, quick_question, visualize, visualize_context, compare, follow_up, general)
+- [x] Implement ticker extraction from natural language (regex with .NS/.BO/.L support)
+- [x] Implement company name resolution via Yahoo Finance + Polygon search
+- [x] Implement expanded ticker/name stopwords to prevent false positives
 - [x] Implement context grounding (build LLM prompt with verdict data)
 - [x] Implement `process_message()` streaming method
 - [x] Implement `process_message_sync()` non-streaming method
 - [x] Implement Gemini streaming integration
 - [x] Implement conversation history retrieval for context
 - [x] Implement conversation persistence (store user + assistant messages)
-- [x] Implement system prompt with grounding rules
+- [x] Implement intent-specific system prompts
+- [x] Implement "chart" SSE event for inline price chart rendering
+- [x] Implement Indian market detection for context-aware queries
 
 ## API Endpoints
 - [x] `POST /api/v1/chat` -- streaming SSE response
@@ -30,12 +34,16 @@
 - [x] Initialize VertexMemoryBank in lifespan
 
 ## Frontend
-- [x] Add TypeScript types (ChatRequest, ChatEvent, ChatMessage, ChatHistoryResponse)
+- [x] Add TypeScript types (ChatRequest, ChatEvent with chart type, ChatMessage, ChatHistoryResponse)
 - [x] Add API client functions (streamChat, getChatHistory, deleteChatHistory)
 - [x] Create chat page (`frontend/app/chat/page.tsx`)
-- [x] Message bubble components (user + assistant)
-- [x] Streaming token display
-- [x] Input area with send button
+- [x] Message bubble components (user + assistant with markdown rendering)
+- [x] ChatMarkdown component with financial value colorization (green/red for +/-)
+- [x] ChatPriceChart component with AreaChart (7D/1M/3M timeframes, currency-aware)
+- [x] Inline price charts triggered by backend "chart" SSE event
+- [x] Clickable example prompts in empty state
+- [x] Streaming token display with "Analyzing..." indicator
+- [x] Input area with send button and expanded placeholder
 - [x] Auto-scroll behavior
 - [x] Navigation link to /chat in layout
 

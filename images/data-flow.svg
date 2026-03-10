@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 580" font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <linearGradient id="step1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#818cf8"/>
+    </linearGradient>
+    <linearGradient id="step2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0ea5e9"/>
+      <stop offset="100%" style="stop-color:#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="step3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#34d399"/>
+    </linearGradient>
+    <linearGradient id="step4" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#fbbf24"/>
+    </linearGradient>
+    <linearGradient id="step5" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f43f5e"/>
+      <stop offset="100%" style="stop-color:#fb7185"/>
+    </linearGradient>
+    <linearGradient id="step6" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#a78bfa"/>
+    </linearGradient>
+    <filter id="sh2">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="580" fill="url(#bg2)" rx="12"/>
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" fill="#f8fafc" font-size="18" font-weight="700" letter-spacing="1">Analysis Pipeline -- Data Flow</text>
+
+  <!-- Step 1: User Request -->
+  <rect x="50" y="58" width="700" height="55" rx="10" fill="url(#step1)" filter="url(#sh2)" opacity="0.95"/>
+  <circle cx="82" cy="85" r="16" fill="#4338ca"/>
+  <text x="82" y="91" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">1</text>
+  <text x="120" y="80" fill="#fff" font-size="13" font-weight="700">User Request</text>
+  <text x="120" y="100" fill="#c7d2fe" font-size="10">POST /api/v1/analyze/AAPL  --  Frontend or API client submits ticker for analysis</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="113" x2="400" y2="133" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Step 2: Conductor -->
+  <rect x="50" y="138" width="700" height="55" rx="10" fill="url(#step2)" filter="url(#sh2)" opacity="0.95"/>
+  <circle cx="82" cy="165" r="16" fill="#0369a1"/>
+  <text x="82" y="171" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">2</text>
+  <text x="120" y="160" fill="#fff" font-size="13" font-weight="700">Market Conductor Orchestration</text>
+  <text x="120" y="180" fill="#bae6fd" font-size="10">Creates session_id (UUID), validates ticker, dispatches to 6 agents via asyncio.gather()</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="193" x2="400" y2="213" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Step 3: Parallel Agents -->
+  <rect x="50" y="218" width="700" height="85" rx="10" fill="url(#step3)" filter="url(#sh2)" opacity="0.95"/>
+  <circle cx="82" cy="250" r="16" fill="#047857"/>
+  <text x="82" y="256" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">3</text>
+  <text x="120" y="242" fill="#fff" font-size="13" font-weight="700">Parallel Agent Analysis (6 agents + web search)</text>
+  <text x="120" y="262" fill="#d1fae5" font-size="10">Each agent fetches domain-specific data, runs Gemini 3 Flash LLM analysis, returns typed AnalystReport</text>
+
+  <!-- Agent mini boxes -->
+  <rect x="90" y="274" width="90" height="20" rx="4" fill="#065f46" opacity="0.8"/>
+  <text x="135" y="288" text-anchor="middle" fill="#a7f3d0" font-size="8">Valuation</text>
+  <rect x="190" y="274" width="90" height="20" rx="4" fill="#065f46" opacity="0.8"/>
+  <text x="235" y="288" text-anchor="middle" fill="#a7f3d0" font-size="8">Momentum</text>
+  <rect x="290" y="274" width="90" height="20" rx="4" fill="#065f46" opacity="0.8"/>
+  <text x="335" y="288" text-anchor="middle" fill="#a7f3d0" font-size="8">Pulse</text>
+  <rect x="390" y="274" width="90" height="20" rx="4" fill="#065f46" opacity="0.8"/>
+  <text x="435" y="288" text-anchor="middle" fill="#a7f3d0" font-size="8">Economy</text>
+  <rect x="490" y="274" width="90" height="20" rx="4" fill="#065f46" opacity="0.8"/>
+  <text x="535" y="288" text-anchor="middle" fill="#a7f3d0" font-size="8">Compliance</text>
+  <rect x="590" y="274" width="90" height="20" rx="4" fill="#831843" opacity="0.8"/>
+  <text x="635" y="288" text-anchor="middle" fill="#fda4af" font-size="8">Risk Guardian</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="303" x2="400" y2="323" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="460" y="318" fill="#94a3b8" font-size="8">5 AnalystReports + RiskReport</text>
+
+  <!-- Step 4: Signal Fusion -->
+  <rect x="50" y="328" width="700" height="70" rx="10" fill="url(#step4)" filter="url(#sh2)" opacity="0.95"/>
+  <circle cx="82" cy="358" r="16" fill="#92400e"/>
+  <text x="82" y="364" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">4</text>
+  <text x="120" y="352" fill="#fff" font-size="13" font-weight="700">Signal Synthesizer -- XGBoost Fusion</text>
+  <text x="120" y="372" fill="#fef3c7" font-size="10">Extract features from all reports, feed to XGBoost model (fallback: weighted average)</text>
+  <text x="120" y="388" fill="#fef3c7" font-size="10">Apply compliance override (going_concern/restatement -> SELL) + confidence thresholds</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="398" x2="400" y2="418" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Step 5: Verdict -->
+  <rect x="50" y="423" width="700" height="55" rx="10" fill="url(#step5)" filter="url(#sh2)" opacity="0.95"/>
+  <circle cx="82" cy="450" r="16" fill="#9f1239"/>
+  <text x="82" y="456" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">5</text>
+  <text x="120" y="445" fill="#fff" font-size="13" font-weight="700">FinalVerdict Generation</text>
+  <text x="120" y="465" fill="#fecdd3" font-size="10">STRONG_BUY | BUY | HOLD | SELL | STRONG_SELL  +  confidence, price_target, key_drivers, risk_summary</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="478" x2="400" y2="498" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Step 6: Storage & Response -->
+  <rect x="50" y="503" width="700" height="55" rx="10" fill="url(#step6)" filter="url(#sh2)" opacity="0.95"/>
+  <circle cx="82" cy="530" r="16" fill="#5b21b6"/>
+  <text x="82" y="536" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">6</text>
+  <text x="120" y="525" fill="#fff" font-size="13" font-weight="700">Store &amp; Respond</text>
+  <text x="120" y="545" fill="#ddd6fe" font-size="10">Persist verdict in InsightVault (SQLite / Firestore) + return JSON response to user</text>
+</svg>

@@ -92,7 +92,7 @@
 | Memory (local) | SQLite via aiosqlite | Zero-config local persistence |
 | Memory (prod) | Firestore | Managed NoSQL, generous free tier |
 | Frontend | Next.js + TypeScript + Tailwind | Modern dashboard with real-time updates |
-| Deployment | Cloud Run (single container) | Auto-scaling 0-10, pay-per-use |
+| Deployment | Cloud Run (single container) | Auto-scaling 0-4, pay-per-use |
 | CI/CD | GitHub Actions | Free for public repos, 2000 min/month private |
 | Secrets | GCP Secret Manager | Free tier (6 active versions) |
 | Config | pydantic-settings + .env | All secrets via environment, no hardcoded keys |

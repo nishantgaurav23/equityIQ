@@ -1,6 +1,7 @@
 """ValuationScout -- Fundamentals analysis agent for EquityIQ.
 
-Uses Polygon.io for US stocks and yfinance for Indian stocks (NSE/BSE).
+Uses Polygon.io for US stocks, yfinance for Indian stocks (NSE/BSE),
+and Serper/Tavily for analyst price targets and valuation opinions.
 Evaluates valuation metrics and returns a ValuationReport with BUY/HOLD/SELL signal.
 """
 
@@ -49,6 +50,23 @@ async def get_price_history_tool(ticker: str) -> dict:
         return {}
 
 
+async def get_analyst_web_reports_tool(ticker: str) -> dict:
+    """Search the web for analyst reports, price targets, and valuation opinions.
+
+    Provides context beyond raw financial ratios — what analysts are saying,
+    consensus price targets, recent upgrades/downgrades. Returns gracefully
+    empty if no Serper/Tavily API keys configured.
+    """
+    try:
+        from tools.serper_connector import serper
+        if serper.available:
+            return await serper.search_analyst_reports(ticker)
+        return {}
+    except Exception:
+        logger.warning("get_analyst_web_reports_tool failed for %s", ticker)
+        return {}
+
+
 class ValuationScout(BaseAnalystAgent):
     """Specialist agent for fundamental stock valuation analysis."""
 
@@ -56,7 +74,11 @@ class ValuationScout(BaseAnalystAgent):
         super().__init__(
             agent_name="valuation_scout",
             output_schema=ValuationReport,
-            tools=[get_fundamentals_tool, get_price_history_tool],
+            tools=[
+                get_fundamentals_tool,
+                get_price_history_tool,
+                get_analyst_web_reports_tool,
+            ],
             model=model,
         )
 

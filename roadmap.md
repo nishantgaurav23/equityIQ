@@ -83,6 +83,7 @@ specs/
 | 14 | Evaluation & QA | 5 | Backtester, benchmarks, E2E tests |
 | 16 | Intelligence Layer | 3 | Vertex AI memory, NL chat, prediction tracker |
 | 17 | Integrations | 4 | Broker connectivity, portfolio sync, alerts |
+| 18 | Web Search Integration | 4 | Serper + Tavily connectors, unified search, agent web tools |
 
 ---
 
@@ -95,7 +96,7 @@ Output: `make local-dev` starts a healthy FastAPI server with `/health` endpoint
 |------|--------------|-----------|----------|---------|-------|--------|
 | S1.1 | `specs/spec-S1.1-dependency-declaration/` | -- | `pyproject.toml`, `.env.example` | Dependency declaration | Runtime: google-adk, google-generativeai, fastapi, uvicorn, pydantic, pydantic-settings, httpx, aiohttp, cachetools, aiosqlite, xgboost, scikit-learn, pandas, numpy, python-dotenv, beautifulsoup4, lxml, colorlog. Dev: pytest, pytest-asyncio, ruff, pytest-mock, httpx | done |
 | S1.2 | `specs/spec-S1.2-developer-commands/` | -- | `Makefile` | Developer commands | Targets: venv, install, install-dev, local-dev, local-test, local-lint, dev (Docker), test (Docker) | done |
-| S1.3 | `specs/spec-S1.3-pydantic-settings/` | S1.1 | `config/settings.py` | Settings via pydantic-settings | Fields: GOOGLE_API_KEY, POLYGON_API_KEY, FRED_API_KEY, NEWS_API_KEY, ENVIRONMENT, SQLITE_DB_PATH, GCP_PROJECT_ID, GCP_REGION, LOG_LEVEL. All from .env | done |
+| S1.3 | `specs/spec-S1.3-pydantic-settings/` | S1.1 | `config/settings.py` | Settings via pydantic-settings | Fields: GOOGLE_API_KEY, POLYGON_API_KEY, FRED_API_KEY, NEWS_API_KEY, SERPER_API_KEY, TAVILY_API_KEY, ENVIRONMENT, SQLITE_DB_PATH, GCP_PROJECT_ID, GCP_REGION, LOG_LEVEL. All from .env | done |
 | S1.4 | `specs/spec-S1.4-fastapi-skeleton/` | S1.3 | `app.py` | FastAPI app factory | Lifespan: connect DB on startup, disconnect on shutdown. GET /health returning `{"status": "ok", "agents": {...}}`. Include routers | done |
 | S1.5 | `specs/spec-S1.5-logging-setup/` | S1.3 | `config/logging.py` | Structured logging | Colorlog for local, structured JSON for production. LOG_LEVEL from settings. request_id context for tracing | done |
 
@@ -234,11 +235,11 @@ Cloud Run deployment with GitHub Actions CI/CD. Designed for under $50/month.
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
-| S12.1 | `specs/spec-S12.1-github-actions-ci/` | S1.2, S11.1 | `.github/workflows/ci.yml` | CI pipeline | On push/PR: checkout, setup Python, install deps, run tests (pytest), run lint (ruff). Fail fast on errors | pending |
-| S12.2 | `specs/spec-S12.2-github-actions-cd/` | S12.1, S11.1 | `.github/workflows/deploy.yml` | CD pipeline | On push to main: build Docker image, push to Artifact Registry, deploy to Cloud Run. Uses Workload Identity Federation (no service account keys) | pending |
-| S12.3 | `specs/spec-S12.3-cloud-run-config/` | S11.1 | `deploy/cloudrun.yaml` | Cloud Run service config | Single container. Memory: 1GB. CPU: 1. Min instances: 0. Max instances: 4. Port: 8080. Concurrency: 80. Timeout: 300s | pending |
-| S12.4 | `specs/spec-S12.4-secret-manager/` | S1.3 | `deploy/setup-secrets.sh` | GCP Secret Manager setup | Script to create secrets: GOOGLE_API_KEY, POLYGON_API_KEY, FRED_API_KEY, NEWS_API_KEY. Cloud Run mounts as env vars | pending |
-| S12.5 | `specs/spec-S12.5-firestore-setup/` | S5.3 | `deploy/setup-firestore.sh` | Firestore database setup | Create Firestore database in Native mode. Collection: verdicts. Composite index on ticker + created_at | pending |
+| S12.1 | `specs/spec-S12.1-github-actions-ci/` | S1.2, S11.1 | `.github/workflows/ci.yml` | CI pipeline | On push/PR: checkout, setup Python, install deps, run tests (pytest), run lint (ruff). Fail fast on errors | done |
+| S12.2 | `specs/spec-S12.2-github-actions-cd/` | S12.1, S11.1 | `.github/workflows/deploy.yml` | CD pipeline | On push to main: build Docker image, push to Artifact Registry, deploy to Cloud Run. Uses Workload Identity Federation (no service account keys) | done |
+| S12.3 | `specs/spec-S12.3-cloud-run-config/` | S11.1 | `deploy/cloudrun.yaml` | Cloud Run service config | Single container. Memory: 1GB. CPU: 1. Min instances: 0. Max instances: 4. Port: 8080. Concurrency: 80. Timeout: 300s | done |
+| S12.4 | `specs/spec-S12.4-secret-manager/` | S1.3 | `deploy/setup-secrets.sh` | GCP Secret Manager setup | Script to create secrets: GOOGLE_API_KEY, POLYGON_API_KEY, FRED_API_KEY, NEWS_API_KEY. Cloud Run mounts as env vars | done |
+| S12.5 | `specs/spec-S12.5-firestore-setup/` | S5.3 | `deploy/setup-firestore.sh` | Firestore database setup | Create Firestore database in Native mode. Collection: verdicts. Composite index on ticker + created_at | done |
 
 ---
 
@@ -257,14 +258,14 @@ Next.js dashboard for stock analysis visualization.
 
 ## Phase 15 -- Enhanced UX
 
-Backend enhancements (ticker search, rich response, better prompts) and complete frontend redesign with dark glassmorphism theme.
+Backend enhancements (ticker search, rich response, better prompts) and complete frontend redesign with dark glassmorphism theme, Plus Jakarta Sans + JetBrains Mono typography, and data-optimized font features.
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
 | S15.1 | `specs/spec-S15.1-ticker-search/` | S1.3, S3.1 | `tools/ticker_search.py`, `api/routes.py` | Ticker search/autocomplete API | Polygon ticker search, 1hr TTL cache, GET /api/v1/search?q= | done |
 | S15.2 | `specs/spec-S15.2-rich-analysis-response/` | S8.2, S2.2 | `config/data_contracts.py`, `agents/market_conductor.py` | Rich analysis response | AgentDetail model, risk_level, execution_time_ms, per-agent metrics | done |
 | S15.3 | `specs/spec-S15.3-enhanced-prompts/` | S2.3 | `config/analyst_personas.py` | Enhanced agent prompts | Better signal guidelines, confidence criteria, decision logic | done |
-| S15.4 | `specs/spec-S15.4-dark-design-system/` | S13.1 | `frontend/` | Dark glassmorphism design system | Framer Motion, glass cards, gradient accents, glow effects | done |
+| S15.4 | `specs/spec-S15.4-dark-design-system/` | S13.1 | `frontend/` | Dark glassmorphism design system | Framer Motion, glass cards, gradient accents, glow effects. Plus Jakarta Sans + JetBrains Mono typography. data-value/label-text/section-title CSS utility classes. @tailwindcss/typography plugin | done |
 | S15.5 | `specs/spec-S15.5-ticker-autocomplete/` | S15.1, S15.4 | `frontend/components/TickerSearch.tsx` | Ticker autocomplete component | Debounced search, dropdown, keyboard nav, popular stocks | done |
 | S15.6 | `specs/spec-S15.6-analysis-dashboard/` | S15.2, S15.4, S15.5 | `frontend/app/page.tsx` | Analysis dashboard redesign | Orchestrator card, rich agent cards, results panel, animations | done |
 | S15.7 | `specs/spec-S15.7-history-redesign/` | S15.4, S9.3 | `frontend/app/history/` | History page redesign | Stats bar, filter tabs, rich rows, detail modal | done |
@@ -292,8 +293,21 @@ Cross-session learning, conversational AI interface, and prediction accuracy tra
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
 | S16.1 | `specs/spec-S16.1-vertex-memory-bank/` | S5.3, S8.2 | `memory/vertex_memory.py` | Vertex AI Memory Bank | Cross-session conversational memory using Vertex AI. Stores user preferences, past interactions, prediction outcomes. Enables the system to learn from historical predictions and improve signal weights over time | done |
-| S16.2 | `specs/spec-S16.2-natural-language-chat/` | S16.1, S9.1, S13.1 | `api/chat.py`, `frontend/app/chat/` | Natural language chat interface | POST /api/v1/chat endpoint with Gemini streaming. Conversation history management. Context-aware follow-ups ("Why did you say SELL?", "Compare AAPL vs MSFT"). Frontend chat panel with message bubbles. Uses agent results as grounding context | done |
+| S16.2 | `specs/spec-S16.2-natural-language-chat/` | S16.1, S9.1, S13.1 | `api/chat.py`, `frontend/app/chat/` | Natural language chat interface | POST /api/v1/chat endpoint with Gemini streaming. Redesigned as true conversational AI: smart intent detection (greeting/full_analysis/quick_question/visualize/compare/follow_up/general), company name resolution via Yahoo/Polygon, inline price charts, ChatMarkdown renderer with financial value colorization, web search context via Serper/Tavily. Expanded ticker/name stopwords to prevent false positives | done |
 | S16.3 | `specs/spec-S16.3-prediction-tracker/` | S5.2, S14.3 | `evaluation/prediction_tracker.py` | Prediction accuracy tracker | Compare past FinalVerdicts to actual price movement (30/60/90 day windows). Track hit rate per agent and overall. Auto-adjust signal weights based on historical accuracy. Dashboard showing prediction scorecard | done |
+
+---
+
+## Phase 18 -- Web Search Integration
+
+Adds Serper (Google Search) and Tavily (AI search) connectors to augment agents with real-time web intelligence. Agents gain broader coverage beyond their primary APIs.
+
+| Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
+|------|--------------|-----------|----------|---------|-------|--------|
+| S18.1 | `specs/spec-S18.1-serper-connector/` | S1.3 | `tools/serper_connector.py` | Serper.dev Google Search connector | Async wrapper for Serper.dev API. Web search + news search. TTLCache 5min. Analyst reports, regulatory news, macro outlook search methods. Optional -- gracefully returns empty if no API key | done |
+| S18.2 | `specs/spec-S18.2-tavily-connector/` | S1.3 | `tools/tavily_connector.py` | Tavily AI Search connector | Async wrapper for Tavily API. Deep research with AI-summarized results. TTLCache 5min. Stock intelligence, regulatory, macro search methods. Optional -- gracefully returns empty if no API key | done |
+| S18.3 | `specs/spec-S18.3-web-search-layer/` | S18.1, S18.2 | `tools/web_search.py` | Unified web search layer | Merges Serper + Tavily results for richer context. Functions: search_stock_intelligence(), search_regulatory_intelligence(), search_macro_intelligence(). Used by agents and chat engine | done |
+| S18.4 | `specs/spec-S18.4-agent-web-tools/` | S18.3, S7.1-S7.5 | `agents/*.py` | Web search tools for agents | Adds web search tool functions to ValuationScout (analyst reports), PulseMonitor (web news), ComplianceChecker (regulatory web news), EconomyWatcher (macro web outlook). Each agent now has 3 tools instead of 2 | done |
 
 ---
 
@@ -303,10 +317,10 @@ Broker connectivity, portfolio synchronization, and alert system. Connects Equit
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
-| S17.1 | `specs/spec-S17.1-zerodha-integration/` | S9.2, S8.3 | `integrations/zerodha.py` | Zerodha broker integration (India) | OAuth2 login via Kite Connect API. Fetch holdings and positions. Display portfolio with live P&L. Map Zerodha symbols to EquityIQ tickers (.NS/.BO). Read-only initially -- no order placement | pending |
-| S17.2 | `specs/spec-S17.2-alpaca-integration/` | S9.2, S8.3 | `integrations/alpaca.py` | Alpaca broker integration (US) | OAuth2 + API key auth. Paper trading support. Fetch positions and account balance. Map Alpaca symbols to EquityIQ tickers. Optional: place paper orders based on STRONG_BUY/STRONG_SELL signals | pending |
-| S17.3 | `specs/spec-S17.3-portfolio-sync/` | S17.1, S17.2, S8.3 | `integrations/portfolio_sync.py` | Portfolio sync from brokers | Auto-import holdings from connected Zerodha/Alpaca accounts. Run analyze_portfolio() on imported tickers. Show side-by-side: current holdings vs EquityIQ recommendations. Periodic refresh (configurable interval) | pending |
-| S17.4 | `specs/spec-S17.4-webhook-alerts/` | S10.1, S5.1 | `integrations/alerts.py`, `api/webhooks.py` | Webhook and alert system | Watch list: user adds tickers to monitor. Background scheduler re-analyzes watched tickers daily. Signal change detection: notify when verdict changes (e.g., BUY -> SELL). Webhook delivery (POST to user-configured URL). Optional: email via SendGrid or Telegram bot integration | pending |
+| S17.1 | `specs/spec-S17.1-zerodha-integration/` | S9.2, S8.3 | `integrations/zerodha.py` | Zerodha broker integration (India) | OAuth2 login via Kite Connect API. Fetch holdings and positions. Display portfolio with live P&L. Map Zerodha symbols to EquityIQ tickers (.NS/.BO). Read-only initially -- no order placement | done |
+| S17.2 | `specs/spec-S17.2-alpaca-integration/` | S9.2, S8.3 | `integrations/alpaca.py` | Alpaca broker integration (US) | OAuth2 + API key auth. Paper trading support. Fetch positions and account balance. Map Alpaca symbols to EquityIQ tickers. Optional: place paper orders based on STRONG_BUY/STRONG_SELL signals | done |
+| S17.3 | `specs/spec-S17.3-portfolio-sync/` | S17.1, S17.2, S8.3 | `integrations/portfolio_sync.py` | Portfolio sync from brokers | Auto-import holdings from connected Zerodha/Alpaca accounts. Run analyze_portfolio() on imported tickers. Show side-by-side: current holdings vs EquityIQ recommendations. Periodic refresh (configurable interval) | done |
+| S17.4 | `specs/spec-S17.4-webhook-alerts/` | S10.1, S5.1 | `integrations/alerts.py`, `api/webhooks.py` | Webhook and alert system | Watch list: user adds tickers to monitor. Background scheduler re-analyzes watched tickers daily. Signal change detection: notify when verdict changes (e.g., BUY -> SELL). Webhook delivery (POST to user-configured URL). Optional: email via SendGrid or Telegram bot integration | done |
 
 ---
 
@@ -356,11 +370,11 @@ Broker connectivity, portfolio synchronization, and alert system. Connects Equit
 | S11.3 | Infrastructure | `scripts/launch_agents.sh` | Launch/stop scripts | `specs/spec-S11.3-launch-scripts/` | done |
 | S11.4 | Infrastructure | `.dockerignore` | Docker ignore rules | `specs/spec-S11.4-dockerignore/` | done |
 | S11.5 | Infrastructure | `scripts/health_check.sh` | Health check script | `specs/spec-S11.5-health-check-script/` | done |
-| S12.1 | GCP Deployment | `.github/workflows/ci.yml` | CI pipeline | `specs/spec-S12.1-github-actions-ci/` | pending |
-| S12.2 | GCP Deployment | `.github/workflows/deploy.yml` | CD pipeline | `specs/spec-S12.2-github-actions-cd/` | pending |
-| S12.3 | GCP Deployment | `deploy/cloudrun.yaml` | Cloud Run config | `specs/spec-S12.3-cloud-run-config/` | pending |
-| S12.4 | GCP Deployment | `deploy/setup-secrets.sh` | Secret Manager setup | `specs/spec-S12.4-secret-manager/` | pending |
-| S12.5 | GCP Deployment | `deploy/setup-firestore.sh` | Firestore setup | `specs/spec-S12.5-firestore-setup/` | pending |
+| S12.1 | GCP Deployment | `.github/workflows/ci.yml` | CI pipeline | `specs/spec-S12.1-github-actions-ci/` | done |
+| S12.2 | GCP Deployment | `.github/workflows/deploy.yml` | CD pipeline | `specs/spec-S12.2-github-actions-cd/` | done |
+| S12.3 | GCP Deployment | `deploy/cloudrun.yaml` | Cloud Run config | `specs/spec-S12.3-cloud-run-config/` | done |
+| S12.4 | GCP Deployment | `deploy/setup-secrets.sh` | Secret Manager setup | `specs/spec-S12.4-secret-manager/` | done |
+| S12.5 | GCP Deployment | `deploy/setup-firestore.sh` | Firestore setup | `specs/spec-S12.5-firestore-setup/` | done |
 | S13.1 | Frontend | `frontend/` | Next.js scaffold | `specs/spec-S13.1-nextjs-scaffold/` | done |
 | S13.2 | Frontend | `frontend/app/page.tsx` | Analysis page | `specs/spec-S13.2-analysis-page/` | done |
 | S13.3 | Frontend | `frontend/app/components/` | Agent signal cards | `specs/spec-S13.3-agent-cards/` | done |
@@ -373,14 +387,18 @@ Broker connectivity, portfolio synchronization, and alert system. Connects Equit
 | S15.1 | Enhanced UX | `tools/ticker_search.py`, `api/routes.py` | Ticker search API | `specs/spec-S15.1-ticker-search/` | done |
 | S15.2 | Enhanced UX | `config/data_contracts.py`, `agents/market_conductor.py` | Rich analysis response | `specs/spec-S15.2-rich-analysis-response/` | done |
 | S15.3 | Enhanced UX | `config/analyst_personas.py` | Enhanced agent prompts | `specs/spec-S15.3-enhanced-prompts/` | done |
-| S15.4 | Enhanced UX | `frontend/` | Dark design system | `specs/spec-S15.4-dark-design-system/` | done |
+| S15.4 | Enhanced UX | `frontend/` | Dark design system + typography | `specs/spec-S15.4-dark-design-system/` | done |
 | S15.5 | Enhanced UX | `frontend/components/TickerSearch.tsx` | Ticker autocomplete | `specs/spec-S15.5-ticker-autocomplete/` | done |
 | S15.6 | Enhanced UX | `frontend/app/page.tsx` | Analysis dashboard redesign | `specs/spec-S15.6-analysis-dashboard/` | done |
 | S15.7 | Enhanced UX | `frontend/app/history/` | History page redesign | `specs/spec-S15.7-history-redesign/` | done |
 | S16.1 | Intelligence Layer | `memory/vertex_memory.py` | Vertex AI Memory Bank | `specs/spec-S16.1-vertex-memory-bank/` | done |
-| S16.2 | Intelligence Layer | `api/chat.py`, `frontend/app/chat/` | Natural language chat | `specs/spec-S16.2-natural-language-chat/` | done |
+| S16.2 | Intelligence Layer | `api/chat.py`, `frontend/app/chat/`, `frontend/components/Chat*.tsx` | NL chat (redesigned) | `specs/spec-S16.2-natural-language-chat/` | done |
 | S16.3 | Intelligence Layer | `evaluation/prediction_tracker.py` | Prediction accuracy tracker | `specs/spec-S16.3-prediction-tracker/` | done |
-| S17.1 | Integrations | `integrations/zerodha.py` | Zerodha broker (India) | `specs/spec-S17.1-zerodha-integration/` | pending |
-| S17.2 | Integrations | `integrations/alpaca.py` | Alpaca broker (US) | `specs/spec-S17.2-alpaca-integration/` | pending |
-| S17.3 | Integrations | `integrations/portfolio_sync.py` | Portfolio sync | `specs/spec-S17.3-portfolio-sync/` | pending |
-| S17.4 | Integrations | `integrations/alerts.py`, `api/webhooks.py` | Webhook alerts | `specs/spec-S17.4-webhook-alerts/` | pending |
+| S18.1 | Web Search Integration | `tools/serper_connector.py` | Serper Google Search connector | `specs/spec-S18.1-serper-connector/` | done |
+| S18.2 | Web Search Integration | `tools/tavily_connector.py` | Tavily AI Search connector | `specs/spec-S18.2-tavily-connector/` | done |
+| S18.3 | Web Search Integration | `tools/web_search.py` | Unified web search layer | `specs/spec-S18.3-web-search-layer/` | done |
+| S18.4 | Web Search Integration | `agents/*.py` | Agent web search tools | `specs/spec-S18.4-agent-web-tools/` | done |
+| S17.1 | Integrations | `integrations/zerodha.py` | Zerodha broker (India) | `specs/spec-S17.1-zerodha-integration/` | done |
+| S17.2 | Integrations | `integrations/alpaca.py` | Alpaca broker (US) | `specs/spec-S17.2-alpaca-integration/` | done |
+| S17.3 | Integrations | `integrations/portfolio_sync.py` | Portfolio sync | `specs/spec-S17.3-portfolio-sync/` | done |
+| S17.4 | Integrations | `integrations/alerts.py`, `api/webhooks.py` | Webhook alerts | `specs/spec-S17.4-webhook-alerts/` | done |

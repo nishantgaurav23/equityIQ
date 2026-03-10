@@ -1,8 +1,9 @@
 """PulseMonitor -- News sentiment analysis agent for EquityIQ.
 
-Uses NewsConnector for sentiment scoring and PolygonConnector for additional
-company news. For Indian stocks, searches using the company name (sans suffix)
-to get relevant results. Returns a PulseReport with BUY/HOLD/SELL signal. Port 8003.
+Uses NewsConnector for sentiment scoring, PolygonConnector for additional
+company news, and Serper/Tavily for real-time web intelligence. For Indian
+stocks, searches using the company name (sans suffix) for better coverage.
+Returns a PulseReport with BUY/HOLD/SELL signal. Port 8003.
 """
 
 from __future__ import annotations
@@ -64,14 +65,36 @@ async def get_company_news_tool(ticker: str) -> dict:
         return {}
 
 
+async def get_web_news_tool(ticker: str) -> dict:
+    """Fetch real-time web news and analyst opinions via Serper + Tavily.
+
+    Provides broader coverage than NewsAPI alone — includes Google News,
+    analyst reports, and AI-summarized research. Returns gracefully empty
+    if neither Serper nor Tavily API keys are configured.
+    """
+    try:
+        from tools.web_search import search_stock_intelligence
+        company_name = ""
+        if is_indian_ticker(ticker):
+            company_name = get_company_name_for_search(ticker)
+        return await search_stock_intelligence(ticker, company_name)
+    except Exception:
+        logger.warning("get_web_news_tool failed for %s", ticker)
+        return {}
+
+
 class PulseMonitorAgent(BaseAnalystAgent):
-    """News sentiment analyst using NewsAPI and Polygon company news."""
+    """News sentiment analyst using NewsAPI, Polygon, and web search."""
 
     def __init__(self, model: str = "gemini-3-flash-preview") -> None:
         super().__init__(
             agent_name="pulse_monitor",
             output_schema=PulseReport,
-            tools=[get_news_sentiment_tool, get_company_news_tool],
+            tools=[
+                get_news_sentiment_tool,
+                get_company_news_tool,
+                get_web_news_tool,
+            ],
             model=model,
         )
 

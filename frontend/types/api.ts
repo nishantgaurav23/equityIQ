@@ -143,10 +143,12 @@ export interface ChatRequest {
 }
 
 export interface ChatEvent {
-  type: "session" | "token" | "context" | "done";
+  type: "session" | "token" | "context" | "chart" | "done";
   session_id?: string;
   content?: string;
   ticker?: string;
+  /** List of tickers to render charts for (sent by backend on visualize intent) */
+  tickers?: string[];
   verdict_session_id?: string;
   full_response?: string;
 }

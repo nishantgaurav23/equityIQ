@@ -160,11 +160,11 @@ class TestPulseMonitorAgent:
 
         assert issubclass(PulseMonitorAgent, BaseAnalystAgent)
 
-    def test_has_two_tools(self):
+    def test_has_three_tools(self):
         from agents.pulse_monitor import PulseMonitorAgent
 
         agent = PulseMonitorAgent()
-        assert len(agent._tools) == 2
+        assert len(agent._tools) == 3
 
 
 class TestAgentCard:

@@ -139,6 +139,14 @@ async def get_price_history(
     from tools.yahoo_connector import yahoo
 
     result = await yahoo.get_price_history(ticker, days=days)
+
+    # If bare ticker returned nothing, try Indian exchange suffixes (.NS, .BO)
+    if not result and "." not in ticker:
+        for suffix in (".NS", ".BO"):
+            result = await yahoo.get_price_history(f"{ticker.upper()}{suffix}", days=days)
+            if result:
+                break
+
     if not result:
         # Fallback to Polygon for US tickers
         try:

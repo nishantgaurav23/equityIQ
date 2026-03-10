@@ -37,6 +37,7 @@ dev = [
     "ruff",
     "pytest-mock",
     "httpx",
+    "pyyaml",
 ]
 
 [tool.setuptools.packages.find]

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Activity, Clock, ShieldAlert, Zap, Brain, Cpu, Network,
+  Activity, Clock, ShieldAlert, Zap, Brain,
   ChevronDown, ChevronUp, FileText, Building2, Users, BarChart3,
 } from "lucide-react";
 import { analyzeStock, checkHealth, ApiError } from "@/lib/api";
@@ -17,7 +17,7 @@ import RiskExplainer from "@/components/RiskExplainer";
 import StockReport from "@/components/StockReport";
 import AgentCardGrid from "./components/AgentCardGrid";
 
-type HealthState = "checking" | "online" | "offline";
+type HealthState = "online" | "offline";
 
 /** Infer display currency from ticker suffix */
 function inferCurrency(ticker: string): string {
@@ -47,7 +47,7 @@ function formatMarketCap(value: number, currency: string = "USD"): string {
 }
 
 export default function HomePage() {
-  const [health, setHealth] = useState<HealthState>("checking");
+  const [health, setHealth] = useState<HealthState>("online");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [verdict, setVerdict] = useState<FinalVerdict | null>(null);
@@ -88,7 +88,7 @@ export default function HomePage() {
         <motion.h1
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-4xl md:text-5xl font-bold gradient-text"
+          className="text-4xl md:text-6xl font-extrabold gradient-text tracking-tight"
         >
           EquityIQ
         </motion.h1>
@@ -96,51 +96,24 @@ export default function HomePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="text-zinc-400 max-w-xl mx-auto"
+          className="text-zinc-400 max-w-2xl mx-auto text-[15px] leading-relaxed font-light"
         >
-          7 AI agents analyze any stock in parallel — fundamentals, momentum, news,
-          economy, compliance, and risk — then deliver a clear verdict you can act on.
+          Your AI-powered stock research assistant. Enter any ticker — US or Indian —
+          and get an instant, data-driven verdict backed by real-time fundamentals,
+          price trends, news sentiment, macro analysis, and compliance checks.
         </motion.p>
 
-        {/* Tech Badges */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="flex flex-wrap items-center justify-center gap-3"
-        >
-          {[
-            { icon: Network, label: "A2A Protocol" },
-            { icon: Brain, label: "Gemini Flash" },
-            { icon: Cpu, label: "7 Agents" },
-            { icon: Zap, label: "AI Signal Fusion" },
-          ].map(({ icon: Icon, label }) => (
-            <span
-              key={label}
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-zinc-800/60 text-zinc-400 border border-zinc-700/50"
-            >
-              <Icon className="w-3.5 h-3.5" />
-              {label}
-            </span>
-          ))}
-        </motion.div>
-
-        {/* Health Status */}
-        <div className="flex items-center justify-center gap-2 text-sm">
-          <span className="text-zinc-500">Backend:</span>
-          <span
-            className={`inline-block w-2 h-2 rounded-full ${
-              health === "online"
-                ? "bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.5)]"
-                : health === "offline"
-                  ? "bg-red-500"
-                  : "bg-yellow-500 animate-pulse"
-            }`}
-          />
-          <span className="text-zinc-400">
-            {health === "online" ? "Online" : health === "offline" ? "Offline" : "Checking..."}
-          </span>
-        </div>
+        {/* Offline warning — only show when backend is down */}
+        {health === "offline" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center justify-center gap-2 text-sm"
+          >
+            <span className="inline-block w-2 h-2 rounded-full bg-red-500" />
+            <span className="text-red-400">Backend unavailable — please start the server</span>
+          </motion.div>
+        )}
       </div>
 
       {/* Ticker Search */}
@@ -234,12 +207,12 @@ export default function HomePage() {
               {/* Ticker + Signal */}
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-3xl font-bold text-white">{verdict.ticker}</h2>
+                  <h2 className="text-3xl font-extrabold text-white tracking-tight">{verdict.ticker}</h2>
                   {verdict.company_info?.name && (
-                    <p className="text-sm text-zinc-400 mt-0.5">{verdict.company_info.name}</p>
+                    <p className="text-sm text-zinc-400 mt-0.5 font-medium">{verdict.company_info.name}</p>
                   )}
-                  <p className="text-xs text-zinc-500 mt-1">
-                    Analysis ID: {verdict.session_id.slice(0, 8)}
+                  <p className="text-[11px] text-zinc-600 mt-1 font-mono">
+                    ID: {verdict.session_id.slice(0, 8)}
                   </p>
                 </div>
                 <SignalBadge signal={verdict.final_signal} size="lg" />
@@ -315,7 +288,7 @@ export default function HomePage() {
               {/* Quick Agent Summary */}
               {Object.keys(verdict.analyst_signals).length > 0 && (
                 <div className="space-y-2">
-                  <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                  <h3 className="section-title">
                     Agent Signals at a Glance
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -374,13 +347,13 @@ function MetricCard({
   color: string;
 }) {
   return (
-    <div className="glass-dark rounded-xl p-3 space-y-1">
+    <div className="glass-dark rounded-xl p-3.5 space-y-1.5">
       <div className="flex items-center gap-1.5 text-zinc-500">
         {icon}
-        <span className="text-[10px] uppercase tracking-wider">{label}</span>
+        <span className="label-text">{label}</span>
       </div>
-      <p className={`text-lg font-bold font-mono ${color}`}>{value}</p>
-      {sublabel && <p className="text-[10px] text-zinc-600">{sublabel}</p>}
+      <p className={`text-xl font-bold data-value ${color}`}>{value}</p>
+      {sublabel && <p className="text-[10px] text-zinc-600 font-medium">{sublabel}</p>}
     </div>
   );
 }

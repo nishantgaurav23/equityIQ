@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const jakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -26,42 +28,42 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+        className={`${jakartaSans.variable} ${jetbrainsMono.variable} antialiased min-h-screen flex flex-col`}
       >
         {/* Background orbs */}
         <div className="bg-orb bg-orb-1" />
         <div className="bg-orb bg-orb-2" />
 
-        <header className="sticky top-0 z-50 glass-dark border-b border-zinc-800/50 px-6 py-3">
+        <header className="sticky top-0 z-50 glass-dark border-b border-zinc-800/50 px-6 py-3.5">
           <nav className="max-w-7xl mx-auto flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-rose-600 flex items-center justify-center text-white font-bold text-sm">
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-rose-600 flex items-center justify-center text-white font-bold text-xs tracking-tight">
                 EQ
               </div>
-              <span className="text-lg font-bold gradient-text group-hover:opacity-80 transition-opacity">
+              <span className="text-lg font-extrabold gradient-text group-hover:opacity-80 transition-opacity tracking-tight">
                 EquityIQ
               </span>
             </Link>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-7">
               <Link
                 href="/chat"
-                className="text-sm text-zinc-400 hover:text-white transition-colors"
+                className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors"
               >
                 Chat
               </Link>
               <Link
                 href="/compare"
-                className="text-sm text-zinc-400 hover:text-white transition-colors"
+                className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors"
               >
                 Compare
               </Link>
               <Link
                 href="/history"
-                className="text-sm text-zinc-400 hover:text-white transition-colors"
+                className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors"
               >
                 History
               </Link>
-              <span className="text-xs px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 tracking-wide">
                 7 AI Agents
               </span>
             </div>

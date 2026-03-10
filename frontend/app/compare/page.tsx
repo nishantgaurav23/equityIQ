@@ -82,9 +82,9 @@ export default function ComparePage() {
       <div>
         <div className="flex items-center gap-3">
           <GitCompareArrows className="w-7 h-7 text-amber-400" />
-          <h1 className="text-3xl font-bold gradient-text">Compare Stocks</h1>
+          <h1 className="text-3xl font-extrabold gradient-text tracking-tight">Compare Stocks</h1>
         </div>
-        <p className="text-zinc-400 mt-1">
+        <p className="text-zinc-400 mt-1 text-[14px] font-light">
           Add up to {MAX_STOCKS} stocks to compare side by side. See charts, signals, and a combined assessment.
         </p>
       </div>
@@ -98,7 +98,7 @@ export default function ComparePage() {
               slot.loading ? "animate-pulse" : ""
             }`}
           >
-            <span className="font-mono font-bold text-white">{slot.ticker}</span>
+            <span className="font-mono font-bold text-white tracking-tight">{slot.ticker}</span>
             {slot.loading && <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />}
             {slot.verdict && <SignalBadge signal={slot.verdict.final_signal} size="sm" />}
             {slot.error && <span className="text-xs text-red-400">Failed</span>}
@@ -207,7 +207,7 @@ export default function ComparePage() {
       {/* Side-by-Side Comparison Cards */}
       {analyzedSlots.length >= 2 && (
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
+          <h3 className="section-title flex items-center gap-2">
             <Zap className="w-4 h-4 text-amber-400" />
             Side-by-Side Comparison
           </h3>
@@ -222,7 +222,7 @@ export default function ComparePage() {
                   className="glass rounded-xl p-5 space-y-4"
                 >
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xl font-bold text-white">{v.ticker}</h4>
+                    <h4 className="text-xl font-extrabold text-white tracking-tight">{v.ticker}</h4>
                     <SignalBadge signal={v.final_signal} size="sm" />
                   </div>
 
@@ -230,7 +230,7 @@ export default function ComparePage() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="glass-dark rounded-lg p-2.5">
-                      <p className="text-[10px] text-zinc-500 uppercase">Risk</p>
+                      <p className="label-text">Risk</p>
                       <p className={`text-sm font-bold ${
                         v.risk_level === "LOW" ? "text-green-400" :
                         v.risk_level === "HIGH" ? "text-red-400" : "text-amber-400"
@@ -239,19 +239,19 @@ export default function ComparePage() {
                       </p>
                     </div>
                     <div className="glass-dark rounded-lg p-2.5">
-                      <p className="text-[10px] text-zinc-500 uppercase">Target</p>
-                      <p className="text-sm font-bold text-amber-400 font-mono">
+                      <p className="label-text">Target</p>
+                      <p className="text-sm font-bold data-value text-amber-400">
                         {v.price_target != null ? `$${v.price_target.toFixed(2)}` : "N/A"}
                       </p>
                     </div>
                     <div className="glass-dark rounded-lg p-2.5">
-                      <p className="text-[10px] text-zinc-500 uppercase">Confidence</p>
-                      <p className="text-sm font-bold text-white font-mono">
+                      <p className="label-text">Confidence</p>
+                      <p className="text-sm font-bold data-value text-white">
                         {Math.round(v.overall_confidence * 100)}%
                       </p>
                     </div>
                     <div className="glass-dark rounded-lg p-2.5">
-                      <p className="text-[10px] text-zinc-500 uppercase">Agents</p>
+                      <p className="label-text">Agents</p>
                       <p className="text-sm font-bold text-zinc-300">
                         {Object.keys(v.analyst_signals).length} ran
                       </p>

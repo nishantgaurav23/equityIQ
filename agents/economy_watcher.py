@@ -1,6 +1,7 @@
 """EconomyWatcher -- Macroeconomic analysis agent for EquityIQ.
 
-Uses FRED API for US stocks and World Bank API for Indian stocks.
+Uses FRED API for US stocks, World Bank API for Indian stocks, and
+Serper/Tavily for real-time macro news and policy outlook.
 Classifies the macro regime and returns an EconomyReport with BUY/HOLD/SELL signal.
 """
 
@@ -40,17 +41,37 @@ async def get_macro_indicators_tool() -> dict:
         return {}
 
 
+async def get_macro_web_outlook_tool() -> dict:
+    """Search the web for latest macroeconomic outlook, policy changes,
+    and market conditions.
+
+    Provides real-time context beyond static FRED/World Bank data:
+    - Fed/RBI policy announcements, rate decisions
+    - GDP forecasts and economic projections
+    - Market sentiment on economic direction
+    Returns gracefully empty if no Serper/Tavily API keys configured.
+    """
+    try:
+        from tools.web_search import search_macro_intelligence
+        market = "INDIA" if is_indian_ticker(_current_ticker) else "US"
+        return await search_macro_intelligence(market)
+    except Exception:
+        logger.warning("get_macro_web_outlook_tool failed")
+        return {}
+
+
 class EconomyWatcher(BaseAnalystAgent):
     """Specialist agent for macroeconomic analysis.
 
     Automatically routes to FRED (US) or World Bank (India) based on the ticker.
+    Augmented with web search for real-time policy and outlook data.
     """
 
     def __init__(self, model: str = "gemini-3-flash-preview") -> None:
         super().__init__(
             agent_name="economy_watcher",
             output_schema=EconomyReport,
-            tools=[get_macro_indicators_tool],
+            tools=[get_macro_indicators_tool, get_macro_web_outlook_tool],
             model=model,
         )
 

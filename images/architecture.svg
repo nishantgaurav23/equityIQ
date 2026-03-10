@@ -1,0 +1,190 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 720" font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <linearGradient id="frontendGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="apiGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0ea5e9"/>
+      <stop offset="100%" style="stop-color:#0284c7"/>
+    </linearGradient>
+    <linearGradient id="conductorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#d97706"/>
+    </linearGradient>
+    <linearGradient id="agentGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#059669"/>
+    </linearGradient>
+    <linearGradient id="synthGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f43f5e"/>
+      <stop offset="100%" style="stop-color:#e11d48"/>
+    </linearGradient>
+    <linearGradient id="dataGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="riskGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ec4899"/>
+      <stop offset="100%" style="stop-color:#db2777"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="720" fill="url(#bgGrad)" rx="12"/>
+
+  <!-- Title -->
+  <text x="450" y="38" text-anchor="middle" fill="#f8fafc" font-size="20" font-weight="700" letter-spacing="1">EquityIQ System Architecture</text>
+
+  <!-- Frontend Layer -->
+  <rect x="280" y="55" width="340" height="55" rx="10" fill="url(#frontendGrad)" filter="url(#shadow)" opacity="0.95"/>
+  <text x="450" y="78" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Next.js Frontend</text>
+  <text x="450" y="97" text-anchor="middle" fill="#c7d2fe" font-size="10">Dashboard + Chat + Broker Views  :3000</text>
+
+  <!-- Arrow -->
+  <line x1="450" y1="110" x2="450" y2="130" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="510" y="125" fill="#94a3b8" font-size="9">REST / SSE</text>
+
+  <!-- API Gateway -->
+  <rect x="200" y="132" width="500" height="58" rx="10" fill="url(#apiGrad)" filter="url(#shadow)" opacity="0.95"/>
+  <text x="450" y="155" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">FastAPI Gateway  :8000</text>
+  <text x="450" y="175" text-anchor="middle" fill="#bae6fd" font-size="9">/analyze  /portfolio  /chat  /history  /search  /zerodha  /alpaca  /alerts  /health</text>
+
+  <!-- Arrow -->
+  <line x1="450" y1="190" x2="450" y2="210" stroke="#94a3b8" stroke-width="2"/>
+
+  <!-- Market Conductor -->
+  <rect x="280" y="212" width="340" height="50" rx="10" fill="url(#conductorGrad)" filter="url(#shadow)" opacity="0.95"/>
+  <text x="450" y="234" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Market Conductor (Orchestrator)</text>
+  <text x="450" y="250" text-anchor="middle" fill="#fef3c7" font-size="9">asyncio.gather() -- parallel dispatch to all agents</text>
+
+  <!-- Fan-out arrows -->
+  <line x1="310" y1="262" x2="105" y2="295" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="370" y1="262" x2="255" y2="295" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="430" y1="262" x2="405" y2="295" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="490" y1="262" x2="555" y2="295" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="550" y1="262" x2="705" y2="295" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="590" y1="262" x2="830" y2="295" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <!-- Agent Cards Row -->
+  <!-- Valuation Scout -->
+  <rect x="30" y="297" width="130" height="65" rx="8" fill="url(#agentGrad)" filter="url(#shadow)" opacity="0.92"/>
+  <text x="95" y="316" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Valuation Scout</text>
+  <text x="95" y="332" text-anchor="middle" fill="#d1fae5" font-size="9">Fundamentals</text>
+  <text x="95" y="348" text-anchor="middle" fill="#d1fae5" font-size="9">PE, PB, FCF  :8001</text>
+
+  <!-- Momentum Tracker -->
+  <rect x="178" y="297" width="130" height="65" rx="8" fill="url(#agentGrad)" filter="url(#shadow)" opacity="0.92"/>
+  <text x="243" y="316" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Momentum</text>
+  <text x="243" y="332" text-anchor="middle" fill="#d1fae5" font-size="9">RSI, MACD, SMA</text>
+  <text x="243" y="348" text-anchor="middle" fill="#d1fae5" font-size="9">Technicals  :8002</text>
+
+  <!-- Pulse Monitor -->
+  <rect x="326" y="297" width="130" height="65" rx="8" fill="url(#agentGrad)" filter="url(#shadow)" opacity="0.92"/>
+  <text x="391" y="316" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Pulse Monitor</text>
+  <text x="391" y="332" text-anchor="middle" fill="#d1fae5" font-size="9">News Sentiment</text>
+  <text x="391" y="348" text-anchor="middle" fill="#d1fae5" font-size="9">Events  :8003</text>
+
+  <!-- Economy Watcher -->
+  <rect x="474" y="297" width="130" height="65" rx="8" fill="url(#agentGrad)" filter="url(#shadow)" opacity="0.92"/>
+  <text x="539" y="316" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Economy</text>
+  <text x="539" y="332" text-anchor="middle" fill="#d1fae5" font-size="9">GDP, Inflation</text>
+  <text x="539" y="348" text-anchor="middle" fill="#d1fae5" font-size="9">Fed Policy  :8004</text>
+
+  <!-- Compliance Checker -->
+  <rect x="622" y="297" width="130" height="65" rx="8" fill="url(#agentGrad)" filter="url(#shadow)" opacity="0.92"/>
+  <text x="687" y="316" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Compliance</text>
+  <text x="687" y="332" text-anchor="middle" fill="#d1fae5" font-size="9">SEC Filings</text>
+  <text x="687" y="348" text-anchor="middle" fill="#d1fae5" font-size="9">Risk Flags  :8005</text>
+
+  <!-- Risk Guardian -->
+  <rect x="770" y="297" width="110" height="65" rx="8" fill="url(#riskGrad)" filter="url(#shadow)" opacity="0.92"/>
+  <text x="825" y="316" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Risk Guardian</text>
+  <text x="825" y="332" text-anchor="middle" fill="#fce7f3" font-size="9">Beta, VaR</text>
+  <text x="825" y="348" text-anchor="middle" fill="#fce7f3" font-size="9">Sizing  :8007</text>
+
+  <!-- Fan-in arrows to Synthesizer -->
+  <line x1="95" y1="362" x2="330" y2="405" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="243" y1="362" x2="370" y2="405" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="391" y1="362" x2="430" y2="405" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="539" y1="362" x2="490" y2="405" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="687" y1="362" x2="540" y2="405" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="825" y1="362" x2="570" y2="405" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+  <!-- Signal Synthesizer -->
+  <rect x="260" y="400" width="380" height="60" rx="10" fill="url(#synthGrad)" filter="url(#shadow)" opacity="0.95"/>
+  <text x="450" y="424" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Signal Synthesizer  :8006</text>
+  <text x="450" y="444" text-anchor="middle" fill="#fecdd3" font-size="10">XGBoost Fusion  |  STRONG_BUY / BUY / HOLD / SELL / STRONG_SELL</text>
+
+  <!-- Label for risk arrow -->
+  <text x="710" y="392" fill="#f9a8d4" font-size="8" font-style="italic">position sizing only</text>
+
+  <!-- Verdict output arrow -->
+  <line x1="450" y1="460" x2="450" y2="488" stroke="#94a3b8" stroke-width="2"/>
+  <text x="510" y="480" fill="#94a3b8" font-size="9">FinalVerdict</text>
+
+  <!-- Memory / Storage Layer -->
+  <rect x="170" y="490" width="560" height="55" rx="10" fill="url(#dataGrad)" filter="url(#shadow)" opacity="0.92"/>
+  <text x="450" y="513" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Memory Layer</text>
+  <text x="450" y="532" text-anchor="middle" fill="#ddd6fe" font-size="10">SQLite (local)  |  Firestore (prod)  |  Vertex AI Memory Bank</text>
+
+  <!-- Data Sources -->
+  <rect x="50" y="575" width="800" height="55" rx="10" fill="none" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="450" y="593" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">External Data Sources</text>
+
+  <!-- Data source pills -->
+  <rect x="70" y="601" width="105" height="22" rx="11" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1"/>
+  <text x="122" y="616" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600">Polygon.io</text>
+
+  <rect x="190" y="601" width="80" height="22" rx="11" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1"/>
+  <text x="230" y="616" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600">FRED</text>
+
+  <rect x="285" y="601" width="90" height="22" rx="11" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1"/>
+  <text x="330" y="616" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600">NewsAPI</text>
+
+  <rect x="390" y="601" width="95" height="22" rx="11" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1"/>
+  <text x="437" y="616" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600">SEC Edgar</text>
+
+  <rect x="500" y="601" width="105" height="22" rx="11" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1"/>
+  <text x="552" y="616" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600">Yahoo Finance</text>
+
+  <rect x="620" y="601" width="90" height="22" rx="11" fill="#1e3a5f" stroke="#22c55e" stroke-width="1"/>
+  <text x="665" y="616" text-anchor="middle" fill="#86efac" font-size="9" font-weight="600">Serper</text>
+
+  <rect x="725" y="601" width="90" height="22" rx="11" fill="#1e3a5f" stroke="#22c55e" stroke-width="1"/>
+  <text x="770" y="616" text-anchor="middle" fill="#86efac" font-size="9" font-weight="600">Tavily</text>
+
+  <!-- Integrations bar -->
+  <rect x="50" y="650" width="800" height="55" rx="10" fill="none" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="450" y="668" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">Broker Integrations &amp; Alerts</text>
+
+  <rect x="160" y="676" width="130" height="22" rx="11" fill="#1e3a5f" stroke="#f59e0b" stroke-width="1"/>
+  <text x="225" y="691" text-anchor="middle" fill="#fcd34d" font-size="9" font-weight="600">Zerodha (India)</text>
+
+  <rect x="320" y="676" width="120" height="22" rx="11" fill="#1e3a5f" stroke="#f59e0b" stroke-width="1"/>
+  <text x="380" y="691" text-anchor="middle" fill="#fcd34d" font-size="9" font-weight="600">Alpaca (US)</text>
+
+  <rect x="470" y="676" width="140" height="22" rx="11" fill="#1e3a5f" stroke="#f59e0b" stroke-width="1"/>
+  <text x="540" y="691" text-anchor="middle" fill="#fcd34d" font-size="9" font-weight="600">Portfolio Sync</text>
+
+  <rect x="640" y="676" width="140" height="22" rx="11" fill="#1e3a5f" stroke="#f59e0b" stroke-width="1"/>
+  <text x="710" y="691" text-anchor="middle" fill="#fcd34d" font-size="9" font-weight="600">Webhook Alerts</text>
+
+  <!-- Arrowhead marker -->
+  <defs>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#94a3b8"/>
+    </marker>
+  </defs>
+</svg>

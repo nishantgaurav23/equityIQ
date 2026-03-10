@@ -1,6 +1,6 @@
 # S16.2 -- Natural Language Chat Interface
 
-## Status: spec-written
+## Status: done
 ## Depends on: S16.1 (Vertex Memory Bank), S9.1 (Analyze Endpoint), S13.1 (Next.js Scaffold)
 
 ---
@@ -74,6 +74,8 @@ data: {"type": "token", "content": "Based on"}
 data: {"type": "token", "content": " the analysis"}
 
 data: {"type": "context", "ticker": "AAPL", "verdict_session_id": "abc-123"}
+
+data: {"type": "chart", "tickers": ["AAPL"]}
 
 data: {"type": "done", "full_response": "Based on the analysis..."}
 ```
@@ -169,16 +171,20 @@ class ChatEngine:
 
 ### Intent Detection
 
-The ChatEngine detects user intent from the message:
+The ChatEngine detects user intent from the message (redesigned for smarter classification):
 
 | Intent | Trigger Examples | Action |
 |--------|-----------------|--------|
-| `analyze` | "Analyze AAPL", "What do you think about TSLA?" | Run full analysis via conductor |
-| `follow_up` | "Why did you say SELL?", "Explain the risk" | Use last verdict as context |
+| `greeting` | "Hello", "Hi", "Good morning" | Warm conversational response |
+| `full_analysis` | "Analyze AAPL", bare ticker "AAPL", "Evaluate GOOG" | Run full 7-agent analysis via conductor |
+| `quick_question` | "What about TSLA?", "Tell me about MSFT" | Fetch lightweight data (price, company info) without full analysis |
+| `visualize` | "Show me the AAPL chart", "Graph TSLA price" | Analysis + inline price chart |
+| `visualize_context` | "Show chart" (after prior analysis) | Show chart for contextual ticker |
 | `compare` | "Compare AAPL vs MSFT", "Which is better?" | Run/fetch analysis for both |
-| `general` | "What is PE ratio?", "Hello" | Answer from LLM knowledge |
+| `follow_up` | "Why did you say SELL?", "Explain the reasoning" | Use last verdict as context |
+| `general` | "What is PE ratio?", "How does the stock market work?" | Answer from LLM knowledge |
 
-Intent detection uses keyword matching + ticker extraction (regex for 1-5 uppercase letters). No ML classifier needed.
+Intent detection uses keyword matching + ticker extraction (regex for 1-12 uppercase letters with .NS/.BO/.L suffix support). Extensive stopword lists prevent false positives (common English words, exchange names, financial terms). Company name resolution via Yahoo Finance + Polygon search enables natural queries like "Tell me about Tata Motors".
 
 ### Context Grounding
 
@@ -192,18 +198,13 @@ This ensures the LLM gives answers grounded in actual analysis data, not halluci
 
 ### System Prompt
 
-```
-You are EquityIQ, an AI stock analysis assistant. You help users understand
-stock analysis results from our multi-agent system.
-
-Rules:
-- Always ground your answers in the analysis data provided
-- Never give specific buy/sell financial advice -- present the analysis findings
-- If asked about a ticker not yet analyzed, offer to run an analysis
-- Be concise but thorough in explanations
-- Reference specific agent findings when explaining signals
-- Acknowledge uncertainty when data is limited
-```
+The system prompt has been redesigned to support true conversational financial AI:
+- Answers ANY question contextually (price, market cap, fundamentals, macro, general finance)
+- Uses conversation history to avoid repeating itself
+- Fetches lightweight data (price, company info) without running full 7-agent analysis
+- Only triggers full multi-agent analysis when user explicitly asks for deep analysis
+- Reuses prior analysis from conversation history for follow-up questions
+- Intent-specific prompt sections are injected based on detected intent
 
 ---
 
@@ -249,10 +250,11 @@ interface ChatRequest {
 }
 
 interface ChatEvent {
-  type: "session" | "token" | "context" | "done";
+  type: "session" | "token" | "context" | "chart" | "done";
   session_id?: string;
   content?: string;
   ticker?: string;
+  tickers?: string[];  // list of tickers to render charts for
   verdict_session_id?: string;
   full_response?: string;
 }
@@ -365,13 +367,15 @@ Map ConversationEntry records to Gemini's content format:
 
 | File | Purpose |
 |------|---------|
-| `api/chat.py` | ChatEngine class, chat router with endpoints |
+| `api/chat.py` | ChatEngine class, chat router, intent detection, company name resolution, context building |
 | `config/data_contracts.py` | ChatRequest, ChatResponse models (add to existing) |
 | `api/routes.py` | Include chat router |
 | `app.py` | Initialize ChatEngine in lifespan |
-| `frontend/app/chat/page.tsx` | Chat page UI |
+| `frontend/app/chat/page.tsx` | Chat page UI with inline charts and markdown rendering |
+| `frontend/components/ChatMarkdown.tsx` | Markdown renderer with financial value colorization (green/red for +/-) |
+| `frontend/components/ChatPriceChart.tsx` | Inline price chart component (AreaChart via Recharts, 7D/1M/3M timeframes) |
 | `frontend/lib/api.ts` | streamChat, getChatHistory, deleteChatHistory |
-| `frontend/types/api.ts` | ChatRequest, ChatEvent, ChatMessage types |
+| `frontend/types/api.ts` | ChatRequest, ChatEvent (with chart type), ChatMessage types |
 | `tests/test_chat.py` | Backend tests |
 
 ---

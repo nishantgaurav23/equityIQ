@@ -152,11 +152,11 @@ class TestComplianceCheckerAgent:
 
         assert issubclass(ComplianceCheckerAgent, BaseAnalystAgent)
 
-    def test_has_two_tools(self):
+    def test_has_three_tools(self):
         from agents.compliance_checker import ComplianceCheckerAgent
 
         agent = ComplianceCheckerAgent()
-        assert len(agent._tools) == 2
+        assert len(agent._tools) == 3
 
 
 # ---------------------------------------------------------------------------

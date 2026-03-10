@@ -26,3 +26,7 @@ scrollbar styling.
 4. Background has subtle animated gradient orbs
 5. Custom scrollbar styling
 6. Dark theme is default (no light mode toggle needed)
+7. Plus Jakarta Sans (display/body) + JetBrains Mono (data/code) fonts loaded
+8. Typography scale: data-value, label-text, section-title, body-text utility classes
+9. @tailwindcss/typography plugin installed for prose rendering
+10. Font feature settings: tabular nums ("tnum") and slashed zero ("zero") on mono fonts

@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <linearGradient id="ghGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="ciGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#d97706"/>
+    </linearGradient>
+    <linearGradient id="crGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0ea5e9"/>
+      <stop offset="100%" style="stop-color:#0284c7"/>
+    </linearGradient>
+    <linearGradient id="svcGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#7c3aed"/>
+    </linearGradient>
+    <filter id="sh3">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+    <marker id="arr3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="480" fill="url(#bg3)" rx="12"/>
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" fill="#f8fafc" font-size="18" font-weight="700" letter-spacing="1">GCP Deployment Architecture (Under $50/month)</text>
+
+  <!-- GitHub -->
+  <rect x="50" y="55" width="200" height="60" rx="10" fill="url(#ghGrad)" filter="url(#sh3)" opacity="0.95"/>
+  <text x="150" y="80" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">GitHub Repository</text>
+  <text x="150" y="100" text-anchor="middle" fill="#c7d2fe" font-size="10">Push to main branch</text>
+
+  <!-- Arrow -->
+  <line x1="250" y1="85" x2="310" y2="85" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr3)"/>
+  <text x="275" y="78" fill="#94a3b8" font-size="8">trigger</text>
+
+  <!-- GitHub Actions -->
+  <rect x="320" y="55" width="220" height="60" rx="10" fill="url(#ciGrad)" filter="url(#sh3)" opacity="0.95"/>
+  <text x="430" y="80" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">GitHub Actions CI/CD</text>
+  <text x="430" y="100" text-anchor="middle" fill="#fef3c7" font-size="10">Test + Lint + Build + Deploy</text>
+
+  <!-- Arrow -->
+  <line x1="540" y1="85" x2="595" y2="85" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr3)"/>
+
+  <!-- Artifact Registry -->
+  <rect x="605" y="55" width="160" height="60" rx="10" fill="url(#svcGrad)" filter="url(#sh3)" opacity="0.95"/>
+  <text x="685" y="80" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Artifact Registry</text>
+  <text x="685" y="100" text-anchor="middle" fill="#ddd6fe" font-size="10">Docker Image Store</text>
+
+  <!-- Arrow down from Artifact Registry -->
+  <line x1="685" y1="115" x2="685" y2="155" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr3)"/>
+
+  <!-- Arrow down from CI to Cloud Run -->
+  <line x1="430" y1="115" x2="430" y2="155" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr3)"/>
+  <text x="440" y="140" fill="#94a3b8" font-size="8">deploy</text>
+
+  <!-- Cloud Run Box -->
+  <rect x="100" y="160" width="600" height="145" rx="12" fill="url(#crGrad)" filter="url(#sh3)" opacity="0.95"/>
+  <text x="400" y="185" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">Google Cloud Run (Single Container)</text>
+  <text x="400" y="205" text-anchor="middle" fill="#bae6fd" font-size="10">Auto-scale 0-4 instances  |  1 GB Memory  |  1 vCPU  |  Port 8080</text>
+
+  <!-- Internal architecture -->
+  <rect x="130" y="218" width="540" height="75" rx="8" fill="rgba(0,0,0,0.25)"/>
+  <text x="400" y="238" text-anchor="middle" fill="#e0f2fe" font-size="11" font-weight="600">Monolith-in-Container: All agents as async Python functions</text>
+
+  <rect x="145" y="250" width="85" height="28" rx="5" fill="rgba(255,255,255,0.1)"/>
+  <text x="187" y="268" text-anchor="middle" fill="#bae6fd" font-size="8">FastAPI Gateway</text>
+  <rect x="240" y="250" width="85" height="28" rx="5" fill="rgba(255,255,255,0.1)"/>
+  <text x="282" y="268" text-anchor="middle" fill="#bae6fd" font-size="8">Conductor</text>
+  <rect x="335" y="250" width="85" height="28" rx="5" fill="rgba(255,255,255,0.1)"/>
+  <text x="377" y="268" text-anchor="middle" fill="#bae6fd" font-size="8">6 Agents</text>
+  <rect x="430" y="250" width="85" height="28" rx="5" fill="rgba(255,255,255,0.1)"/>
+  <text x="472" y="268" text-anchor="middle" fill="#bae6fd" font-size="8">Synthesizer</text>
+  <rect x="525" y="250" width="85" height="28" rx="5" fill="rgba(255,255,255,0.1)"/>
+  <text x="567" y="268" text-anchor="middle" fill="#bae6fd" font-size="8">Chat Engine</text>
+
+  <!-- GCP Services -->
+  <rect x="50" y="340" width="195" height="55" rx="10" fill="url(#svcGrad)" filter="url(#sh3)" opacity="0.92"/>
+  <text x="147" y="363" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Firestore</text>
+  <text x="147" y="383" text-anchor="middle" fill="#ddd6fe" font-size="9">Verdicts + History (free tier)</text>
+
+  <rect x="270" y="340" width="195" height="55" rx="10" fill="url(#svcGrad)" filter="url(#sh3)" opacity="0.92"/>
+  <text x="367" y="363" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Secret Manager</text>
+  <text x="367" y="383" text-anchor="middle" fill="#ddd6fe" font-size="9">API keys as env vars (free tier)</text>
+
+  <rect x="490" y="340" width="195" height="55" rx="10" fill="url(#svcGrad)" filter="url(#sh3)" opacity="0.92"/>
+  <text x="587" y="363" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Cloud Logging</text>
+  <text x="587" y="383" text-anchor="middle" fill="#ddd6fe" font-size="9">Structured JSON logs (50GB free)</text>
+
+  <!-- Arrows from Cloud Run to services -->
+  <line x1="250" y1="305" x2="147" y2="340" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr3)"/>
+  <line x1="400" y1="305" x2="367" y2="340" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr3)"/>
+  <line x1="550" y1="305" x2="587" y2="340" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+  <!-- Cost estimate bar -->
+  <rect x="50" y="420" width="700" height="45" rx="10" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1"/>
+  <text x="400" y="440" text-anchor="middle" fill="#4ade80" font-size="11" font-weight="600">Cloud Run: $0-5  |  Gemini API: $5-15  |  Firestore + Secrets + Logging: $0  |  Total: $5-20/month</text>
+  <text x="400" y="456" text-anchor="middle" fill="#86efac" font-size="9">Budget buffer of $30-45 for scaling or overages</text>
+</svg>

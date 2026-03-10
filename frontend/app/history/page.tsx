@@ -64,9 +64,9 @@ export default function HistoryPage() {
       <div>
         <div className="flex items-center gap-3">
           <Clock className="w-7 h-7 text-amber-400" />
-          <h1 className="text-3xl font-bold gradient-text">Analysis History</h1>
+          <h1 className="text-3xl font-extrabold gradient-text tracking-tight">Analysis History</h1>
         </div>
-        <p className="text-zinc-400 mt-1">
+        <p className="text-zinc-400 mt-1 text-[14px] font-light">
           Track past predictions. Click a row to view detailed analysis.
         </p>
       </div>
@@ -120,7 +120,7 @@ export default function HistoryPage() {
               className="w-full glass rounded-xl p-4 flex items-center justify-between gap-4 text-left group"
             >
               <div className="flex items-center gap-3 min-w-0">
-                <span className="text-xl font-bold text-white shrink-0 max-w-[140px] truncate">{v.ticker}</span>
+                <span className="text-xl font-extrabold text-white shrink-0 max-w-[140px] truncate tracking-tight">{v.ticker}</span>
                 <span className="shrink-0">
                   <SignalBadge signal={v.final_signal} size="sm" />
                 </span>
@@ -131,13 +131,13 @@ export default function HistoryPage() {
               </div>
               <div className="flex items-center gap-6 text-sm">
                 <div>
-                  <p className="text-[10px] text-zinc-500 uppercase">Confidence</p>
-                  <p className="font-mono font-semibold text-amber-400">
+                  <p className="label-text">Confidence</p>
+                  <p className="data-value text-amber-400">
                     {Math.round(v.overall_confidence * 100)}%
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-zinc-500 uppercase">Risk</p>
+                  <p className="label-text">Risk</p>
                   <p className={`font-semibold ${
                     v.risk_level === "LOW" ? "text-green-400" :
                     v.risk_level === "HIGH" ? "text-red-400" : "text-amber-400"
@@ -146,8 +146,8 @@ export default function HistoryPage() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-zinc-500 uppercase">Time</p>
-                  <p className="font-mono text-zinc-300">
+                  <p className="label-text">Time</p>
+                  <p className="data-value text-zinc-300">
                     {v.execution_time_ms > 0 ? `${(v.execution_time_ms / 1000).toFixed(1)}s` : "N/A"}
                   </p>
                 </div>
@@ -176,7 +176,7 @@ export default function HistoryPage() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl font-bold text-white">{selectedVerdict.ticker}</span>
+                  <span className="text-2xl font-extrabold text-white tracking-tight">{selectedVerdict.ticker}</span>
                   <SignalBadge signal={selectedVerdict.final_signal} />
                 </div>
                 <button onClick={() => setSelectedVerdict(null)} className="text-zinc-400 hover:text-white text-xl">
@@ -186,11 +186,11 @@ export default function HistoryPage() {
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="glass-dark rounded-lg p-3">
-                  <p className="text-[10px] text-zinc-500 uppercase">Confidence</p>
-                  <p className="text-lg font-bold text-amber-400">{Math.round(selectedVerdict.overall_confidence * 100)}%</p>
+                  <p className="label-text">Confidence</p>
+                  <p className="text-lg font-bold data-value text-amber-400">{Math.round(selectedVerdict.overall_confidence * 100)}%</p>
                 </div>
                 <div className="glass-dark rounded-lg p-3">
-                  <p className="text-[10px] text-zinc-500 uppercase">Risk Level</p>
+                  <p className="label-text">Risk Level</p>
                   <p className={`text-lg font-bold ${
                     selectedVerdict.risk_level === "LOW" ? "text-green-400" :
                     selectedVerdict.risk_level === "HIGH" ? "text-red-400" : "text-amber-400"
@@ -199,14 +199,14 @@ export default function HistoryPage() {
                   </p>
                 </div>
                 <div className="glass-dark rounded-lg p-3">
-                  <p className="text-[10px] text-zinc-500 uppercase">Analysis Time</p>
-                  <p className="text-lg font-bold text-amber-400">
+                  <p className="label-text">Analysis Time</p>
+                  <p className="text-lg font-bold data-value text-amber-400">
                     {selectedVerdict.execution_time_ms > 0 ? `${(selectedVerdict.execution_time_ms / 1000).toFixed(1)}s` : "N/A"}
                   </p>
                 </div>
                 <div className="glass-dark rounded-lg p-3">
-                  <p className="text-[10px] text-zinc-500 uppercase">Price Target</p>
-                  <p className="text-lg font-bold text-rose-400">
+                  <p className="label-text">Price Target</p>
+                  <p className="text-lg font-bold data-value text-rose-400">
                     {selectedVerdict.price_target != null ? formatPrice(selectedVerdict.price_target, inferCurrency(selectedVerdict.ticker)) : "N/A"}
                   </p>
                 </div>
@@ -259,8 +259,8 @@ export default function HistoryPage() {
 function StatCard({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div className="glass rounded-xl p-4">
-      <p className="text-xs text-zinc-500">{label}</p>
-      <p className={`text-2xl font-bold font-mono ${color}`}>{value}</p>
+      <p className="label-text">{label}</p>
+      <p className={`text-2xl font-bold data-value ${color}`}>{value}</p>
     </div>
   );
 }
