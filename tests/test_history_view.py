@@ -224,6 +224,12 @@ class TestBuildSucceeds:
     """Verify frontend builds without errors."""
 
     @pytest.mark.slow
+    @pytest.mark.skipif(
+        not os.path.exists(
+            os.path.join(os.path.dirname(__file__), "..", "frontend", "node_modules")
+        ),
+        reason="node_modules not installed (run npm install in frontend/)",
+    )
     def test_next_build_succeeds(self):
         result = subprocess.run(
             ["npm", "run", "build"],
