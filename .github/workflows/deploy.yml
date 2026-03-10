@@ -51,7 +51,7 @@ jobs:
             ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REPO }}/equityiq:${{ github.sha }}
             ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REPO }}/equityiq:latest
 
-      - name: Set up Cloud SDK          # ← REPLACE old deploy step with these two
+      - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy to Cloud Run
@@ -60,7 +60,7 @@ jobs:
           sed -i "s|:latest|:${{ github.sha }}|g" deploy/cloudrun.yaml
           gcloud run services replace deploy/cloudrun.yaml \
             --region=${{ secrets.GCP_REGION }}
-          gcloud run services add-iam-policy-binding equityiq \
+          gcloud run services add-iam-policy-binding equityiq-api \
             --region=${{ secrets.GCP_REGION }} \
             --member="allUsers" \
             --role="roles/run.invoker"

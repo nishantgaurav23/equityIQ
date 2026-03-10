@@ -1,7 +1,7 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: equityiq
+  name: equityiq-api
   labels:
     cloud.googleapis.com/location: asia-south1
   annotations:
