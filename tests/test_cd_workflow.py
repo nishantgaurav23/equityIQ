@@ -205,24 +205,29 @@ class TestDeployCloudRun:
         return deploy_job.get("steps", [])
 
     def test_deploy_cloud_run_step(self):
-        """Must use google-github-actions/deploy-cloudrun."""
+        """Must have a Cloud Run deploy step (gcloud run or deploy-cloudrun action)."""
         steps = self._get_steps()
         cr_steps = [
-            s for s in steps if "google-github-actions/deploy-cloudrun" in s.get("uses", "")
+            s
+            for s in steps
+            if "google-github-actions/deploy-cloudrun" in s.get("uses", "")
+            or "gcloud run" in s.get("run", "")
         ]
-        assert len(cr_steps) >= 1, "Must have deploy-cloudrun step"
+        assert len(cr_steps) >= 1, "Must have Cloud Run deploy step"
 
     def test_deploy_cloud_run_uses_secrets(self):
-        """Cloud Run service and region must reference secrets."""
+        """Cloud Run deploy must reference secrets for region/project."""
         steps = self._get_steps()
         cr_steps = [
-            s for s in steps if "google-github-actions/deploy-cloudrun" in s.get("uses", "")
+            s
+            for s in steps
+            if "google-github-actions/deploy-cloudrun" in s.get("uses", "")
+            or "gcloud run" in s.get("run", "")
         ]
         cr_step = cr_steps[0]
-        with_block = cr_step.get("with", {})
-        service = str(with_block.get("service", ""))
-        region = str(with_block.get("region", ""))
-        assert "${{" in service or "${{" in region or "secrets." in str(with_block), (
+        # Check either `with` block (action) or `run` block (gcloud) for secrets
+        step_str = str(cr_step.get("with", {})) + str(cr_step.get("run", ""))
+        assert "secrets." in step_str or "${{" in step_str, (
             "Cloud Run config should reference GitHub secrets"
         )
 
