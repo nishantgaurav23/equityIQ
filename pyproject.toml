@@ -8,11 +8,21 @@ version = "0.1.0"
 description = "Multi-agent stock intelligence system"
 requires-python = ">=3.12"
 dependencies = [
-    "google-adk",
-    "google-generativeai",
+    "google-adk>=1.25,<2",
+    "google-generativeai>=0.8,<1",
+    "google-ai-generativelanguage>=0.6.10,<0.7",
+    "google-cloud-firestore>=2.20,<3",
+    "google-cloud-aiplatform>=1.132,<2",
+    "google-cloud-iam>=2.15,<3",
+    "google-genai>=1.56,<2",
+    "protobuf>=5.29,<7",
+    "grpcio>=1.62,<2",
+    "opentelemetry-api>=1.36,<1.39",
+    "opentelemetry-sdk>=1.36,<1.39",
+    "sse-starlette>=2.0,<4",
     "fastapi",
     "uvicorn",
-    "pydantic",
+    "pydantic>=2.0,<3",
     "pydantic-settings",
     "httpx",
     "aiohttp",
@@ -27,8 +37,6 @@ dependencies = [
     "beautifulsoup4",
     "lxml",
     "colorlog",
-    "google-cloud-firestore",
-    "alembic>=1.13.0",
 ]
 
 [project.optional-dependencies]
