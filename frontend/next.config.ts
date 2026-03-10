@@ -3,8 +3,8 @@ import type { NextConfig } from "next";
 const isProd = process.env.NODE_ENV === "production";
 
 const nextConfig: NextConfig = {
-  // Static export for single-container GCP deployment
-  ...(isProd ? { output: "export" } : {}),
+  output: "export",        // ← always export (removes conditional)
+  distDir: "out",          // ← explicitly set output dir
   ...(!isProd
     ? {
         async rewrites() {
