@@ -47,9 +47,9 @@ class TestStages:
             "Must have prod stage FROM base AS prod"
         )
 
-    def test_exactly_three_from_instructions(self, dockerfile_content):
+    def test_exactly_four_from_instructions(self, dockerfile_content):
         froms = re.findall(r"^FROM\s+", dockerfile_content, re.MULTILINE)
-        assert len(froms) == 3, f"Expected 3 FROM instructions, got {len(froms)}"
+        assert len(froms) == 4, f"Expected 4 FROM instructions, got {len(froms)}"
 
 
 # --- Base stage ---

@@ -104,7 +104,7 @@ class TestEnvironmentConfig:
         filepath = os.path.join(FRONTEND_DIR, "lib", "config.ts")
         with open(filepath) as f:
             content = f.read()
-        assert "localhost:8000" in content, "Missing default API URL in config.ts"
+        assert "NEXT_PUBLIC_API_URL" in content, "Missing API URL env var in config.ts"
         assert "EquityIQ" in content, "Missing default app name in config.ts"
 
 
