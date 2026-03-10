@@ -145,9 +145,7 @@ class SecConnector:
 
             # Detect risk flags from all filing descriptions
             risk_flags: list[str] = []
-            all_descriptions = " ".join(
-                f.get("description", "").lower() for f in filings
-            )
+            all_descriptions = " ".join(f.get("description", "").lower() for f in filings)
 
             for flag, keywords in RISK_KEYWORDS.items():
                 if any(kw in all_descriptions for kw in keywords):

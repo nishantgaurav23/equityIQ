@@ -1,7 +1,7 @@
 """ValuationScout -- Fundamentals analysis agent for EquityIQ.
 
-Uses Polygon.io to fetch financial data, evaluates valuation metrics,
-and returns a ValuationReport with BUY/HOLD/SELL signal.
+Uses Polygon.io for US stocks and yfinance for Indian stocks (NSE/BSE).
+Evaluates valuation metrics and returns a ValuationReport with BUY/HOLD/SELL signal.
 """
 
 from __future__ import annotations
@@ -10,27 +10,40 @@ import logging
 
 from agents.base_agent import BaseAnalystAgent
 from config.data_contracts import ValuationReport
+from tools.market_detector import is_indian_ticker
 from tools.polygon_connector import PolygonConnector
+from tools.yahoo_connector import YahooConnector
 
 logger = logging.getLogger(__name__)
 
-# Module-level connector instance (shared across tool calls).
-_connector = PolygonConnector()
+# Module-level connector instances (shared across tool calls).
+_polygon = PolygonConnector()
+_yahoo = YahooConnector()
 
 
 async def get_fundamentals_tool(ticker: str) -> dict:
-    """Fetch fundamental financial ratios for a ticker from Polygon.io."""
+    """Fetch fundamental financial ratios for a ticker.
+
+    Routes to yfinance for Indian tickers (.NS/.BO), Polygon.io for US.
+    """
     try:
-        return await _connector.get_fundamentals(ticker)
+        if is_indian_ticker(ticker):
+            return await _yahoo.get_fundamentals(ticker)
+        return await _polygon.get_fundamentals(ticker)
     except Exception:
         logger.warning("get_fundamentals_tool failed for %s", ticker)
         return {}
 
 
 async def get_price_history_tool(ticker: str) -> dict:
-    """Fetch 1-year daily price history for a ticker from Polygon.io."""
+    """Fetch 1-year daily price history for a ticker.
+
+    Routes to yfinance for Indian tickers (.NS/.BO), Polygon.io for US.
+    """
     try:
-        return await _connector.get_price_history(ticker, days=365)
+        if is_indian_ticker(ticker):
+            return await _yahoo.get_price_history(ticker, days=365)
+        return await _polygon.get_price_history(ticker, days=365)
     except Exception:
         logger.warning("get_price_history_tool failed for %s", ticker)
         return {}

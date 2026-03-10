@@ -16,22 +16,25 @@ from config.data_contracts import PulseReport
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture()
 def mock_news_connector():
     """Patch the module-level _news_connector in pulse_monitor."""
     with patch("agents.pulse_monitor._news_connector") as mock:
-        mock.get_news_sentiment = AsyncMock(return_value={
-            "sentiment_score": 0.45,
-            "article_count": 5,
-            "top_headlines": [
-                "AAPL beats earnings expectations",
-                "Apple launches new product",
-                "Apple stock surges on strong guidance",
-                "Analysts upgrade AAPL",
-                "Apple AI strategy impresses Wall Street",
-            ],
-            "event_flags": ["earnings", "product_launch"],
-        })
+        mock.get_news_sentiment = AsyncMock(
+            return_value={
+                "sentiment_score": 0.45,
+                "article_count": 5,
+                "top_headlines": [
+                    "AAPL beats earnings expectations",
+                    "Apple launches new product",
+                    "Apple stock surges on strong guidance",
+                    "Analysts upgrade AAPL",
+                    "Apple AI strategy impresses Wall Street",
+                ],
+                "event_flags": ["earnings", "product_launch"],
+            }
+        )
         yield mock
 
 
@@ -39,13 +42,15 @@ def mock_news_connector():
 def mock_polygon_connector():
     """Patch the module-level _polygon_connector in pulse_monitor."""
     with patch("agents.pulse_monitor._polygon_connector") as mock:
-        mock.get_company_news = AsyncMock(return_value={
-            "headlines": ["Apple Q4 results top estimates", "AAPL rises 3%"],
-            "articles": [
-                {"title": "Apple Q4 results top estimates", "published_utc": "2025-01-15"},
-                {"title": "AAPL rises 3%", "published_utc": "2025-01-14"},
-            ],
-        })
+        mock.get_company_news = AsyncMock(
+            return_value={
+                "headlines": ["Apple Q4 results top estimates", "AAPL rises 3%"],
+                "articles": [
+                    {"title": "Apple Q4 results top estimates", "published_utc": "2025-01-15"},
+                    {"title": "AAPL rises 3%", "published_utc": "2025-01-14"},
+                ],
+            }
+        )
         yield mock
 
 
@@ -68,6 +73,7 @@ def mock_polygon_error():
 # ---------------------------------------------------------------------------
 # T2: Tool Functions
 # ---------------------------------------------------------------------------
+
 
 class TestGetNewsSentimentTool:
     """Tests for get_news_sentiment_tool."""
@@ -132,6 +138,7 @@ class TestGetCompanyNewsTool:
 # T3: Agent Class
 # ---------------------------------------------------------------------------
 
+
 class TestPulseMonitorAgent:
     """Tests for PulseMonitorAgent instantiation and properties."""
 
@@ -187,6 +194,7 @@ class TestAgentCard:
 # T4: Module Exports
 # ---------------------------------------------------------------------------
 
+
 class TestModuleExports:
     """Tests for module-level exports."""
 
@@ -206,6 +214,7 @@ class TestModuleExports:
 # ---------------------------------------------------------------------------
 # T5: Analyze Success (mocked LLM)
 # ---------------------------------------------------------------------------
+
 
 class TestAnalyzeSuccess:
     """Test analyze() with mocked LLM returning valid PulseReport."""
@@ -251,9 +260,7 @@ class TestAnalyzeSuccess:
             with patch("agents.base_agent.InMemorySessionService") as MockSession:
                 mock_session = MagicMock()
                 mock_session.id = "test-session"
-                MockSession.return_value.create_session = AsyncMock(
-                    return_value=mock_session
-                )
+                MockSession.return_value.create_session = AsyncMock(return_value=mock_session)
 
                 result = await agent.analyze("AAPL")
 
@@ -268,6 +275,7 @@ class TestAnalyzeSuccess:
 # ---------------------------------------------------------------------------
 # T6: Analyze Fallback
 # ---------------------------------------------------------------------------
+
 
 class TestAnalyzeFallback:
     """Test analyze() fallback on error."""
@@ -312,6 +320,7 @@ class TestAnalyzeFallback:
 # ---------------------------------------------------------------------------
 # T7: Confidence Cap (PulseReport validator)
 # ---------------------------------------------------------------------------
+
 
 class TestConfidenceCap:
     """Verify PulseReport caps confidence at 0.70 when article_count < 3."""
@@ -375,5 +384,3 @@ class TestConfidenceCap:
             article_count=3,
         )
         assert report.confidence == 0.85
-
-

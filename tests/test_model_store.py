@@ -100,9 +100,7 @@ def compliance_report():
 
 
 @pytest.fixture
-def all_reports(
-    valuation_report, momentum_report, pulse_report, economy_report, compliance_report
-):
+def all_reports(valuation_report, momentum_report, pulse_report, economy_report, compliance_report):
     return [valuation_report, momentum_report, pulse_report, economy_report, compliance_report]
 
 
@@ -111,9 +109,7 @@ def trained_model(all_reports):
     """Create a trained SignalFusionModel for testing."""
     model = SignalFusionModel()
     training_data = (
-        [(all_reports, "BUY")] * 5
-        + [(all_reports, "HOLD")] * 5
-        + [(all_reports, "SELL")] * 5
+        [(all_reports, "BUY")] * 5 + [(all_reports, "HOLD")] * 5 + [(all_reports, "SELL")] * 5
     )
     model.fit(training_data)
     return model

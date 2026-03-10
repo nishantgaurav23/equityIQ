@@ -315,14 +315,22 @@ class SignalFusionModel:
     # FR-5: Prediction
     # -------------------------------------------------------------------
 
-    def predict(self, reports: list) -> FinalVerdict:
-        """Predict final verdict from analyst reports."""
+    def predict(self, reports: list, session_id: str | None = None) -> FinalVerdict:
+        """Predict final verdict from analyst reports.
+
+        Args:
+            reports: List of AnalystReport subclass instances.
+            session_id: Optional session ID for request tracing. If None, a new UUID
+                is generated for backward compatibility.
+        """
+        effective_sid = session_id or str(uuid.uuid4())
+
         if not reports:
             return FinalVerdict(
                 ticker="",
                 final_signal="HOLD",
                 overall_confidence=0.0,
-                session_id=str(uuid.uuid4()),
+                session_id=effective_sid,
             )
 
         ticker = reports[0].ticker
@@ -352,7 +360,7 @@ class SignalFusionModel:
             overall_confidence=confidence,
             analyst_signals=analyst_signals,
             key_drivers=key_drivers,
-            session_id=str(uuid.uuid4()),
+            session_id=effective_sid,
         )
 
         # Apply compliance override

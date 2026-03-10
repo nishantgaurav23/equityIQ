@@ -79,14 +79,11 @@ class FredConnector:
 
             # If all indicators are None, return {}
             if all(
-                v is None
-                for v in [gdp_growth, inflation_rate, fed_funds_rate, unemployment_rate]
+                v is None for v in [gdp_growth, inflation_rate, fed_funds_rate, unemployment_rate]
             ):
                 return {}
 
-            macro_regime = self._classify_regime(
-                gdp_growth, inflation_rate, unemployment_rate
-            )
+            macro_regime = self._classify_regime(gdp_growth, inflation_rate, unemployment_rate)
 
             result = {
                 "gdp_growth": gdp_growth,

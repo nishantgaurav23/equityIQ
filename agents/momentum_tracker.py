@@ -1,7 +1,8 @@
 """Momentum Tracker agent -- technical analysis using price momentum indicators.
 
-Uses polygon_connector for price history and technical_engine for RSI, MACD,
-SMA crossovers, and volatility. Returns a MomentumReport. Port 8002.
+Uses polygon_connector for US price history and yahoo_connector for Indian
+stocks (NSE/BSE). technical_engine computes RSI, MACD, SMA crossovers,
+and volatility. Returns a MomentumReport. Port 8002.
 """
 
 from __future__ import annotations
@@ -10,8 +11,10 @@ import logging
 
 from agents.base_agent import BaseAnalystAgent
 from config.data_contracts import MomentumReport
+from tools.market_detector import is_indian_ticker
 from tools.polygon_connector import PolygonConnector
 from tools.technical_engine import calc_macd, calc_rsi, calc_sma
+from tools.yahoo_connector import YahooConnector
 
 logger = logging.getLogger(__name__)
 
@@ -74,11 +77,16 @@ def _compute_momentum_score(
 async def get_technical_analysis(ticker: str) -> dict:
     """Fetch price history and compute all technical indicators.
 
+    Routes to yfinance for Indian tickers (.NS/.BO), Polygon.io for US.
     Returns a dict with rsi_14, macd_signal, above_sma_50, above_sma_200,
     volume_trend, and price_momentum_score. On error, all values are None.
     """
     try:
-        connector = PolygonConnector()
+        if is_indian_ticker(ticker):
+            connector = YahooConnector()
+        else:
+            connector = PolygonConnector()
+
         price_data = await connector.get_price_history(ticker, days=250)
 
         if not price_data or "prices" not in price_data:

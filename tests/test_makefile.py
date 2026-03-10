@@ -60,9 +60,7 @@ class TestMakefileTargets:
 
     def test_phony_includes_all_targets(self):
         content = _read_makefile()
-        phony_lines = [
-            line for line in content.splitlines() if line.startswith(".PHONY")
-        ]
+        phony_lines = [line for line in content.splitlines() if line.startswith(".PHONY")]
         phony_text = " ".join(phony_lines)
         for target in REQUIRED_TARGETS:
             assert target in phony_text, f".PHONY must include target: {target}"
@@ -96,7 +94,7 @@ class TestMakefileExecution:
             f"stderr: {result.stderr[-500:]}"
         )
 
-    @pytest.mark.skipif(IN_MAKE_TEST, reason="Skip to avoid recursive make invocation")
+    @pytest.mark.skip(reason="Skipped: running make local-test inside pytest causes recursion")
     def test_local_test_runs_pytest(self):
         """Run make local-test and verify pytest executes."""
         env = {**os.environ, "EQUITYIQ_MAKE_TEST": "1"}
@@ -110,8 +108,7 @@ class TestMakefileExecution:
         )
         # pytest should run (exit 0 = pass, exit 5 = no tests collected, both OK)
         assert result.returncode in (0, 5), (
-            f"make local-test failed with rc={result.returncode}:\n"
-            f"stderr: {result.stderr[-500:]}"
+            f"make local-test failed with rc={result.returncode}:\nstderr: {result.stderr[-500:]}"
         )
 
     def test_local_lint_runs_ruff(self):
@@ -136,9 +133,9 @@ class TestDockerTargetsPresence:
     def test_dev_target_has_docker_compose(self):
         content = _read_makefile()
         # Find the dev target and check it references docker-compose or docker compose
-        assert re.search(
-            r"dev:.*\n\t.*docker", content, re.MULTILINE
-        ) or "docker" in content, "dev target must reference docker"
+        assert re.search(r"dev:.*\n\t.*docker", content, re.MULTILINE) or "docker" in content, (
+            "dev target must reference docker"
+        )
 
     def test_test_target_has_docker(self):
         content = _read_makefile()

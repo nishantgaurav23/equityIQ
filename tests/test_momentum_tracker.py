@@ -2,20 +2,22 @@
 
 from __future__ import annotations
 
+import random
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from config.data_contracts import AnalystReport, MomentumReport
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_price_data(n: int = 250, base: float = 100.0, trend: float = 0.5):
     """Generate synthetic price/volume data for testing."""
     import random
+
     random.seed(42)
     prices = []
     volumes = []
@@ -45,6 +47,7 @@ def _make_stable_volume_data(n: int = 250):
 # ---------------------------------------------------------------------------
 # Tool Function Tests
 # ---------------------------------------------------------------------------
+
 
 class TestGetTechnicalAnalysis:
     """Tests for the get_technical_analysis tool function."""
@@ -172,7 +175,6 @@ class TestGetTechnicalAnalysis:
 
         # Create data where price recently crossed above SMA50 but not SMA200
         # Start bearish then turn bullish recently
-        import random
         random.seed(42)
         prices = []
         p = 200.0
@@ -291,11 +293,61 @@ class TestGetTechnicalAnalysis:
         assert -1.0 <= result["price_momentum_score"] <= 1.0
 
     @pytest.mark.asyncio
+    async def test_indian_ticker_routes_to_yahoo(self):
+        """Indian ticker (.NS) routes to YahooConnector instead of Polygon."""
+        from agents.momentum_tracker import get_technical_analysis
+
+        price_data = _make_price_data()
+        price_data["currency"] = "INR"
+        mock_connector = MagicMock()
+        mock_connector.get_price_history = AsyncMock(return_value=price_data)
+
+        with patch("agents.momentum_tracker.YahooConnector", return_value=mock_connector):
+            result = await get_technical_analysis("TCS.NS")
+
+        mock_connector.get_price_history.assert_awaited_once_with("TCS.NS", days=250)
+        assert result["rsi_14"] is not None
+        assert result["price_momentum_score"] is not None
+
+    @pytest.mark.asyncio
+    async def test_bse_ticker_routes_to_yahoo(self):
+        """BSE ticker (.BO) also routes to YahooConnector."""
+        from agents.momentum_tracker import get_technical_analysis
+
+        price_data = _make_price_data()
+        mock_connector = MagicMock()
+        mock_connector.get_price_history = AsyncMock(return_value=price_data)
+
+        with patch("agents.momentum_tracker.YahooConnector", return_value=mock_connector):
+            result = await get_technical_analysis("RELIANCE.BO")
+
+        mock_connector.get_price_history.assert_awaited_once_with("RELIANCE.BO", days=250)
+        assert result["rsi_14"] is not None
+
+    @pytest.mark.asyncio
+    async def test_indian_ticker_yahoo_error(self):
+        """Indian ticker with Yahoo error returns empty result."""
+        from agents.momentum_tracker import get_technical_analysis
+
+        mock_connector = MagicMock()
+        mock_connector.get_price_history = AsyncMock(side_effect=Exception("Yahoo down"))
+
+        with patch("agents.momentum_tracker.YahooConnector", return_value=mock_connector):
+            result = await get_technical_analysis("INFY.NS")
+
+        assert result["rsi_14"] is None
+        assert result["price_momentum_score"] is None
+
+    @pytest.mark.asyncio
     async def test_insufficient_data(self):
         """Fewer than 15 prices -> RSI defaults to 50."""
         from agents.momentum_tracker import get_technical_analysis
 
-        price_data = {"prices": [100.0] * 10, "volumes": [1_000_000] * 10, "dates": ["2025-01-01"] * 10}
+        price_data = {
+            "prices": [100.0] * 10,
+            "volumes": [1_000_000] * 10,
+            "dates": ["2025-01-01"] * 10,
+        }
         mock_connector = MagicMock()
         mock_connector.get_price_history = AsyncMock(return_value=price_data)
 
@@ -309,6 +361,7 @@ class TestGetTechnicalAnalysis:
 # ---------------------------------------------------------------------------
 # Agent Tests
 # ---------------------------------------------------------------------------
+
 
 class TestMomentumTrackerAgent:
     """Tests for the MomentumTrackerAgent class."""
@@ -338,7 +391,7 @@ class TestMomentumTrackerAgent:
 
     def test_agent_tools_include_technical_analysis(self):
         """Tools list includes get_technical_analysis."""
-        from agents.momentum_tracker import MomentumTrackerAgent, get_technical_analysis
+        from agents.momentum_tracker import MomentumTrackerAgent
 
         with patch("agents.base_agent.Agent"):
             agent = MomentumTrackerAgent()
@@ -360,14 +413,17 @@ class TestMomentumTrackerAgent:
         """Module-level momentum_tracker is a MomentumTrackerAgent."""
         with patch("agents.base_agent.Agent"):
             from agents import momentum_tracker as mt_module
+
             assert hasattr(mt_module, "momentum_tracker")
             from agents.momentum_tracker import MomentumTrackerAgent
+
             assert isinstance(mt_module.momentum_tracker, MomentumTrackerAgent)
 
     def test_factory_function(self):
         """create_momentum_tracker() returns a valid agent."""
         with patch("agents.base_agent.Agent"):
             from agents.momentum_tracker import create_momentum_tracker
+
             agent = create_momentum_tracker()
             assert agent.name == "momentum_tracker"
 
@@ -401,9 +457,11 @@ class TestMomentumTrackerAgent:
         async def mock_run_async(**kwargs):
             yield mock_event
 
-        with patch("agents.base_agent.Agent"), \
-             patch("agents.base_agent.InMemorySessionService") as mock_svc, \
-             patch("agents.base_agent.Runner") as mock_runner_cls:
+        with (
+            patch("agents.base_agent.Agent"),
+            patch("agents.base_agent.InMemorySessionService") as mock_svc,
+            patch("agents.base_agent.Runner") as mock_runner_cls,
+        ):
             mock_session = MagicMock()
             mock_session.id = "test-session"
             mock_svc.return_value.create_session = AsyncMock(return_value=mock_session)
@@ -422,9 +480,11 @@ class TestMomentumTrackerAgent:
         """LLM failure produces HOLD/0.0 fallback."""
         from agents.momentum_tracker import MomentumTrackerAgent
 
-        with patch("agents.base_agent.Agent"), \
-             patch("agents.base_agent.InMemorySessionService") as mock_svc, \
-             patch("agents.base_agent.Runner") as mock_runner_cls:
+        with (
+            patch("agents.base_agent.Agent"),
+            patch("agents.base_agent.InMemorySessionService") as mock_svc,
+            patch("agents.base_agent.Runner"),
+        ):
             mock_svc.return_value.create_session = AsyncMock(
                 side_effect=Exception("LLM unavailable")
             )

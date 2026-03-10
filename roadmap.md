@@ -3,7 +3,8 @@
 **Prototype target**: End-to-end stock analysis via API -- 7 agents in parallel, XGBoost synthesis, final verdict.
 **Budget**: $0-50 GCP (free tier + minimal paid).
 **LLM**: Gemini 3 Flash (`gemini-3-flash-preview`) for all agents.
-**Out of scope for prototype**: Real-time streaming, multi-market (non-US), mobile app, social trading features.
+**Out of scope for prototype**: Real-time streaming, mobile app, social trading features.
+**Multi-market**: US (Polygon/SEC/FRED) + India (Yahoo/SEBI/RBI/NSE) fully supported.
 
 ---
 
@@ -80,6 +81,8 @@ specs/
 | 12 | GCP Deployment | 5 | Cloud Run, GitHub Actions, secrets |
 | 13 | Frontend | 4 | Next.js dashboard |
 | 14 | Evaluation & QA | 5 | Backtester, benchmarks, E2E tests |
+| 16 | Intelligence Layer | 3 | Vertex AI memory, NL chat, prediction tracker |
+| 17 | Integrations | 4 | Broker connectivity, portfolio sync, alerts |
 
 ---
 
@@ -180,9 +183,9 @@ Signal synthesizer fuses analyst signals. Market conductor orchestrates all agen
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
-| S8.1 | `specs/spec-S8.1-signal-synthesizer/` | S6.1, S4.1, S2.2 | `agents/signal_synthesizer.py` | Signal fusion agent | Receives 5 AnalystReports + RiskGuardianReport. Runs XGBoost prediction. Applies compliance override. Returns FinalVerdict. Port 8006 | pending |
-| S8.2 | `specs/spec-S8.2-market-conductor/` | S6.2, S7.1-S7.6, S8.1, S5.1 | `agents/market_conductor.py` | Orchestrator agent | Dispatches to all agents via asyncio.gather(). Handles timeouts (30s per agent). Reduces confidence for missing agents. Stores verdict in InsightVault. Port 8000 | pending |
-| S8.3 | `specs/spec-S8.3-portfolio-analyzer/` | S8.2, S2.2 | `agents/market_conductor.py` | Multi-stock portfolio analysis | analyze_portfolio(): runs analyze() for each ticker, aggregates into PortfolioInsight. Calculates diversification_score, selects top_pick | pending |
+| S8.1 | `specs/spec-S8.1-signal-synthesizer/` | S6.1, S4.1, S2.2 | `agents/signal_synthesizer.py` | Signal fusion agent | Receives 5 AnalystReports + RiskGuardianReport. Runs XGBoost prediction. Applies compliance override. Returns FinalVerdict. Port 8006 | done |
+| S8.2 | `specs/spec-S8.2-market-conductor/` | S6.2, S7.1-S7.6, S8.1, S5.1 | `agents/market_conductor.py` | Orchestrator agent | Dispatches to all agents via asyncio.gather(). Handles timeouts (30s per agent). Reduces confidence for missing agents. Stores verdict in InsightVault. Port 8000 | done |
+| S8.3 | `specs/spec-S8.3-portfolio-analyzer/` | S8.2, S2.2 | `agents/market_conductor.py` | Multi-stock portfolio analysis | analyze_portfolio(): runs analyze() for each ticker, aggregates into PortfolioInsight. Calculates diversification_score, selects top_pick | done |
 
 ---
 
@@ -192,10 +195,10 @@ FastAPI endpoints exposing the analysis system.
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
-| S9.1 | `specs/spec-S9.1-analyze-endpoint/` | S8.2, S1.4 | `app.py` | POST /analyze/{ticker} | Validates ticker format. Calls market_conductor.analyze(). Returns FinalVerdict JSON. Timeout: 60s | pending |
-| S9.2 | `specs/spec-S9.2-portfolio-endpoint/` | S8.3, S1.4 | `app.py` | POST /portfolio | Accepts list of tickers (max 10). Calls analyze_portfolio(). Returns PortfolioInsight JSON | pending |
-| S9.3 | `specs/spec-S9.3-history-endpoints/` | S5.2, S1.4 | `app.py` | GET /history/{ticker} + /history/{ticker}/trend | Returns past analyses and signal trends from InsightVault | pending |
-| S9.4 | `specs/spec-S9.4-error-handling/` | S9.1 | `app.py` | API error taxonomy | Custom exceptions: TickerNotFoundError, AnalysisTimeoutError, InsufficientDataError. Mapped to appropriate HTTP status codes. Structured error responses | pending |
+| S9.1 | `specs/spec-S9.1-analyze-endpoint/` | S8.2, S1.4 | `app.py` | POST /analyze/{ticker} | Validates ticker format. Calls market_conductor.analyze(). Returns FinalVerdict JSON. Timeout: 60s | done |
+| S9.2 | `specs/spec-S9.2-portfolio-endpoint/` | S8.3, S1.4 | `app.py` | POST /portfolio | Accepts list of tickers (max 10). Calls analyze_portfolio(). Returns PortfolioInsight JSON | done |
+| S9.3 | `specs/spec-S9.3-history-endpoints/` | S5.2, S1.4 | `app.py` | GET /history/{ticker} + /history/{ticker}/trend | Returns past analyses and signal trends from InsightVault | done |
+| S9.4 | `specs/spec-S9.4-error-handling/` | S9.1 | `app.py` | API error taxonomy | Custom exceptions: TickerNotFoundError, AnalysisTimeoutError, InsufficientDataError. Mapped to appropriate HTTP status codes. Structured error responses | done |
 
 ---
 
@@ -205,9 +208,9 @@ End-to-end wiring and integration testing.
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
-| S10.1 | `specs/spec-S10.1-pipeline-wiring/` | S9.1, S8.2, S5.1 | `app.py` | Full analysis pipeline | Wire: request -> conductor -> agents -> synthesizer -> vault -> response. All steps traced with session_id | pending |
-| S10.2 | `specs/spec-S10.2-graceful-degradation/` | S10.1 | `agents/market_conductor.py` | Agent failure handling | Missing agent -> reduce confidence by 0.20. Timeout handling. Partial results still returned with warning | pending |
-| S10.3 | `specs/spec-S10.3-integration-test/` | S10.1, S10.2 | `tests/test_pipeline.py` | Integration test: full pipeline | Mock all external services (Polygon, FRED, NewsAPI, SEC, Gemini). Submit analysis request. Assert: correct FinalVerdict structure, all agents called, verdict stored, response format correct | pending |
+| S10.1 | `specs/spec-S10.1-pipeline-wiring/` | S9.1, S8.2, S5.1 | `app.py` | Full analysis pipeline | Wire: request -> conductor -> agents -> synthesizer -> vault -> response. All steps traced with session_id | done |
+| S10.2 | `specs/spec-S10.2-graceful-degradation/` | S10.1 | `agents/market_conductor.py` | Agent failure handling | Missing agent -> reduce confidence by 0.20. Timeout handling. Partial results still returned with warning | done |
+| S10.3 | `specs/spec-S10.3-integration-test/` | S10.1, S10.2 | `tests/test_pipeline.py` | Integration test: full pipeline | Mock all external services (Polygon, FRED, NewsAPI, SEC, Gemini). Submit analysis request. Assert: correct FinalVerdict structure, all agents called, verdict stored, response format correct | done |
 
 ---
 
@@ -217,11 +220,11 @@ Docker setup, scripts, and local development infrastructure.
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
-| S11.1 | `specs/spec-S11.1-dockerfile/` | S1.1 | `Dockerfile` | Multi-stage Dockerfile | Stage 1 (base): Python 3.12-slim, install deps. Stage 2 (dev): add pytest + ruff. Stage 3 (prod): copy app, non-root user, uvicorn CMD. Single container for all agents | pending |
-| S11.2 | `specs/spec-S11.2-docker-compose/` | S11.1 | `docker-compose.yml` | Local dev stack | Services: app (build from Dockerfile dev stage). Port 8000 exposed. Env from .env file. Volume mount for hot reload | pending |
-| S11.3 | `specs/spec-S11.3-launch-scripts/` | S1.2 | `scripts/launch_agents.sh`, `scripts/stop_agents.sh` | Agent launch/stop scripts | Start all agents on ports 8001-8007. PID management in .pids/. Health check after launch | pending |
-| S11.4 | `specs/spec-S11.4-dockerignore/` | -- | `.dockerignore` | Docker ignore rules | Exclude: venv, .env, notebooks/, docs/, __pycache__, *.pyc, .git, data/*.db, frontend/node_modules | pending |
-| S11.5 | `specs/spec-S11.5-health-check-script/` | S11.3 | `scripts/health_check.sh` | Health check for all agents | Curl each agent's /health endpoint. Report status table. Exit 1 if any agent is down | pending |
+| S11.1 | `specs/spec-S11.1-dockerfile/` | S1.1 | `Dockerfile` | Multi-stage Dockerfile | Stage 1 (base): Python 3.12-slim, install deps. Stage 2 (dev): add pytest + ruff. Stage 3 (prod): copy app, non-root user, uvicorn CMD. Single container for all agents | done |
+| S11.2 | `specs/spec-S11.2-docker-compose/` | S11.1 | `docker-compose.yml` | Local dev stack | Services: app (build from Dockerfile dev stage). Port 8000 exposed. Env from .env file. Volume mount for hot reload | done |
+| S11.3 | `specs/spec-S11.3-launch-scripts/` | S1.2 | `scripts/launch_agents.sh`, `scripts/stop_agents.sh` | Agent launch/stop scripts | Start all agents on ports 8001-8007. PID management in .pids/. Health check after launch | done |
+| S11.4 | `specs/spec-S11.4-dockerignore/` | -- | `.dockerignore` | Docker ignore rules | Exclude: venv, .env, notebooks/, docs/, __pycache__, *.pyc, .git, data/*.db, frontend/node_modules | done |
+| S11.5 | `specs/spec-S11.5-health-check-script/` | S11.3 | `scripts/health_check.sh` | Health check for all agents | Curl each agent's /health endpoint. Report status table. Exit 1 if any agent is down | done |
 
 ---
 
@@ -245,10 +248,26 @@ Next.js dashboard for stock analysis visualization.
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
-| S13.1 | `specs/spec-S13.1-nextjs-scaffold/` | S9.1 | `frontend/` | Next.js project setup | Create Next.js app with TypeScript + Tailwind. API proxy to backend. Environment config | pending |
-| S13.2 | `specs/spec-S13.2-analysis-page/` | S13.1, S9.1 | `frontend/app/page.tsx` | Stock analysis page | Ticker input, submit button, loading state. Display FinalVerdict with signal badge, confidence meter, key drivers | pending |
-| S13.3 | `specs/spec-S13.3-agent-cards/` | S13.2 | `frontend/app/components/` | Agent signal cards | Individual cards for each agent showing signal, confidence, key metrics. Color-coded BUY/HOLD/SELL | pending |
-| S13.4 | `specs/spec-S13.4-history-view/` | S13.1, S9.3 | `frontend/app/history/` | Analysis history page | Past analyses for a ticker. Signal trend chart over time. Filterable by date range | pending |
+| S13.1 | `specs/spec-S13.1-nextjs-scaffold/` | S9.1 | `frontend/` | Next.js project setup | Create Next.js app with TypeScript + Tailwind. API proxy to backend. Environment config | done |
+| S13.2 | `specs/spec-S13.2-analysis-page/` | S13.1, S9.1 | `frontend/app/page.tsx` | Stock analysis page | Ticker input, submit button, loading state. Display FinalVerdict with signal badge, confidence meter, key drivers | done |
+| S13.3 | `specs/spec-S13.3-agent-cards/` | S13.2 | `frontend/app/components/` | Agent signal cards | Individual cards for each agent showing signal, confidence, key metrics. Color-coded BUY/HOLD/SELL | done |
+| S13.4 | `specs/spec-S13.4-history-view/` | S13.1, S9.3 | `frontend/app/history/` | Analysis history page | Past analyses for a ticker. Signal trend chart over time. Filterable by date range | done |
+
+---
+
+## Phase 15 -- Enhanced UX
+
+Backend enhancements (ticker search, rich response, better prompts) and complete frontend redesign with dark glassmorphism theme.
+
+| Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
+|------|--------------|-----------|----------|---------|-------|--------|
+| S15.1 | `specs/spec-S15.1-ticker-search/` | S1.3, S3.1 | `tools/ticker_search.py`, `api/routes.py` | Ticker search/autocomplete API | Polygon ticker search, 1hr TTL cache, GET /api/v1/search?q= | done |
+| S15.2 | `specs/spec-S15.2-rich-analysis-response/` | S8.2, S2.2 | `config/data_contracts.py`, `agents/market_conductor.py` | Rich analysis response | AgentDetail model, risk_level, execution_time_ms, per-agent metrics | done |
+| S15.3 | `specs/spec-S15.3-enhanced-prompts/` | S2.3 | `config/analyst_personas.py` | Enhanced agent prompts | Better signal guidelines, confidence criteria, decision logic | done |
+| S15.4 | `specs/spec-S15.4-dark-design-system/` | S13.1 | `frontend/` | Dark glassmorphism design system | Framer Motion, glass cards, gradient accents, glow effects | done |
+| S15.5 | `specs/spec-S15.5-ticker-autocomplete/` | S15.1, S15.4 | `frontend/components/TickerSearch.tsx` | Ticker autocomplete component | Debounced search, dropdown, keyboard nav, popular stocks | done |
+| S15.6 | `specs/spec-S15.6-analysis-dashboard/` | S15.2, S15.4, S15.5 | `frontend/app/page.tsx` | Analysis dashboard redesign | Orchestrator card, rich agent cards, results panel, animations | done |
+| S15.7 | `specs/spec-S15.7-history-redesign/` | S15.4, S9.3 | `frontend/app/history/` | History page redesign | Stats bar, filter tabs, rich rows, detail modal | done |
 
 ---
 
@@ -258,11 +277,36 @@ Evaluation framework, backtesting, and end-to-end validation.
 
 | Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
 |------|--------------|-----------|----------|---------|-------|--------|
-| S14.1 | `specs/spec-S14.1-quality-assessor/` | S10.1 | `evaluation/quality_assessor.py` | Quality scoring for verdicts | Score analysis quality: data completeness, signal consensus, confidence calibration. Returns quality grade A-F | pending |
-| S14.2 | `specs/spec-S14.2-benchmark-cases/` | S14.1 | `evaluation/benchmarks/` | Benchmark test cases | 10 well-known stocks with expected signal ranges. AAPL, TSLA, JPM, etc. Validate agent signals are reasonable | pending |
-| S14.3 | `specs/spec-S14.3-backtester/` | S14.2, S5.2 | `evaluation/backtester.py` | Historical backtesting | Run analysis on historical data. Compare predicted signals vs actual price movement. Track accuracy metrics | pending |
-| S14.4 | `specs/spec-S14.4-e2e-smoke-test/` | S10.1 | `tests/test_e2e.py` | End-to-end smoke test | Full analysis of AAPL with all real APIs (or mocked). Assert complete FinalVerdict returned in <30s | pending |
-| S14.5 | `specs/spec-S14.5-documentation/` | S10.3 | `README.md`, `docs/` | Final documentation | README: local setup, running tests, deployment guide. API docs. Architecture diagrams | pending |
+| S14.1 | `specs/spec-S14.1-quality-assessor/` | S10.1 | `evaluation/quality_assessor.py` | Quality scoring for verdicts | Score analysis quality: data completeness, signal consensus, confidence calibration. Returns quality grade A-F | done |
+| S14.2 | `specs/spec-S14.2-benchmark-cases/` | S14.1 | `evaluation/benchmarks/` | Benchmark test cases | 10 well-known stocks with expected signal ranges. AAPL, TSLA, JPM, etc. Validate agent signals are reasonable | done |
+| S14.3 | `specs/spec-S14.3-backtester/` | S14.2, S5.2 | `evaluation/backtester.py` | Historical backtesting | Run analysis on historical data. Compare predicted signals vs actual price movement. Track accuracy metrics | done |
+| S14.4 | `specs/spec-S14.4-e2e-smoke-test/` | S10.1 | `tests/test_e2e.py` | End-to-end smoke test | Full analysis of AAPL with all real APIs (or mocked). Assert complete FinalVerdict returned in <30s | done |
+| S14.5 | `specs/spec-S14.5-documentation/` | S10.3 | `README.md`, `docs/` | Final documentation | README: local setup, running tests, deployment guide. API docs. Architecture diagrams | done |
+
+---
+
+## Phase 16 -- Intelligence Layer
+
+Cross-session learning, conversational AI interface, and prediction accuracy tracking. Transforms EquityIQ from a stateless analyzer to a learning system.
+
+| Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
+|------|--------------|-----------|----------|---------|-------|--------|
+| S16.1 | `specs/spec-S16.1-vertex-memory-bank/` | S5.3, S8.2 | `memory/vertex_memory.py` | Vertex AI Memory Bank | Cross-session conversational memory using Vertex AI. Stores user preferences, past interactions, prediction outcomes. Enables the system to learn from historical predictions and improve signal weights over time | done |
+| S16.2 | `specs/spec-S16.2-natural-language-chat/` | S16.1, S9.1, S13.1 | `api/chat.py`, `frontend/app/chat/` | Natural language chat interface | POST /api/v1/chat endpoint with Gemini streaming. Conversation history management. Context-aware follow-ups ("Why did you say SELL?", "Compare AAPL vs MSFT"). Frontend chat panel with message bubbles. Uses agent results as grounding context | done |
+| S16.3 | `specs/spec-S16.3-prediction-tracker/` | S5.2, S14.3 | `evaluation/prediction_tracker.py` | Prediction accuracy tracker | Compare past FinalVerdicts to actual price movement (30/60/90 day windows). Track hit rate per agent and overall. Auto-adjust signal weights based on historical accuracy. Dashboard showing prediction scorecard | done |
+
+---
+
+## Phase 17 -- Integrations
+
+Broker connectivity, portfolio synchronization, and alert system. Connects EquityIQ to the trading workflow.
+
+| Spec | Spec Location | Depends On | Location | Feature | Notes | Status |
+|------|--------------|-----------|----------|---------|-------|--------|
+| S17.1 | `specs/spec-S17.1-zerodha-integration/` | S9.2, S8.3 | `integrations/zerodha.py` | Zerodha broker integration (India) | OAuth2 login via Kite Connect API. Fetch holdings and positions. Display portfolio with live P&L. Map Zerodha symbols to EquityIQ tickers (.NS/.BO). Read-only initially -- no order placement | pending |
+| S17.2 | `specs/spec-S17.2-alpaca-integration/` | S9.2, S8.3 | `integrations/alpaca.py` | Alpaca broker integration (US) | OAuth2 + API key auth. Paper trading support. Fetch positions and account balance. Map Alpaca symbols to EquityIQ tickers. Optional: place paper orders based on STRONG_BUY/STRONG_SELL signals | pending |
+| S17.3 | `specs/spec-S17.3-portfolio-sync/` | S17.1, S17.2, S8.3 | `integrations/portfolio_sync.py` | Portfolio sync from brokers | Auto-import holdings from connected Zerodha/Alpaca accounts. Run analyze_portfolio() on imported tickers. Show side-by-side: current holdings vs EquityIQ recommendations. Periodic refresh (configurable interval) | pending |
+| S17.4 | `specs/spec-S17.4-webhook-alerts/` | S10.1, S5.1 | `integrations/alerts.py`, `api/webhooks.py` | Webhook and alert system | Watch list: user adds tickers to monitor. Background scheduler re-analyzes watched tickers daily. Signal change detection: notify when verdict changes (e.g., BUY -> SELL). Webhook delivery (POST to user-configured URL). Optional: email via SendGrid or Telegram bot integration | pending |
 
 ---
 
@@ -297,32 +341,46 @@ Evaluation framework, backtesting, and end-to-end validation.
 | S7.4 | Specialist Agents | `agents/economy_watcher.py` | Macro indicators agent | `specs/spec-S7.4-economy-watcher/` | done |
 | S7.5 | Specialist Agents | `agents/compliance_checker.py` | Regulatory risk agent | `specs/spec-S7.5-compliance-checker/` | done |
 | S7.6 | Specialist Agents | `agents/risk_guardian.py` | Portfolio risk agent | `specs/spec-S7.6-risk-guardian/` | done |
-| S8.1 | Orchestration | `agents/signal_synthesizer.py` | Signal fusion agent | `specs/spec-S8.1-signal-synthesizer/` | pending |
-| S8.2 | Orchestration | `agents/market_conductor.py` | Orchestrator agent | `specs/spec-S8.2-market-conductor/` | pending |
-| S8.3 | Orchestration | `agents/market_conductor.py` | Portfolio analysis | `specs/spec-S8.3-portfolio-analyzer/` | pending |
-| S9.1 | API Layer | `app.py` | POST /analyze/{ticker} | `specs/spec-S9.1-analyze-endpoint/` | pending |
-| S9.2 | API Layer | `app.py` | POST /portfolio | `specs/spec-S9.2-portfolio-endpoint/` | pending |
-| S9.3 | API Layer | `app.py` | GET /history endpoints | `specs/spec-S9.3-history-endpoints/` | pending |
-| S9.4 | API Layer | `app.py` | Error taxonomy | `specs/spec-S9.4-error-handling/` | pending |
-| S10.1 | Pipeline Integration | `app.py` | Full pipeline wiring | `specs/spec-S10.1-pipeline-wiring/` | pending |
-| S10.2 | Pipeline Integration | `agents/market_conductor.py` | Graceful degradation | `specs/spec-S10.2-graceful-degradation/` | pending |
-| S10.3 | Pipeline Integration | `tests/test_pipeline.py` | Integration test | `specs/spec-S10.3-integration-test/` | pending |
-| S11.1 | Infrastructure | `Dockerfile` | Multi-stage Dockerfile | `specs/spec-S11.1-dockerfile/` | pending |
-| S11.2 | Infrastructure | `docker-compose.yml` | Local dev stack | `specs/spec-S11.2-docker-compose/` | pending |
-| S11.3 | Infrastructure | `scripts/launch_agents.sh` | Launch/stop scripts | `specs/spec-S11.3-launch-scripts/` | pending |
-| S11.4 | Infrastructure | `.dockerignore` | Docker ignore rules | `specs/spec-S11.4-dockerignore/` | pending |
-| S11.5 | Infrastructure | `scripts/health_check.sh` | Health check script | `specs/spec-S11.5-health-check-script/` | pending |
+| S8.1 | Orchestration | `agents/signal_synthesizer.py` | Signal fusion agent | `specs/spec-S8.1-signal-synthesizer/` | done |
+| S8.2 | Orchestration | `agents/market_conductor.py` | Orchestrator agent | `specs/spec-S8.2-market-conductor/` | done |
+| S8.3 | Orchestration | `agents/market_conductor.py` | Portfolio analysis | `specs/spec-S8.3-portfolio-analyzer/` | done |
+| S9.1 | API Layer | `app.py` | POST /analyze/{ticker} | `specs/spec-S9.1-analyze-endpoint/` | done |
+| S9.2 | API Layer | `app.py` | POST /portfolio | `specs/spec-S9.2-portfolio-endpoint/` | done |
+| S9.3 | API Layer | `app.py` | GET /history endpoints | `specs/spec-S9.3-history-endpoints/` | done |
+| S9.4 | API Layer | `app.py` | Error taxonomy | `specs/spec-S9.4-error-handling/` | done |
+| S10.1 | Pipeline Integration | `app.py` | Full pipeline wiring | `specs/spec-S10.1-pipeline-wiring/` | done |
+| S10.2 | Pipeline Integration | `agents/market_conductor.py` | Graceful degradation | `specs/spec-S10.2-graceful-degradation/` | done |
+| S10.3 | Pipeline Integration | `tests/test_pipeline.py` | Integration test | `specs/spec-S10.3-integration-test/` | done |
+| S11.1 | Infrastructure | `Dockerfile` | Multi-stage Dockerfile | `specs/spec-S11.1-dockerfile/` | done |
+| S11.2 | Infrastructure | `docker-compose.yml` | Local dev stack | `specs/spec-S11.2-docker-compose/` | done |
+| S11.3 | Infrastructure | `scripts/launch_agents.sh` | Launch/stop scripts | `specs/spec-S11.3-launch-scripts/` | done |
+| S11.4 | Infrastructure | `.dockerignore` | Docker ignore rules | `specs/spec-S11.4-dockerignore/` | done |
+| S11.5 | Infrastructure | `scripts/health_check.sh` | Health check script | `specs/spec-S11.5-health-check-script/` | done |
 | S12.1 | GCP Deployment | `.github/workflows/ci.yml` | CI pipeline | `specs/spec-S12.1-github-actions-ci/` | pending |
 | S12.2 | GCP Deployment | `.github/workflows/deploy.yml` | CD pipeline | `specs/spec-S12.2-github-actions-cd/` | pending |
 | S12.3 | GCP Deployment | `deploy/cloudrun.yaml` | Cloud Run config | `specs/spec-S12.3-cloud-run-config/` | pending |
 | S12.4 | GCP Deployment | `deploy/setup-secrets.sh` | Secret Manager setup | `specs/spec-S12.4-secret-manager/` | pending |
 | S12.5 | GCP Deployment | `deploy/setup-firestore.sh` | Firestore setup | `specs/spec-S12.5-firestore-setup/` | pending |
-| S13.1 | Frontend | `frontend/` | Next.js scaffold | `specs/spec-S13.1-nextjs-scaffold/` | pending |
-| S13.2 | Frontend | `frontend/app/page.tsx` | Analysis page | `specs/spec-S13.2-analysis-page/` | pending |
-| S13.3 | Frontend | `frontend/app/components/` | Agent signal cards | `specs/spec-S13.3-agent-cards/` | pending |
-| S13.4 | Frontend | `frontend/app/history/` | History view | `specs/spec-S13.4-history-view/` | pending |
-| S14.1 | Evaluation & QA | `evaluation/quality_assessor.py` | Quality scoring | `specs/spec-S14.1-quality-assessor/` | pending |
-| S14.2 | Evaluation & QA | `evaluation/benchmarks/` | Benchmark cases | `specs/spec-S14.2-benchmark-cases/` | pending |
-| S14.3 | Evaluation & QA | `evaluation/backtester.py` | Backtesting | `specs/spec-S14.3-backtester/` | pending |
-| S14.4 | Evaluation & QA | `tests/test_e2e.py` | E2E smoke test | `specs/spec-S14.4-e2e-smoke-test/` | pending |
-| S14.5 | Evaluation & QA | `README.md`, `docs/` | Documentation | `specs/spec-S14.5-documentation/` | pending |
+| S13.1 | Frontend | `frontend/` | Next.js scaffold | `specs/spec-S13.1-nextjs-scaffold/` | done |
+| S13.2 | Frontend | `frontend/app/page.tsx` | Analysis page | `specs/spec-S13.2-analysis-page/` | done |
+| S13.3 | Frontend | `frontend/app/components/` | Agent signal cards | `specs/spec-S13.3-agent-cards/` | done |
+| S13.4 | Frontend | `frontend/app/history/` | History view | `specs/spec-S13.4-history-view/` | done |
+| S14.1 | Evaluation & QA | `evaluation/quality_assessor.py` | Quality scoring | `specs/spec-S14.1-quality-assessor/` | done |
+| S14.2 | Evaluation & QA | `evaluation/benchmarks/` | Benchmark cases | `specs/spec-S14.2-benchmark-cases/` | done |
+| S14.3 | Evaluation & QA | `evaluation/backtester.py` | Backtesting | `specs/spec-S14.3-backtester/` | done |
+| S14.4 | Evaluation & QA | `tests/test_e2e.py` | E2E smoke test | `specs/spec-S14.4-e2e-smoke-test/` | done |
+| S14.5 | Evaluation & QA | `README.md`, `docs/` | Documentation | `specs/spec-S14.5-documentation/` | done |
+| S15.1 | Enhanced UX | `tools/ticker_search.py`, `api/routes.py` | Ticker search API | `specs/spec-S15.1-ticker-search/` | done |
+| S15.2 | Enhanced UX | `config/data_contracts.py`, `agents/market_conductor.py` | Rich analysis response | `specs/spec-S15.2-rich-analysis-response/` | done |
+| S15.3 | Enhanced UX | `config/analyst_personas.py` | Enhanced agent prompts | `specs/spec-S15.3-enhanced-prompts/` | done |
+| S15.4 | Enhanced UX | `frontend/` | Dark design system | `specs/spec-S15.4-dark-design-system/` | done |
+| S15.5 | Enhanced UX | `frontend/components/TickerSearch.tsx` | Ticker autocomplete | `specs/spec-S15.5-ticker-autocomplete/` | done |
+| S15.6 | Enhanced UX | `frontend/app/page.tsx` | Analysis dashboard redesign | `specs/spec-S15.6-analysis-dashboard/` | done |
+| S15.7 | Enhanced UX | `frontend/app/history/` | History page redesign | `specs/spec-S15.7-history-redesign/` | done |
+| S16.1 | Intelligence Layer | `memory/vertex_memory.py` | Vertex AI Memory Bank | `specs/spec-S16.1-vertex-memory-bank/` | done |
+| S16.2 | Intelligence Layer | `api/chat.py`, `frontend/app/chat/` | Natural language chat | `specs/spec-S16.2-natural-language-chat/` | done |
+| S16.3 | Intelligence Layer | `evaluation/prediction_tracker.py` | Prediction accuracy tracker | `specs/spec-S16.3-prediction-tracker/` | done |
+| S17.1 | Integrations | `integrations/zerodha.py` | Zerodha broker (India) | `specs/spec-S17.1-zerodha-integration/` | pending |
+| S17.2 | Integrations | `integrations/alpaca.py` | Alpaca broker (US) | `specs/spec-S17.2-alpaca-integration/` | pending |
+| S17.3 | Integrations | `integrations/portfolio_sync.py` | Portfolio sync | `specs/spec-S17.3-portfolio-sync/` | pending |
+| S17.4 | Integrations | `integrations/alerts.py`, `api/webhooks.py` | Webhook alerts | `specs/spec-S17.4-webhook-alerts/` | pending |

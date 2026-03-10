@@ -11,12 +11,15 @@ import pytest
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _fred_response(series_id: str, observations: list[dict]) -> httpx.Response:
     """Build a fake FRED JSON response."""
     return httpx.Response(
         200,
         json={"observations": observations},
-        request=httpx.Request("GET", f"https://api.stlouisfed.org/fred/series/observations?series_id={series_id}"),
+        request=httpx.Request(
+            "GET", f"https://api.stlouisfed.org/fred/series/observations?series_id={series_id}"
+        ),
     )
 
 
@@ -31,6 +34,7 @@ def _fred_error_response() -> httpx.Response:
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def connector():
@@ -47,25 +51,38 @@ def connector():
 # Test: get_macro_indicators -- success
 # ---------------------------------------------------------------------------
 
+
 class TestGetMacroIndicatorsSuccess:
     @pytest.mark.asyncio
     async def test_returns_all_keys(self, connector):
         """Successful call returns all 5 keys."""
         responses = {
-            "GDP": _fred_response("GDP", [
-                {"date": "2024-01-01", "value": "25000.0"},
-                {"date": "2023-10-01", "value": "24000.0"},
-            ]),
-            "CPIAUCSL": _fred_response("CPIAUCSL", [
-                {"date": "2024-06-01", "value": "315.0"},
-                {"date": "2023-06-01", "value": "305.0"},
-            ]),
-            "FEDFUNDS": _fred_response("FEDFUNDS", [
-                {"date": "2024-06-01", "value": "5.33"},
-            ]),
-            "UNRATE": _fred_response("UNRATE", [
-                {"date": "2024-06-01", "value": "4.0"},
-            ]),
+            "GDP": _fred_response(
+                "GDP",
+                [
+                    {"date": "2024-01-01", "value": "25000.0"},
+                    {"date": "2023-10-01", "value": "24000.0"},
+                ],
+            ),
+            "CPIAUCSL": _fred_response(
+                "CPIAUCSL",
+                [
+                    {"date": "2024-06-01", "value": "315.0"},
+                    {"date": "2023-06-01", "value": "305.0"},
+                ],
+            ),
+            "FEDFUNDS": _fred_response(
+                "FEDFUNDS",
+                [
+                    {"date": "2024-06-01", "value": "5.33"},
+                ],
+            ),
+            "UNRATE": _fred_response(
+                "UNRATE",
+                [
+                    {"date": "2024-06-01", "value": "4.0"},
+                ],
+            ),
         }
 
         async def mock_get(url, **kwargs):
@@ -89,20 +106,32 @@ class TestGetMacroIndicatorsSuccess:
     async def test_gdp_growth_calculation(self, connector):
         """GDP growth is computed as % change from last 2 observations."""
         responses = {
-            "GDP": _fred_response("GDP", [
-                {"date": "2024-01-01", "value": "25000.0"},
-                {"date": "2023-10-01", "value": "24000.0"},
-            ]),
-            "CPIAUCSL": _fred_response("CPIAUCSL", [
-                {"date": "2024-06-01", "value": "315.0"},
-                {"date": "2023-06-01", "value": "305.0"},
-            ]),
-            "FEDFUNDS": _fred_response("FEDFUNDS", [
-                {"date": "2024-06-01", "value": "5.33"},
-            ]),
-            "UNRATE": _fred_response("UNRATE", [
-                {"date": "2024-06-01", "value": "4.0"},
-            ]),
+            "GDP": _fred_response(
+                "GDP",
+                [
+                    {"date": "2024-01-01", "value": "25000.0"},
+                    {"date": "2023-10-01", "value": "24000.0"},
+                ],
+            ),
+            "CPIAUCSL": _fred_response(
+                "CPIAUCSL",
+                [
+                    {"date": "2024-06-01", "value": "315.0"},
+                    {"date": "2023-06-01", "value": "305.0"},
+                ],
+            ),
+            "FEDFUNDS": _fred_response(
+                "FEDFUNDS",
+                [
+                    {"date": "2024-06-01", "value": "5.33"},
+                ],
+            ),
+            "UNRATE": _fred_response(
+                "UNRATE",
+                [
+                    {"date": "2024-06-01", "value": "4.0"},
+                ],
+            ),
         }
 
         async def mock_get(url, **kwargs):
@@ -123,20 +152,32 @@ class TestGetMacroIndicatorsSuccess:
     async def test_inflation_rate_calculation(self, connector):
         """Inflation rate computed as % change from last 2 CPI observations."""
         responses = {
-            "GDP": _fred_response("GDP", [
-                {"date": "2024-01-01", "value": "25000.0"},
-                {"date": "2023-10-01", "value": "24000.0"},
-            ]),
-            "CPIAUCSL": _fred_response("CPIAUCSL", [
-                {"date": "2024-06-01", "value": "315.0"},
-                {"date": "2023-06-01", "value": "305.0"},
-            ]),
-            "FEDFUNDS": _fred_response("FEDFUNDS", [
-                {"date": "2024-06-01", "value": "5.33"},
-            ]),
-            "UNRATE": _fred_response("UNRATE", [
-                {"date": "2024-06-01", "value": "4.0"},
-            ]),
+            "GDP": _fred_response(
+                "GDP",
+                [
+                    {"date": "2024-01-01", "value": "25000.0"},
+                    {"date": "2023-10-01", "value": "24000.0"},
+                ],
+            ),
+            "CPIAUCSL": _fred_response(
+                "CPIAUCSL",
+                [
+                    {"date": "2024-06-01", "value": "315.0"},
+                    {"date": "2023-06-01", "value": "305.0"},
+                ],
+            ),
+            "FEDFUNDS": _fred_response(
+                "FEDFUNDS",
+                [
+                    {"date": "2024-06-01", "value": "5.33"},
+                ],
+            ),
+            "UNRATE": _fred_response(
+                "UNRATE",
+                [
+                    {"date": "2024-06-01", "value": "4.0"},
+                ],
+            ),
         }
 
         async def mock_get(url, **kwargs):
@@ -157,20 +198,32 @@ class TestGetMacroIndicatorsSuccess:
     async def test_fed_funds_rate_direct(self, connector):
         """Fed funds rate is extracted directly as float."""
         responses = {
-            "GDP": _fred_response("GDP", [
-                {"date": "2024-01-01", "value": "25000.0"},
-                {"date": "2023-10-01", "value": "24000.0"},
-            ]),
-            "CPIAUCSL": _fred_response("CPIAUCSL", [
-                {"date": "2024-06-01", "value": "315.0"},
-                {"date": "2023-06-01", "value": "305.0"},
-            ]),
-            "FEDFUNDS": _fred_response("FEDFUNDS", [
-                {"date": "2024-06-01", "value": "5.33"},
-            ]),
-            "UNRATE": _fred_response("UNRATE", [
-                {"date": "2024-06-01", "value": "4.0"},
-            ]),
+            "GDP": _fred_response(
+                "GDP",
+                [
+                    {"date": "2024-01-01", "value": "25000.0"},
+                    {"date": "2023-10-01", "value": "24000.0"},
+                ],
+            ),
+            "CPIAUCSL": _fred_response(
+                "CPIAUCSL",
+                [
+                    {"date": "2024-06-01", "value": "315.0"},
+                    {"date": "2023-06-01", "value": "305.0"},
+                ],
+            ),
+            "FEDFUNDS": _fred_response(
+                "FEDFUNDS",
+                [
+                    {"date": "2024-06-01", "value": "5.33"},
+                ],
+            ),
+            "UNRATE": _fred_response(
+                "UNRATE",
+                [
+                    {"date": "2024-06-01", "value": "4.0"},
+                ],
+            ),
         }
 
         async def mock_get(url, **kwargs):
@@ -189,20 +242,32 @@ class TestGetMacroIndicatorsSuccess:
     async def test_unemployment_rate_direct(self, connector):
         """Unemployment rate is extracted directly as float."""
         responses = {
-            "GDP": _fred_response("GDP", [
-                {"date": "2024-01-01", "value": "25000.0"},
-                {"date": "2023-10-01", "value": "24000.0"},
-            ]),
-            "CPIAUCSL": _fred_response("CPIAUCSL", [
-                {"date": "2024-06-01", "value": "315.0"},
-                {"date": "2023-06-01", "value": "305.0"},
-            ]),
-            "FEDFUNDS": _fred_response("FEDFUNDS", [
-                {"date": "2024-06-01", "value": "5.33"},
-            ]),
-            "UNRATE": _fred_response("UNRATE", [
-                {"date": "2024-06-01", "value": "4.0"},
-            ]),
+            "GDP": _fred_response(
+                "GDP",
+                [
+                    {"date": "2024-01-01", "value": "25000.0"},
+                    {"date": "2023-10-01", "value": "24000.0"},
+                ],
+            ),
+            "CPIAUCSL": _fred_response(
+                "CPIAUCSL",
+                [
+                    {"date": "2024-06-01", "value": "315.0"},
+                    {"date": "2023-06-01", "value": "305.0"},
+                ],
+            ),
+            "FEDFUNDS": _fred_response(
+                "FEDFUNDS",
+                [
+                    {"date": "2024-06-01", "value": "5.33"},
+                ],
+            ),
+            "UNRATE": _fred_response(
+                "UNRATE",
+                [
+                    {"date": "2024-06-01", "value": "4.0"},
+                ],
+            ),
         }
 
         async def mock_get(url, **kwargs):
@@ -222,22 +287,32 @@ class TestGetMacroIndicatorsSuccess:
 # Test: partial and total failure
 # ---------------------------------------------------------------------------
 
+
 class TestMacroIndicatorsFailures:
     @pytest.mark.asyncio
     async def test_partial_failure(self, connector):
         """If one series fails, others still returned, failed one is None."""
         responses = {
             "GDP": _fred_error_response(),  # GDP fails
-            "CPIAUCSL": _fred_response("CPIAUCSL", [
-                {"date": "2024-06-01", "value": "315.0"},
-                {"date": "2023-06-01", "value": "305.0"},
-            ]),
-            "FEDFUNDS": _fred_response("FEDFUNDS", [
-                {"date": "2024-06-01", "value": "5.33"},
-            ]),
-            "UNRATE": _fred_response("UNRATE", [
-                {"date": "2024-06-01", "value": "4.0"},
-            ]),
+            "CPIAUCSL": _fred_response(
+                "CPIAUCSL",
+                [
+                    {"date": "2024-06-01", "value": "315.0"},
+                    {"date": "2023-06-01", "value": "305.0"},
+                ],
+            ),
+            "FEDFUNDS": _fred_response(
+                "FEDFUNDS",
+                [
+                    {"date": "2024-06-01", "value": "5.33"},
+                ],
+            ),
+            "UNRATE": _fred_response(
+                "UNRATE",
+                [
+                    {"date": "2024-06-01", "value": "4.0"},
+                ],
+            ),
         }
 
         async def mock_get(url, **kwargs):
@@ -258,6 +333,7 @@ class TestMacroIndicatorsFailures:
     @pytest.mark.asyncio
     async def test_total_failure(self, connector):
         """If all series fail, return {}."""
+
         async def mock_get(url, **kwargs):
             raise httpx.ConnectError("connection refused")
 
@@ -271,6 +347,7 @@ class TestMacroIndicatorsFailures:
     @pytest.mark.asyncio
     async def test_exception_returns_empty(self, connector):
         """Any exception in _fetch_series returns empty list."""
+
         async def mock_get(url, **kwargs):
             raise httpx.TimeoutException("timeout")
 
@@ -286,25 +363,38 @@ class TestMacroIndicatorsFailures:
 # Test: FRED missing value "."
 # ---------------------------------------------------------------------------
 
+
 class TestFredMissingValues:
     @pytest.mark.asyncio
     async def test_dot_value_treated_as_none(self, connector):
         """FRED returns '.' for missing data -- should be treated as None."""
         responses = {
-            "GDP": _fred_response("GDP", [
-                {"date": "2024-01-01", "value": "."},
-                {"date": "2023-10-01", "value": "24000.0"},
-            ]),
-            "CPIAUCSL": _fred_response("CPIAUCSL", [
-                {"date": "2024-06-01", "value": "315.0"},
-                {"date": "2023-06-01", "value": "305.0"},
-            ]),
-            "FEDFUNDS": _fred_response("FEDFUNDS", [
-                {"date": "2024-06-01", "value": "."},
-            ]),
-            "UNRATE": _fred_response("UNRATE", [
-                {"date": "2024-06-01", "value": "4.0"},
-            ]),
+            "GDP": _fred_response(
+                "GDP",
+                [
+                    {"date": "2024-01-01", "value": "."},
+                    {"date": "2023-10-01", "value": "24000.0"},
+                ],
+            ),
+            "CPIAUCSL": _fred_response(
+                "CPIAUCSL",
+                [
+                    {"date": "2024-06-01", "value": "315.0"},
+                    {"date": "2023-06-01", "value": "305.0"},
+                ],
+            ),
+            "FEDFUNDS": _fred_response(
+                "FEDFUNDS",
+                [
+                    {"date": "2024-06-01", "value": "."},
+                ],
+            ),
+            "UNRATE": _fred_response(
+                "UNRATE",
+                [
+                    {"date": "2024-06-01", "value": "4.0"},
+                ],
+            ),
         }
 
         async def mock_get(url, **kwargs):
@@ -326,6 +416,7 @@ class TestFredMissingValues:
 # ---------------------------------------------------------------------------
 # Test: regime classification
 # ---------------------------------------------------------------------------
+
 
 class TestClassifyRegime:
     def test_expansion(self, connector):
@@ -355,6 +446,7 @@ class TestClassifyRegime:
 # Test: cache hit
 # ---------------------------------------------------------------------------
 
+
 class TestCacheHit:
     @pytest.mark.asyncio
     async def test_cache_prevents_duplicate_requests(self, connector):
@@ -362,20 +454,32 @@ class TestCacheHit:
         call_count = 0
 
         responses = {
-            "GDP": _fred_response("GDP", [
-                {"date": "2024-01-01", "value": "25000.0"},
-                {"date": "2023-10-01", "value": "24000.0"},
-            ]),
-            "CPIAUCSL": _fred_response("CPIAUCSL", [
-                {"date": "2024-06-01", "value": "315.0"},
-                {"date": "2023-06-01", "value": "305.0"},
-            ]),
-            "FEDFUNDS": _fred_response("FEDFUNDS", [
-                {"date": "2024-06-01", "value": "5.33"},
-            ]),
-            "UNRATE": _fred_response("UNRATE", [
-                {"date": "2024-06-01", "value": "4.0"},
-            ]),
+            "GDP": _fred_response(
+                "GDP",
+                [
+                    {"date": "2024-01-01", "value": "25000.0"},
+                    {"date": "2023-10-01", "value": "24000.0"},
+                ],
+            ),
+            "CPIAUCSL": _fred_response(
+                "CPIAUCSL",
+                [
+                    {"date": "2024-06-01", "value": "315.0"},
+                    {"date": "2023-06-01", "value": "305.0"},
+                ],
+            ),
+            "FEDFUNDS": _fred_response(
+                "FEDFUNDS",
+                [
+                    {"date": "2024-06-01", "value": "5.33"},
+                ],
+            ),
+            "UNRATE": _fred_response(
+                "UNRATE",
+                [
+                    {"date": "2024-06-01", "value": "4.0"},
+                ],
+            ),
         }
 
         async def mock_get(url, **kwargs):
@@ -403,6 +507,7 @@ class TestCacheHit:
 # Test: settings injection
 # ---------------------------------------------------------------------------
 
+
 class TestSettingsInjection:
     def test_api_key_from_settings(self):
         from config.settings import Settings
@@ -427,6 +532,7 @@ class TestSettingsInjection:
 # Test: module singleton
 # ---------------------------------------------------------------------------
 
+
 class TestModuleSingleton:
     def test_fred_singleton_importable(self):
         from tools.fred_connector import fred
@@ -441,6 +547,7 @@ class TestModuleSingleton:
 # Test: close method
 # ---------------------------------------------------------------------------
 
+
 class TestCloseMethod:
     @pytest.mark.asyncio
     async def test_close_calls_aclose(self, connector):
@@ -453,12 +560,16 @@ class TestCloseMethod:
 # Test: _fetch_series
 # ---------------------------------------------------------------------------
 
+
 class TestFetchSeries:
     @pytest.mark.asyncio
     async def test_fetch_series_returns_observations(self, connector):
-        response = _fred_response("FEDFUNDS", [
-            {"date": "2024-06-01", "value": "5.33"},
-        ])
+        response = _fred_response(
+            "FEDFUNDS",
+            [
+                {"date": "2024-06-01", "value": "5.33"},
+            ],
+        )
 
         async def mock_get(url, **kwargs):
             return response
@@ -498,9 +609,12 @@ class TestFetchSeries:
     @pytest.mark.asyncio
     async def test_fetch_series_caches_result(self, connector):
         call_count = 0
-        response = _fred_response("FEDFUNDS", [
-            {"date": "2024-06-01", "value": "5.33"},
-        ])
+        response = _fred_response(
+            "FEDFUNDS",
+            [
+                {"date": "2024-06-01", "value": "5.33"},
+            ],
+        )
 
         async def mock_get(url, **kwargs):
             nonlocal call_count
@@ -520,6 +634,7 @@ class TestFetchSeries:
 # ---------------------------------------------------------------------------
 # Test: connector attributes
 # ---------------------------------------------------------------------------
+
 
 class TestConnectorAttributes:
     def test_base_url(self, connector):

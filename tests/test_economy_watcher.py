@@ -16,26 +16,48 @@ from config.data_contracts import EconomyReport
 
 @pytest.fixture
 def mock_fred():
-    """Patch the module-level _connector used by tool functions."""
-    mock_instance = AsyncMock()
-    mock_instance.get_macro_indicators = AsyncMock(return_value={
-        "gdp_growth": 2.5,
-        "inflation_rate": 3.1,
-        "fed_funds_rate": 5.25,
-        "unemployment_rate": 3.8,
-        "macro_regime": "expansion",
-    })
-    with patch("agents.economy_watcher._connector", mock_instance):
-        yield mock_instance
+    """Patch the module-level connectors used by tool functions."""
+    mock_us = AsyncMock()
+    mock_us.get_macro_indicators = AsyncMock(
+        return_value={
+            "gdp_growth": 2.5,
+            "inflation_rate": 3.1,
+            "fed_funds_rate": 5.25,
+            "unemployment_rate": 3.8,
+            "macro_regime": "expansion",
+        }
+    )
+    mock_india = AsyncMock()
+    mock_india.get_macro_indicators = AsyncMock(
+        return_value={
+            "gdp_growth": 6.5,
+            "inflation_rate": 5.2,
+            "fed_funds_rate": 6.50,
+            "unemployment_rate": 7.8,
+            "macro_regime": "expansion",
+        }
+    )
+    with (
+        patch("agents.economy_watcher._us_connector", mock_us),
+        patch("agents.economy_watcher._india_connector", mock_india),
+        patch("agents.economy_watcher._current_ticker", "AAPL"),
+    ):
+        yield mock_us
 
 
 @pytest.fixture
 def mock_fred_error():
-    """Patch _connector to raise on call (simulating errors)."""
-    mock_instance = AsyncMock()
-    mock_instance.get_macro_indicators = AsyncMock(side_effect=Exception("FRED API down"))
-    with patch("agents.economy_watcher._connector", mock_instance):
-        yield mock_instance
+    """Patch connectors to raise on call (simulating errors)."""
+    mock_us = AsyncMock()
+    mock_us.get_macro_indicators = AsyncMock(side_effect=Exception("FRED API down"))
+    mock_india = AsyncMock()
+    mock_india.get_macro_indicators = AsyncMock(side_effect=Exception("API down"))
+    with (
+        patch("agents.economy_watcher._us_connector", mock_us),
+        patch("agents.economy_watcher._india_connector", mock_india),
+        patch("agents.economy_watcher._current_ticker", "AAPL"),
+    ):
+        yield mock_us
 
 
 # ---------------------------------------------------------------------------
@@ -128,18 +150,20 @@ class TestAnalyze:
 
         watcher = EconomyWatcher()
 
-        report_json = json.dumps({
-            "ticker": "AAPL",
-            "agent_name": "economy_watcher",
-            "signal": "BUY",
-            "confidence": 0.72,
-            "reasoning": "Expansion regime favorable for tech stocks",
-            "gdp_growth": 2.5,
-            "inflation_rate": 3.1,
-            "fed_funds_rate": 5.25,
-            "unemployment_rate": 3.8,
-            "macro_regime": "expansion",
-        })
+        report_json = json.dumps(
+            {
+                "ticker": "AAPL",
+                "agent_name": "economy_watcher",
+                "signal": "BUY",
+                "confidence": 0.72,
+                "reasoning": "Expansion regime favorable for tech stocks",
+                "gdp_growth": 2.5,
+                "inflation_rate": 3.1,
+                "fed_funds_rate": 5.25,
+                "unemployment_rate": 3.8,
+                "macro_regime": "expansion",
+            }
+        )
 
         mock_part = MagicMock()
         mock_part.text = report_json
@@ -178,18 +202,20 @@ class TestAnalyze:
 
         watcher = EconomyWatcher()
 
-        report_json = json.dumps({
-            "ticker": "TSLA",
-            "agent_name": "economy_watcher",
-            "signal": "SELL",
-            "confidence": 0.65,
-            "reasoning": "Contraction regime unfavorable for cyclical stocks",
-            "gdp_growth": -1.2,
-            "inflation_rate": 5.5,
-            "fed_funds_rate": 5.50,
-            "unemployment_rate": 5.1,
-            "macro_regime": "contraction",
-        })
+        report_json = json.dumps(
+            {
+                "ticker": "TSLA",
+                "agent_name": "economy_watcher",
+                "signal": "SELL",
+                "confidence": 0.65,
+                "reasoning": "Contraction regime unfavorable for cyclical stocks",
+                "gdp_growth": -1.2,
+                "inflation_rate": 5.5,
+                "fed_funds_rate": 5.50,
+                "unemployment_rate": 5.1,
+                "macro_regime": "contraction",
+            }
+        )
 
         mock_part = MagicMock()
         mock_part.text = report_json

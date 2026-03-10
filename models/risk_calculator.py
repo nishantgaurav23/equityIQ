@@ -26,8 +26,7 @@ def calc_beta(
 
     if stock.shape != market.shape:
         raise ValueError(
-            f"stock_returns length ({len(stock)}) != "
-            f"market_returns length ({len(market)})"
+            f"stock_returns length ({len(stock)}) != market_returns length ({len(market)})"
         )
 
     if len(stock) <= 1:

@@ -1,0 +1,17 @@
+services:
+  app:
+    build:
+      context: .
+      target: dev
+    container_name: equityiq-dev
+    ports:
+      - "8000:8080"
+    env_file:
+      - .env
+    environment:
+      - ENVIRONMENT=development
+      - PORT=8080
+    volumes:
+      - .:/app
+    command: uvicorn app:app --host 0.0.0.0 --port 8080 --reload
+    restart: unless-stopped

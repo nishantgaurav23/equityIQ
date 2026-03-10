@@ -1,0 +1,47 @@
+# R1: Development and virtual environment
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+*.egg-info
+.mypy_cache/
+
+# R2: Secrets and environment files
+.env
+.env.*
+
+# R3: Version control and IDE
+.git/
+.gitignore
+.vscode/
+.idea/
+.claude/
+
+# R4: Documentation and non-runtime files
+docs/
+notebooks/
+specs/
+*.md
+
+# R5: Test and evaluation files
+tests/
+evaluation/
+
+# R6: Data and frontend
+data/*.db
+data/models/
+frontend/node_modules/
+
+# R7: Docker and CI/CD files
+Dockerfile
+docker-compose.yml
+docker-compose*.yml
+.dockerignore
+.github/
+deploy/
+
+# R8: Scripts (used outside container)
+scripts/

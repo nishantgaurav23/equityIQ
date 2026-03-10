@@ -12,35 +12,39 @@ import pytest
 
 from config.data_contracts import ComplianceReport
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture()
 def mock_sec_connector():
     """Patch the module-level _sec_connector in compliance_checker."""
     with patch("agents.compliance_checker._sec_connector") as mock:
-        mock.get_sec_filings = AsyncMock(return_value=[
-            {
-                "filing_type": "10-K",
-                "filed_date": "2025-01-15",
-                "description": "Annual report",
-                "url": "https://sec.gov/...",
-            },
-            {
-                "filing_type": "10-Q",
-                "filed_date": "2024-10-10",
-                "description": "Quarterly report",
-                "url": "https://sec.gov/...",
-            },
-        ])
-        mock.score_risk = AsyncMock(return_value={
-            "latest_filing_type": "10-K",
-            "days_since_filing": 30,
-            "risk_flags": [],
-            "risk_score": 0.1,
-        })
+        mock.get_sec_filings = AsyncMock(
+            return_value=[
+                {
+                    "filing_type": "10-K",
+                    "filed_date": "2025-01-15",
+                    "description": "Annual report",
+                    "url": "https://sec.gov/...",
+                },
+                {
+                    "filing_type": "10-Q",
+                    "filed_date": "2024-10-10",
+                    "description": "Quarterly report",
+                    "url": "https://sec.gov/...",
+                },
+            ]
+        )
+        mock.score_risk = AsyncMock(
+            return_value={
+                "latest_filing_type": "10-K",
+                "days_since_filing": 30,
+                "risk_flags": [],
+                "risk_score": 0.1,
+            }
+        )
         yield mock
 
 
@@ -56,6 +60,7 @@ def mock_sec_error():
 # ---------------------------------------------------------------------------
 # T1: Tool Functions -- get_sec_filings_tool
 # ---------------------------------------------------------------------------
+
 
 class TestGetSecFilingsTool:
     """Tests for get_sec_filings_tool."""
@@ -89,6 +94,7 @@ class TestGetSecFilingsTool:
 # ---------------------------------------------------------------------------
 # T2: Tool Functions -- score_risk_tool
 # ---------------------------------------------------------------------------
+
 
 class TestScoreRiskTool:
     """Tests for score_risk_tool."""
@@ -124,6 +130,7 @@ class TestScoreRiskTool:
 # T3: Agent Class
 # ---------------------------------------------------------------------------
 
+
 class TestComplianceCheckerAgent:
     """Tests for ComplianceCheckerAgent instantiation and properties."""
 
@@ -156,6 +163,7 @@ class TestComplianceCheckerAgent:
 # T4: Agent Card
 # ---------------------------------------------------------------------------
 
+
 class TestAgentCard:
     """Tests for get_agent_card()."""
 
@@ -183,6 +191,7 @@ class TestAgentCard:
 # T5: Module Exports
 # ---------------------------------------------------------------------------
 
+
 class TestModuleExports:
     """Tests for module-level exports."""
 
@@ -202,6 +211,7 @@ class TestModuleExports:
 # ---------------------------------------------------------------------------
 # T6: Analyze Success (mocked LLM)
 # ---------------------------------------------------------------------------
+
 
 class TestAnalyzeSuccess:
     """Test analyze() with mocked LLM returning valid ComplianceReport."""
@@ -243,9 +253,7 @@ class TestAnalyzeSuccess:
             with patch("agents.base_agent.InMemorySessionService") as MockSession:
                 mock_session = MagicMock()
                 mock_session.id = "test-session"
-                MockSession.return_value.create_session = AsyncMock(
-                    return_value=mock_session
-                )
+                MockSession.return_value.create_session = AsyncMock(return_value=mock_session)
 
                 result = await agent.analyze("AAPL")
 
@@ -261,6 +269,7 @@ class TestAnalyzeSuccess:
 # ---------------------------------------------------------------------------
 # T7: Analyze Fallback
 # ---------------------------------------------------------------------------
+
 
 class TestAnalyzeFallback:
     """Test analyze() fallback on error."""
@@ -304,6 +313,7 @@ class TestAnalyzeFallback:
 # ---------------------------------------------------------------------------
 # T8: ComplianceReport Schema Validation
 # ---------------------------------------------------------------------------
+
 
 class TestComplianceReportSchema:
     """Verify ComplianceReport validates correctly for compliance scenarios."""

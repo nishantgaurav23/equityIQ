@@ -18,6 +18,7 @@ from models.risk_calculator import (
 # calc_beta
 # ---------------------------------------------------------------------------
 
+
 class TestCalcBeta:
     def test_known_values(self):
         # Stock moves 2x the market -> beta ~ 2.0
@@ -65,6 +66,7 @@ class TestCalcBeta:
 # calc_sharpe
 # ---------------------------------------------------------------------------
 
+
 class TestCalcSharpe:
     def test_positive_returns(self):
         # Consistently positive daily returns -> positive Sharpe
@@ -106,6 +108,7 @@ class TestCalcSharpe:
 # calc_var_95
 # ---------------------------------------------------------------------------
 
+
 class TestCalcVar95:
     def test_known_distribution(self):
         np.random.seed(42)
@@ -135,6 +138,7 @@ class TestCalcVar95:
 # ---------------------------------------------------------------------------
 # calc_max_drawdown
 # ---------------------------------------------------------------------------
+
 
 class TestCalcMaxDrawdown:
     def test_known_drawdown(self):
@@ -177,6 +181,7 @@ class TestCalcMaxDrawdown:
 # calc_position_size
 # ---------------------------------------------------------------------------
 
+
 class TestCalcPositionSize:
     def test_normal_volatility(self):
         # vol = 0.25, risk = 0.02 -> 0.02 / 0.25 = 0.08
@@ -217,6 +222,7 @@ class TestCalcPositionSize:
 # ---------------------------------------------------------------------------
 # calc_annualized_volatility
 # ---------------------------------------------------------------------------
+
 
 class TestCalcAnnualizedVolatility:
     def test_known_value(self):

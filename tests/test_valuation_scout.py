@@ -18,29 +18,33 @@ from config.data_contracts import ValuationReport
 def mock_polygon():
     """Patch the module-level _connector used by tool functions."""
     mock_instance = AsyncMock()
-    mock_instance.get_fundamentals = AsyncMock(return_value={
-        "pe_ratio": 25.3,
-        "pb_ratio": 12.1,
-        "revenue_growth": 0.08,
-        "debt_to_equity": 1.5,
-        "fcf_yield": 0.04,
-    })
-    mock_instance.get_price_history = AsyncMock(return_value={
-        "prices": [150.0, 152.0, 155.0],
-        "volumes": [1000000, 1200000, 1100000],
-        "dates": ["2025-01-01", "2025-01-02", "2025-01-03"],
-    })
-    with patch("agents.valuation_scout._connector", mock_instance):
+    mock_instance.get_fundamentals = AsyncMock(
+        return_value={
+            "pe_ratio": 25.3,
+            "pb_ratio": 12.1,
+            "revenue_growth": 0.08,
+            "debt_to_equity": 1.5,
+            "fcf_yield": 0.04,
+        }
+    )
+    mock_instance.get_price_history = AsyncMock(
+        return_value={
+            "prices": [150.0, 152.0, 155.0],
+            "volumes": [1000000, 1200000, 1100000],
+            "dates": ["2025-01-01", "2025-01-02", "2025-01-03"],
+        }
+    )
+    with patch("agents.valuation_scout._polygon", mock_instance):
         yield mock_instance
 
 
 @pytest.fixture
 def mock_polygon_error():
-    """Patch _connector to return empty dicts (simulating errors)."""
+    """Patch _polygon to return empty dicts (simulating errors)."""
     mock_instance = AsyncMock()
     mock_instance.get_fundamentals = AsyncMock(return_value={})
     mock_instance.get_price_history = AsyncMock(return_value={})
-    with patch("agents.valuation_scout._connector", mock_instance):
+    with patch("agents.valuation_scout._polygon", mock_instance):
         yield mock_instance
 
 
@@ -124,6 +128,39 @@ class TestToolFunctions:
         assert result == {}
 
     @pytest.mark.asyncio
+    async def test_get_fundamentals_routes_indian_ticker_to_yahoo(self):
+        """Indian ticker (.NS) routes to YahooConnector."""
+        from agents.valuation_scout import get_fundamentals_tool
+
+        mock_yahoo = AsyncMock()
+        mock_yahoo.get_fundamentals = AsyncMock(
+            return_value={"pe_ratio": 30.0, "pb_ratio": 5.0}
+        )
+        with patch("agents.valuation_scout._yahoo", mock_yahoo):
+            result = await get_fundamentals_tool("TCS.NS")
+        mock_yahoo.get_fundamentals.assert_awaited_once_with("TCS.NS")
+        assert result["pe_ratio"] == 30.0
+
+    @pytest.mark.asyncio
+    async def test_get_price_history_routes_indian_ticker_to_yahoo(self):
+        """Indian ticker (.BO) routes to YahooConnector for price history."""
+        from agents.valuation_scout import get_price_history_tool
+
+        mock_yahoo = AsyncMock()
+        mock_yahoo.get_price_history = AsyncMock(
+            return_value={
+                "prices": [2000.0, 2010.0],
+                "volumes": [500000, 600000],
+                "dates": ["2025-01-01", "2025-01-02"],
+                "currency": "INR",
+            }
+        )
+        with patch("agents.valuation_scout._yahoo", mock_yahoo):
+            result = await get_price_history_tool("RELIANCE.BO")
+        mock_yahoo.get_price_history.assert_awaited_once_with("RELIANCE.BO", days=365)
+        assert result["currency"] == "INR"
+
+    @pytest.mark.asyncio
     async def test_get_fundamentals_tool_exception_returns_empty(self, mock_polygon):
         mock_polygon.get_fundamentals = AsyncMock(side_effect=Exception("API down"))
         from agents.valuation_scout import get_fundamentals_tool
@@ -154,19 +191,21 @@ class TestAnalyze:
 
         scout = ValuationScout()
 
-        report_json = json.dumps({
-            "ticker": "AAPL",
-            "agent_name": "valuation_scout",
-            "signal": "BUY",
-            "confidence": 0.85,
-            "reasoning": "Strong fundamentals, undervalued by 15%",
-            "pe_ratio": 25.3,
-            "pb_ratio": 12.1,
-            "revenue_growth": 0.08,
-            "debt_to_equity": 1.5,
-            "fcf_yield": 0.04,
-            "intrinsic_value_gap": 0.15,
-        })
+        report_json = json.dumps(
+            {
+                "ticker": "AAPL",
+                "agent_name": "valuation_scout",
+                "signal": "BUY",
+                "confidence": 0.85,
+                "reasoning": "Strong fundamentals, undervalued by 15%",
+                "pe_ratio": 25.3,
+                "pb_ratio": 12.1,
+                "revenue_growth": 0.08,
+                "debt_to_equity": 1.5,
+                "fcf_yield": 0.04,
+                "intrinsic_value_gap": 0.15,
+            }
+        )
 
         # Mock the runner to return a valid report
         mock_part = MagicMock()
@@ -206,15 +245,17 @@ class TestAnalyze:
 
         scout = ValuationScout()
 
-        report_json = json.dumps({
-            "ticker": "MSFT",
-            "agent_name": "valuation_scout",
-            "signal": "HOLD",
-            "confidence": 0.5,
-            "reasoning": "Fairly valued, mixed signals",
-            "pe_ratio": 30.0,
-            "intrinsic_value_gap": 0.0,
-        })
+        report_json = json.dumps(
+            {
+                "ticker": "MSFT",
+                "agent_name": "valuation_scout",
+                "signal": "HOLD",
+                "confidence": 0.5,
+                "reasoning": "Fairly valued, mixed signals",
+                "pe_ratio": 30.0,
+                "intrinsic_value_gap": 0.0,
+            }
+        )
 
         mock_part = MagicMock()
         mock_part.text = report_json

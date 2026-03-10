@@ -108,10 +108,16 @@ class TestAdkAgent:
         assert isinstance(valuation_agent.agent, Agent)
 
     def test_adk_agent_has_correct_instruction(self, valuation_agent):
-        assert valuation_agent.agent.instruction == PERSONAS["valuation_scout"]
+        # Instruction now includes the persona AND JSON schema guidance.
+        instruction = valuation_agent.agent.instruction
+        assert PERSONAS["valuation_scout"] in instruction
+        assert "JSON" in instruction
 
     def test_adk_agent_has_correct_output_schema(self, valuation_agent):
-        assert valuation_agent.agent.output_schema == ValuationReport
+        # output_schema is no longer passed to ADK Agent (to avoid datetime
+        # serialization issues). Instead, the schema is embedded in instruction.
+        # The BaseAnalystAgent stores it internally as _output_schema.
+        assert valuation_agent._output_schema == ValuationReport
 
 
 # ---------------------------------------------------------------------------

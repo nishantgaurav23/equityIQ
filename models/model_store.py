@@ -87,9 +87,7 @@ class ModelStore:
             match = FILENAME_PATTERN.match(p.name)
             if not match:
                 continue
-            ts = datetime.strptime(match.group("ts"), TIMESTAMP_FMT).replace(
-                tzinfo=timezone.utc
-            )
+            ts = datetime.strptime(match.group("ts"), TIMESTAMP_FMT).replace(tzinfo=timezone.utc)
             infos.append(
                 ModelInfo(
                     path=p,

@@ -101,9 +101,7 @@ def calc_macd(
 
     # Align: ema_fast is longer, trim from front to match ema_slow length
     offset = len(ema_fast) - len(ema_slow)
-    macd_line_series = [
-        ema_fast[offset + i] - ema_slow[i] for i in range(len(ema_slow))
-    ]
+    macd_line_series = [ema_fast[offset + i] - ema_slow[i] for i in range(len(ema_slow))]
 
     if len(macd_line_series) < signal:
         return zeros

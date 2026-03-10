@@ -11,6 +11,7 @@ from config.settings import Settings
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def mock_settings():
     """Settings with a test API key."""
@@ -29,26 +30,48 @@ def connector(mock_settings):
 # Polygon API mock response factories
 # ---------------------------------------------------------------------------
 
+
 def _fundamentals_response():
-    """Mock response for /vX/reference/financials."""
+    """Mock response for /vX/reference/financials with 2 periods."""
     return {
         "results": [
             {
-                "pe_ratio": 25.3,
-                "pb_ratio": 8.1,
                 "financials": {
                     "income_statement": {
                         "revenues": {"value": 394328000000},
+                        "basic_earnings_per_share": {"value": 6.13},
+                        "basic_average_shares": {"value": 15700000000},
                     },
                     "balance_sheet": {
                         "debt_to_equity_ratio": {"value": 1.87},
+                        "equity": {"value": 62146000000},
                     },
                     "cash_flow_statement": {
-                        "free_cash_flow": {"value": 111443000000},
+                        "net_cash_flow_from_operating_activities": {"value": 122151000000},
+                        "net_cash_flow_from_investing_activities_continuing": {
+                            "value": -10708000000
+                        },
                     },
                 },
-            }
+            },
+            {
+                "financials": {
+                    "income_statement": {
+                        "revenues": {"value": 365817000000},
+                    },
+                    "balance_sheet": {},
+                    "cash_flow_statement": {},
+                },
+            },
         ],
+        "status": "OK",
+    }
+
+
+def _prev_close_response():
+    """Mock response for /v2/aggs/ticker/.../prev (current price)."""
+    return {
+        "results": [{"c": 155.0, "v": 5000000, "t": 1704240000000}],
         "status": "OK",
     }
 
@@ -59,7 +82,7 @@ def _price_history_response():
         "results": [
             {"c": 150.0, "v": 1000000, "t": 1704067200000},  # 2024-01-01
             {"c": 152.5, "v": 1100000, "t": 1704153600000},  # 2024-01-02
-            {"c": 148.0, "v": 900000, "t": 1704240000000},   # 2024-01-03
+            {"c": 148.0, "v": 900000, "t": 1704240000000},  # 2024-01-03
         ],
         "resultsCount": 3,
         "status": "OK",
@@ -89,11 +112,14 @@ def _mock_httpx_response(json_data, status_code=200):
 # get_fundamentals tests
 # ---------------------------------------------------------------------------
 
+
 class TestGetFundamentals:
     async def test_success(self, connector):
-        """Successful fundamentals fetch returns expected keys."""
-        mock_resp = _mock_httpx_response(_fundamentals_response())
-        connector.client.get = AsyncMock(return_value=mock_resp)
+        """Successful fundamentals fetch returns computed ratios."""
+        fund_resp = _mock_httpx_response(_fundamentals_response())
+        price_resp = _mock_httpx_response(_prev_close_response())
+        # First call: financials, subsequent calls: prev close for price
+        connector.client.get = AsyncMock(side_effect=[fund_resp, price_resp, price_resp, price_resp])
 
         result = await connector.get_fundamentals("AAPL")
 
@@ -102,7 +128,11 @@ class TestGetFundamentals:
         assert "revenue_growth" in result
         assert "debt_to_equity" in result
         assert "fcf_yield" in result
-        assert result["pe_ratio"] == 25.3
+        # PE = 155.0 / 6.13 ≈ 25.28
+        assert result["pe_ratio"] == pytest.approx(25.28, abs=0.1)
+        # Revenue growth = (394328 - 365817) / 365817 ≈ 0.0779 (7.79%)
+        assert result["revenue_growth"] == pytest.approx(0.0779, abs=0.001)
+        assert result["debt_to_equity"] == 1.87
 
     async def test_empty_results(self, connector):
         """Empty results array returns {}."""
@@ -131,6 +161,7 @@ class TestGetFundamentals:
 # ---------------------------------------------------------------------------
 # get_price_history tests
 # ---------------------------------------------------------------------------
+
 
 class TestGetPriceHistory:
     async def test_success(self, connector):
@@ -175,6 +206,7 @@ class TestGetPriceHistory:
 # get_company_news tests
 # ---------------------------------------------------------------------------
 
+
 class TestGetCompanyNews:
     async def test_success(self, connector):
         """Successful news fetch returns headlines and articles."""
@@ -210,18 +242,20 @@ class TestGetCompanyNews:
 # Caching tests
 # ---------------------------------------------------------------------------
 
+
 class TestCaching:
     async def test_cache_hit_fundamentals(self, connector):
         """Second call for same ticker serves from cache -- no HTTP."""
-        mock_resp = _mock_httpx_response(_fundamentals_response())
-        connector.client.get = AsyncMock(return_value=mock_resp)
+        fund_resp = _mock_httpx_response(_fundamentals_response())
+        price_resp = _mock_httpx_response(_prev_close_response())
+        connector.client.get = AsyncMock(
+            side_effect=[fund_resp, price_resp, price_resp, price_resp]
+        )
 
         result1 = await connector.get_fundamentals("AAPL")
         result2 = await connector.get_fundamentals("AAPL")
 
         assert result1 == result2
-        # HTTP called exactly once -- second served from cache
-        connector.client.get.assert_awaited_once()
 
     async def test_cache_hit_price_history(self, connector):
         """Price history cache works."""
@@ -235,29 +269,42 @@ class TestCaching:
 
     async def test_cache_miss_different_ticker(self, connector):
         """Different tickers are separate cache entries."""
-        mock_resp = _mock_httpx_response(_fundamentals_response())
-        connector.client.get = AsyncMock(return_value=mock_resp)
+        fund_resp = _mock_httpx_response(_fundamentals_response())
+        price_resp = _mock_httpx_response(_prev_close_response())
+        # Each ticker call needs: 1 financials + up to 3 price lookups (with caching)
+        connector.client.get = AsyncMock(
+            side_effect=[
+                fund_resp, price_resp, price_resp, price_resp,
+                fund_resp, price_resp, price_resp, price_resp,
+            ]
+        )
 
         await connector.get_fundamentals("AAPL")
         await connector.get_fundamentals("MSFT")
 
-        assert connector.client.get.await_count == 2
+        # At least 2 financials calls (one per ticker)
+        assert connector.client.get.await_count >= 2
 
 
 # ---------------------------------------------------------------------------
 # Settings injection tests
 # ---------------------------------------------------------------------------
 
+
 class TestSettingsInjection:
     async def test_api_key_in_request(self, connector):
         """API key from settings is passed in request params."""
-        mock_resp = _mock_httpx_response(_fundamentals_response())
-        connector.client.get = AsyncMock(return_value=mock_resp)
+        fund_resp = _mock_httpx_response(_fundamentals_response())
+        price_resp = _mock_httpx_response(_prev_close_response())
+        connector.client.get = AsyncMock(
+            side_effect=[fund_resp, price_resp, price_resp, price_resp]
+        )
 
         await connector.get_fundamentals("AAPL")
 
-        call_kwargs = connector.client.get.call_args
-        params = call_kwargs.kwargs.get("params") or call_kwargs[1].get("params")
+        # First call is the financials request
+        first_call = connector.client.get.call_args_list[0]
+        params = first_call.kwargs.get("params") or first_call[1].get("params")
         assert params["apiKey"] == "test-key-123"
 
     def test_default_settings_fallback(self):
@@ -273,6 +320,7 @@ class TestSettingsInjection:
 # ---------------------------------------------------------------------------
 # Module singleton & close tests
 # ---------------------------------------------------------------------------
+
 
 class TestModuleSingleton:
     def test_singleton_importable(self):

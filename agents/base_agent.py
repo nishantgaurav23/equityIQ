@@ -51,12 +51,20 @@ class BaseAnalystAgent:
         self._output_schema = output_schema
         self._tools = tools or []
 
+        # Note: we intentionally omit output_schema from the ADK Agent to avoid
+        # datetime serialization issues in ADK's _output_schema_processor.
+        # Instead, we instruct the LLM to return JSON and parse it ourselves
+        # in analyze() via model_validate_json().
+        schema_json = output_schema.model_json_schema()
         self._agent = Agent(
             name=agent_name,
             model=model,
-            instruction=persona,
+            instruction=(
+                f"{persona}\n\n"
+                "IMPORTANT: Return your analysis as a single JSON object matching this schema "
+                f"(do NOT include 'timestamp'):\n{schema_json}"
+            ),
             tools=self._tools,
-            output_schema=output_schema,
         )
 
     # -- Properties -----------------------------------------------------------
@@ -117,7 +125,14 @@ class BaseAnalystAgent:
             if final_text is None:
                 return self._fallback_report(ticker, "No response received from LLM")
 
-            return self._output_schema.model_validate_json(final_text)
+            # Strip markdown code fences if the LLM wraps the JSON.
+            cleaned = final_text.strip()
+            if cleaned.startswith("```"):
+                cleaned = cleaned.split("\n", 1)[-1]
+                if cleaned.endswith("```"):
+                    cleaned = cleaned[:-3].strip()
+
+            return self._output_schema.model_validate_json(cleaned)
 
         except Exception as exc:
             logger.warning("Agent %s failed for %s: %s", self._name, ticker, exc)

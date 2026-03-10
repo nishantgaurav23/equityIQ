@@ -59,8 +59,10 @@ EXPECTED_RUNTIME_DEPS = [
 def test_pyproject_has_runtime_deps():
     with open(ROOT / "pyproject.toml", "rb") as f:
         data = tomllib.load(f)
-    deps = [d.split(">=")[0].split("~=")[0].split("<")[0].strip().lower()
-            for d in data["project"]["dependencies"]]
+    deps = [
+        d.split(">=")[0].split("~=")[0].split("<")[0].strip().lower()
+        for d in data["project"]["dependencies"]
+    ]
     for pkg in EXPECTED_RUNTIME_DEPS:
         assert pkg.lower() in deps, f"Missing runtime dependency: {pkg}"
 
@@ -73,8 +75,7 @@ def test_pyproject_has_dev_deps():
         data = tomllib.load(f)
     opt = data["project"]["optional-dependencies"]
     assert "dev" in opt, "Must have [project.optional-dependencies] dev group"
-    dev_deps = [d.split(">=")[0].split("~=")[0].split("<")[0].strip().lower()
-                for d in opt["dev"]]
+    dev_deps = [d.split(">=")[0].split("~=")[0].split("<")[0].strip().lower() for d in opt["dev"]]
     for pkg in EXPECTED_DEV_DEPS:
         assert pkg.lower() in dev_deps, f"Missing dev dependency: {pkg}"
 

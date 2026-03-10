@@ -1,0 +1,191 @@
+@import "tailwindcss";
+
+:root {
+  --background: #09090b;
+  --foreground: #e4e4e7;
+  --card-bg: rgba(24, 24, 27, 0.6);
+  --card-border: rgba(63, 63, 70, 0.4);
+  --accent-primary: #f59e0b;
+  --accent-secondary: #e11d48;
+  --accent-green: #22c55e;
+  --accent-red: #ef4444;
+  --accent-yellow: #eab308;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* ── Base ─────────────────────────────────────────────────── */
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* ── Glass Card ───────────────────────────────────────────── */
+
+.glass {
+  background: linear-gradient(135deg, rgba(24, 24, 27, 0.6) 0%, rgba(39, 39, 42, 0.4) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(63, 63, 70, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.glass:hover {
+  border-color: rgba(245, 158, 11, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(245, 158, 11, 0.08);
+}
+
+.glass-dark {
+  background: rgba(9, 9, 11, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(39, 39, 42, 0.5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+.glass-input {
+  background: rgba(24, 24, 27, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(63, 63, 70, 0.5);
+  transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+  border-color: rgba(245, 158, 11, 0.5);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
+  outline: none;
+}
+
+/* ── Gradient Text ────────────────────────────────────────── */
+
+.gradient-text {
+  background: linear-gradient(135deg, #f59e0b, #e11d48, #f59e0b);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-green {
+  background: linear-gradient(135deg, #22c55e, #14b8a6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Signal Colors ────────────────────────────────────────── */
+
+.signal-buy {
+  color: #22c55e;
+  text-shadow: 0 0 12px rgba(34, 197, 94, 0.3);
+}
+
+.signal-sell {
+  color: #ef4444;
+  text-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+}
+
+.signal-hold {
+  color: #eab308;
+  text-shadow: 0 0 12px rgba(234, 179, 8, 0.3);
+}
+
+/* ── Glow Effects ─────────────────────────────────────────── */
+
+.glow-primary {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.12), 0 0 60px rgba(245, 158, 11, 0.04);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.15), 0 0 60px rgba(34, 197, 94, 0.05);
+}
+
+.glow-red {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.15), 0 0 60px rgba(239, 68, 68, 0.05);
+}
+
+/* ── Shimmer / Pulse ──────────────────────────────────────── */
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ── Background Orbs ──────────────────────────────────────── */
+
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.bg-orb-1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.04) 0%, transparent 70%);
+  top: -200px;
+  right: -200px;
+}
+
+.bg-orb-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(225, 29, 72, 0.03) 0%, transparent 70%);
+  bottom: -150px;
+  left: -150px;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* ── Utility ──────────────────────────────────────────────── */
+
+.transition-default {
+  transition: all 0.2s ease;
+}
+
+/* ── Chart tooltip ────────────────────────────────────────── */
+
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}

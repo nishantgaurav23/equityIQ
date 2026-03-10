@@ -91,7 +91,10 @@ class TestSettingsDefaults:
 
         # Clear all API keys that might be in .env
         for key in [
-            "GOOGLE_API_KEY", "POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY",
+            "GOOGLE_API_KEY",
+            "POLYGON_API_KEY",
+            "FRED_API_KEY",
+            "NEWS_API_KEY",
             "GCP_PROJECT_ID",
         ]:
             monkeypatch.delenv(key, raising=False)
