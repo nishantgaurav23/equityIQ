@@ -84,8 +84,10 @@ class TestGetTechnicalAnalysis:
         mock_yahoo = MagicMock()
         mock_yahoo.get_price_history = AsyncMock(return_value={})
 
-        with patch("agents.momentum_tracker.PolygonConnector", return_value=mock_polygon), \
-             patch("agents.momentum_tracker.YahooConnector", return_value=mock_yahoo):
+        with (
+            patch("agents.momentum_tracker.PolygonConnector", return_value=mock_polygon),
+            patch("agents.momentum_tracker.YahooConnector", return_value=mock_yahoo),
+        ):
             result = await get_technical_analysis("AAPL")
 
         assert result["rsi_14"] is None
@@ -105,8 +107,10 @@ class TestGetTechnicalAnalysis:
         mock_yahoo = MagicMock()
         mock_yahoo.get_price_history = AsyncMock(return_value={})
 
-        with patch("agents.momentum_tracker.PolygonConnector", return_value=mock_polygon), \
-             patch("agents.momentum_tracker.YahooConnector", return_value=mock_yahoo):
+        with (
+            patch("agents.momentum_tracker.PolygonConnector", return_value=mock_polygon),
+            patch("agents.momentum_tracker.YahooConnector", return_value=mock_yahoo),
+        ):
             result = await get_technical_analysis("AAPL")
 
         assert result["rsi_14"] is None
@@ -122,8 +126,10 @@ class TestGetTechnicalAnalysis:
         mock_yahoo = MagicMock()
         mock_yahoo.get_price_history = AsyncMock(return_value=_make_price_data())
 
-        with patch("agents.momentum_tracker.PolygonConnector", return_value=mock_polygon), \
-             patch("agents.momentum_tracker.YahooConnector", return_value=mock_yahoo):
+        with (
+            patch("agents.momentum_tracker.PolygonConnector", return_value=mock_polygon),
+            patch("agents.momentum_tracker.YahooConnector", return_value=mock_yahoo),
+        ):
             result = await get_technical_analysis("AAPL")
 
         assert result["rsi_14"] is not None
