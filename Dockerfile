@@ -1,4 +1,15 @@
-# Stage 1: Base -- runtime dependencies
+# Stage 1: Build frontend static assets
+FROM node:20-slim AS frontend-builder
+
+WORKDIR /frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY frontend/ .
+ENV NEXT_PUBLIC_API_URL=""
+RUN npm run build
+
+# -----------------------------------------------------------
+# Stage 2: Base -- Python runtime dependencies
 FROM python:3.12-slim AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -7,6 +18,9 @@ ENV PORT=8080
 
 WORKDIR /app
 
+# Install curl for healthcheck
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
 # Install runtime deps from pyproject.toml
 COPY pyproject.toml .
 RUN pip install --no-cache-dir .
@@ -14,8 +28,11 @@ RUN pip install --no-cache-dir .
 # Copy application source
 COPY . .
 
+# Copy built frontend static files
+COPY --from=frontend-builder /frontend/out /app/frontend_static
+
 # -----------------------------------------------------------
-# Stage 2: Dev -- adds testing and linting tools
+# Stage 3: Dev -- adds testing and linting tools
 FROM base AS dev
 
 RUN pip install --no-cache-dir ".[dev]"
@@ -23,7 +40,7 @@ RUN pip install --no-cache-dir ".[dev]"
 CMD ["python", "-m", "pytest", "tests/", "-v", "--tb=short"]
 
 # -----------------------------------------------------------
-# Stage 3: Prod -- minimal, secure, production-ready
+# Stage 4: Prod -- minimal, secure, production-ready
 FROM base AS prod
 
 # Create non-root user

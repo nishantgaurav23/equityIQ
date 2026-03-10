@@ -1,9 +1,13 @@
 """FastAPI application factory -- EquityIQ entry point."""
 
+import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from config import get_settings, setup_logging
 from config.logging import get_logger
@@ -27,8 +31,6 @@ async def health(request: Request) -> dict:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Async lifespan: startup and shutdown hooks."""
-    import os
-
     settings = get_settings()
     setup_logging(settings)
 
@@ -152,6 +154,32 @@ def create_app() -> FastAPI:
     from api.webhooks import router as webhook_router
 
     app.include_router(webhook_router)
+
+    # Serve Next.js static export in production
+    static_dir = Path(__file__).parent / "frontend_static"
+    if static_dir.is_dir():
+        # Serve static assets (_next/, images, etc.)
+        app.mount("/_next", StaticFiles(directory=static_dir / "_next"), name="next-assets")
+        if (static_dir / "images").is_dir():
+            app.mount("/images", StaticFiles(directory=static_dir / "images"), name="static-images")
+
+        # SPA catch-all: serve the correct HTML page or fallback to index.html
+        @app.get("/{path:path}", include_in_schema=False)
+        async def serve_frontend(path: str):
+            # Try exact file (e.g. favicon.ico)
+            file_path = static_dir / path
+            if file_path.is_file():
+                return FileResponse(file_path)
+            # Try path as a page (e.g. /chat -> /chat.html)
+            html_path = static_dir / f"{path}.html"
+            if html_path.is_file():
+                return FileResponse(html_path)
+            # Try path as directory index (e.g. /chat/ -> /chat/index.html)
+            index_path = static_dir / path / "index.html"
+            if index_path.is_file():
+                return FileResponse(index_path)
+            # Fallback to root index.html
+            return FileResponse(static_dir / "index.html")
 
     return app
 
