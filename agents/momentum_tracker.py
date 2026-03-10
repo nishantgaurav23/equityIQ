@@ -82,12 +82,22 @@ async def get_technical_analysis(ticker: str) -> dict:
     volume_trend, and price_momentum_score. On error, all values are None.
     """
     try:
+        price_data = None
+
         if is_indian_ticker(ticker):
             connector = YahooConnector()
+            price_data = await connector.get_price_history(ticker, days=250)
         else:
-            connector = PolygonConnector()
-
-        price_data = await connector.get_price_history(ticker, days=250)
+            # Try Polygon first; fall back to Yahoo on rate-limit or empty response
+            try:
+                connector = PolygonConnector()
+                price_data = await connector.get_price_history(ticker, days=250)
+            except Exception:
+                price_data = None
+            if not price_data or "prices" not in price_data:
+                logger.info("Polygon failed for %s, falling back to Yahoo Finance", ticker)
+                yahoo = YahooConnector()
+                price_data = await yahoo.get_price_history(ticker, days=250)
 
         if not price_data or "prices" not in price_data:
             return _empty_result()

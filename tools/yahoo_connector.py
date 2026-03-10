@@ -307,17 +307,17 @@ class YahooConnector:
         """Fetch price history for multiple tickers.
 
         Returns {ticker: {prices, volumes, dates, currency}} for each.
+        Runs sequentially because yfinance is synchronous and concurrent calls
+        can fail on resource-constrained environments (e.g. Cloud Run).
         """
-        import asyncio
-
-        results = await asyncio.gather(
-            *[self.get_price_history(t, days) for t in tickers],
-            return_exceptions=True,
-        )
         out: dict[str, dict] = {}
-        for ticker, result in zip(tickers, results):
-            if isinstance(result, dict) and result:
-                out[ticker] = result
+        for ticker in tickers:
+            try:
+                result = await self.get_price_history(ticker, days)
+                if isinstance(result, dict) and result:
+                    out[ticker] = result
+            except Exception:
+                logger.warning("Multi price history failed for %s", ticker)
         return out
 
 

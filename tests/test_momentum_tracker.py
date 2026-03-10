@@ -76,13 +76,16 @@ class TestGetTechnicalAnalysis:
 
     @pytest.mark.asyncio
     async def test_empty_prices(self):
-        """Test with empty price history from Polygon."""
+        """Test with empty price history from both Polygon and Yahoo fallback."""
         from agents.momentum_tracker import get_technical_analysis
 
-        mock_connector = MagicMock()
-        mock_connector.get_price_history = AsyncMock(return_value={})
+        mock_polygon = MagicMock()
+        mock_polygon.get_price_history = AsyncMock(return_value={})
+        mock_yahoo = MagicMock()
+        mock_yahoo.get_price_history = AsyncMock(return_value={})
 
-        with patch("agents.momentum_tracker.PolygonConnector", return_value=mock_connector):
+        with patch("agents.momentum_tracker.PolygonConnector", return_value=mock_polygon), \
+             patch("agents.momentum_tracker.YahooConnector", return_value=mock_yahoo):
             result = await get_technical_analysis("AAPL")
 
         assert result["rsi_14"] is None
@@ -94,17 +97,37 @@ class TestGetTechnicalAnalysis:
 
     @pytest.mark.asyncio
     async def test_polygon_error(self):
-        """Test Polygon connector raising an exception."""
+        """Test Polygon error triggers Yahoo fallback; both fail returns empty."""
         from agents.momentum_tracker import get_technical_analysis
 
-        mock_connector = MagicMock()
-        mock_connector.get_price_history = AsyncMock(side_effect=Exception("API down"))
+        mock_polygon = MagicMock()
+        mock_polygon.get_price_history = AsyncMock(side_effect=Exception("API down"))
+        mock_yahoo = MagicMock()
+        mock_yahoo.get_price_history = AsyncMock(return_value={})
 
-        with patch("agents.momentum_tracker.PolygonConnector", return_value=mock_connector):
+        with patch("agents.momentum_tracker.PolygonConnector", return_value=mock_polygon), \
+             patch("agents.momentum_tracker.YahooConnector", return_value=mock_yahoo):
             result = await get_technical_analysis("AAPL")
 
         assert result["rsi_14"] is None
         assert result["price_momentum_score"] is None
+
+    @pytest.mark.asyncio
+    async def test_polygon_error_yahoo_fallback_succeeds(self):
+        """Test Polygon error triggers Yahoo fallback which returns valid data."""
+        from agents.momentum_tracker import get_technical_analysis
+
+        mock_polygon = MagicMock()
+        mock_polygon.get_price_history = AsyncMock(side_effect=Exception("rate limited"))
+        mock_yahoo = MagicMock()
+        mock_yahoo.get_price_history = AsyncMock(return_value=_make_price_data())
+
+        with patch("agents.momentum_tracker.PolygonConnector", return_value=mock_polygon), \
+             patch("agents.momentum_tracker.YahooConnector", return_value=mock_yahoo):
+            result = await get_technical_analysis("AAPL")
+
+        assert result["rsi_14"] is not None
+        assert result["price_momentum_score"] is not None
 
     @pytest.mark.asyncio
     async def test_rsi_calculation(self):
